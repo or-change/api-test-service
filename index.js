@@ -36,9 +36,9 @@ exports.create = function Product(options) {
 
 	options.plugins.forEach(install => install(context));
 
-	const server = Server(options.server, component.routers);
+	const app = Server(options.server, component.routers);
 	
-	server.context.$product = {
+	app.context.$product = {
 		reporter: component.reporter,
 		source: component.source,
 		executer: component.executer
@@ -46,6 +46,6 @@ exports.create = function Product(options) {
 
 	return {
 		webpack,
-		callback: server.callback()
+		callback: app.callback()
 	};
 };

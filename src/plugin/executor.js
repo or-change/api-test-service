@@ -1,27 +1,33 @@
 const EventEmitter = require('events');
 
-module.exports = function Executor(options) {
-	const { scan, start } = options;
+function normalize(options) {
 
-	class Executor extends EventEmitter {
-		constructor(options) {
-			super();
+}
 
-			this.source = {
-				path: options.path
-			};
-		}
+module.exports = function ExecutorProvider(originOptions) {
+	const { progress, start } = normalize(originOptions);
 
-		async scan() {
-			return await scan(this.source);
-		}
+	return function Executor(source) {
+		const Executor = new EventEmitter();
 
-		async start() {
-			return await start(this.source);
-		}
-	}
+		(async function() {
+			const total = await start(source);
 
-	return {
+			Executor.emit('start', total);
+
+			(async function getProgress() {
+				const ended = await progress.get();
+	
+				Executor.emit('progress', ended);
+	
+				if (ended < total) {
+					setTimeout(getProgress, progress.cycle);
+				} else {
+					Executor.emit('end');
+				}
+			}());
+		}());
 		
+		return Executor;
 	};
 };
