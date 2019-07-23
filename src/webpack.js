@@ -1,15 +1,30 @@
 const path = require('path');
 const VueLoaderPlugin = require('vue-loader/lib/plugin');
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
-const BABEL_CONFIG = {
-
+const BABEL_OPTIONS = {
+	presets: [
+		[
+			'@babel/env',
+			{
+				targets: {
+					ie: '9'
+				}
+			},
+		],
+	],
+	plugins: [
+		'@babel/transform-runtime'
+	]
 };
 
 module.exports = function WebpackBase(entryList, publicPath) {
 	return {
 		entry: {
-			bundle: entryList
+			bundle: [
+				path.resolve(__dirname, '../app/product.js')
+			].concat(entryList).concat([
+				path.resolve(__dirname, '../app/index.js')
+			])
 		},
 		output: {
 			filename: '[name].js',
@@ -33,13 +48,13 @@ module.exports = function WebpackBase(entryList, publicPath) {
 				},
 				{
 					test: /\.js$/,
-					exclude: /node_module/,
-					loader: 'babel-loader'
-				},
-				{
-					test: /\.js$/,
-					include: /fabric-ui/,
-					loader: 'babel-loader'
+					exclude(file) {
+						return /node_module/.test(file) && !/fabric/.test(file);
+					},
+					use: {
+						loader: 'babel-loader',
+						options: BABEL_OPTIONS
+					}
 				},
 				{
 					test: /\.(eot|woff|woff2|svg|ttf)$/,
@@ -47,11 +62,18 @@ module.exports = function WebpackBase(entryList, publicPath) {
 				},
 				{
 					test: /\.scss$/,
-					loader: ExtractTextPlugin.extract(['css-loader', 'sass-loader'])
+					use: [
+						'vue-style-loader',
+						'css-loader',
+						'sass-loader'
+					]
 				},
 				{
 					test: /\.css$/,
-					loader: ExtractTextPlugin.extract(['css-loader'])
+					use: [
+						'vue-style-loader',
+						'css-loader'
+					]
 				}
 			]
 		},

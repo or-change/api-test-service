@@ -6,7 +6,7 @@ module.exports = {
 				type: 'object',
 				properties: {
 					abstract: { type: 'model', symbol: 'ReportAbstract' },
-					body: { type: 'blob' }
+					// body: { type: 'blob' }
 				}
 			},
 			methods: {

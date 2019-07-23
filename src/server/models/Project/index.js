@@ -43,6 +43,14 @@ module.exports = Object.assign({
 
 				}
 			}
-		}
+		};
+	},
+	ProjectAbstract() {
+		return {
+			schemas: {
+				type: 'array',
+				items: { type: 'model', symbol: 'Project' }
+			}
+		};
 	}
 }, require('./Version'))

@@ -1,14 +1,36 @@
 const Webpack = require('./src/webpack');
 const Server = require('./src/server');
-const merge = require('webpack-merge');
 
 const Source = require('./src/plugin/source');
 const Reporter = require('./src/plugin/reporter');
 const Executer = require('./src/plugin/executor');
 
-exports.create = function Product(options) {
-	const webpack = Webpack();
-	
+const path = require('path');
+
+function normalize(options) {
+	return {
+		plugins: [],
+		server: {
+			model: {
+				store: {
+					pattern: {
+						hash: /.*/
+					}
+				}
+			},
+			Session(app) {
+
+			},
+			serve: {
+				path: path.resolve()
+			}
+		}
+	};
+}
+
+exports.create = function Product(originOptions) {
+	const options = normalize(originOptions);
+
 	const component = {
 		source: {},
 		reporter: {},
@@ -43,6 +65,8 @@ exports.create = function Product(options) {
 		source: component.source,
 		executer: component.executer
 	};
+
+	const webpack = Webpack(component.entryList);
 
 	return {
 		webpack,

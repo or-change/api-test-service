@@ -13,7 +13,7 @@ module.exports = function Server(options, pluginRouters) {
 		prefix: '/api'
 	}).use(baseRouter.routes());
 
-	app.context.$Model = Model(options.store);
+	app.context.$Model = Model(options.model);
 	app.context.$session = options.Session(app);
 
 	app.use(bodyparser());

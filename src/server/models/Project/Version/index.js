@@ -1,31 +1,31 @@
 module.exports = Object.assign({
-	Version: function Version() {
+	Version() {
 		return {
-			symbol: 'Version',
 			schemas: {
 				type: 'object',
 				properties: {
 					abstract: { type: 'model', symbol: 'VersionAbstract' },
 					sturcture: { type: 'model', symbol: 'CaseTree' },
-					achievement: { type: 'blob' },
+					// achievement: { type: 'blob' },
 					executions: { type: 'model', symbol: 'ExecutionAbstractList' },
 				}
 			}
 		}
 	},
-	VersionAbstract: function VersionAbstract(options) {
+	VersionAbstract(options) {
 		return {
-			symbol: 'VersionAbstract',
 			schemas: {
-				hash: { type: 'string', pattern: options.pattern.hash },
-				semver: { type: 'string' },
-				createdAt: { type: 'date' }
+				type: 'object',
+				properties: {
+					hash: { type: 'string', pattern: options.pattern.hash },
+					semver: { type: 'string' },
+					createdAt: { type: 'date' }
+				}
 			}
 		}
 	},
-	VersionAbstractList: function VersionAbstractList() {
+	VersionAbstractList() {
 		return {
-			symbol: 'VersionAbstractList',
 			schemas: {
 				type: 'array',
 				items: { type: 'model', symbol: 'VersionAbstract' }

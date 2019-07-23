@@ -6,16 +6,53 @@ export default function install(Vue) {
 	});
 
 	Vue.$http = Vue.prototype.$http = {
+		product: {
+			async get() {
+				const { data: product } = await agent.post('/product');
+
+				return product;
+			}
+		},
 		principal: {
-			signin() {
+			async signin(credential) {
+				const { type, body } = credential;
 
+				const { data: principal } = await agent.post('/session/account', body, {
+					params: { type }
+				});
+
+				return principal;
 			},
-			update() {
+			async signout() {
+				await agent.delete('/session/account');
+			},
+			async get() {
+				const { data: product } = await agent.get('/session/account');
 
+				return product;
+			},
+			update(account) {
+				return agent.put('/session/account', account);
 			}
 		},
 		admin: {
-			
+			overview: {
+
+			},
+			project: {
+				get(projectId) {
+
+				},
+				query(filter) {
+
+				},
+				assign(projectId, accountId) {
+
+				}
+			},
+			version: {
+
+			}
 		},
 		project: {
 			create() {

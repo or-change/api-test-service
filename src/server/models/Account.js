@@ -8,5 +8,15 @@ module.exports = {
 				}
 			}
 		}
+	},
+	AccountAbstract() {
+		return {
+			schemas: {
+				type: 'object',
+				properties: {
+					
+				}
+			}
+		}
 	}
-}
+};

@@ -8,7 +8,7 @@ module.exports = Object.assign({
 						type: 'object',
 						properties: {
 							caseLength: {
-								type: 'mumber',
+								type: 'number',
 								range: [{ gt: { value: 0, equal: true } }]
 							},
 							versionId: {

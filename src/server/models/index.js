@@ -11,7 +11,10 @@ module.exports = function Model(options) {
 	const models = {};
 
 	for (const symbol in ModelMapping) {
-		models[symbol] = ModelMapping[symbol](store);
+		const options = ModelMapping[symbol](store);
+
+		options.symbol = symbol;
+		models[symbol] = options;
 	}
 
 	const hub = DataHub.create({

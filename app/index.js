@@ -1,13 +1,15 @@
 import Vue from 'vue';
+import '@or-change/fabric-ui-font';
 import FibricUi from '@or-change/fabric-ui';
 import FibricUiWeb from '@or-change/fabric-ui-web';
-
-import * as product from './product';
+import http from './plugins/http';
 
 Vue.use(FibricUi);
 Vue.use(FibricUiWeb);
+Vue.use(http);
 
 import Router from './router';
+import store from './store';
 
 const productContext = {
 	routerOptions: [],
@@ -19,6 +21,8 @@ const productContext = {
 	},
 	beforeAppMountHandler: []
 };
+
+import * as product from './product';
 
 product.installerList.forEach(installer => {
 	return installer({
@@ -47,6 +51,7 @@ product.installerList.forEach(installer => {
 Vue.prototype.$product = productContext.component;
 
 const app = new Vue({
+	store,
 	router: Router(productContext.routerOptions)
 });
 
