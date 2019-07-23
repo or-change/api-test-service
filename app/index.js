@@ -8,9 +8,6 @@ Vue.use(FibricUi);
 Vue.use(FibricUiWeb);
 Vue.use(http);
 
-import Router from './router';
-import store from './store';
-
 const productContext = {
 	routerOptions: [],
 	component: {
@@ -50,9 +47,42 @@ product.installerList.forEach(installer => {
 
 Vue.prototype.$product = productContext.component;
 
-const app = new Vue({
-	store,
-	router: Router(productContext.routerOptions)
+import App from './components/App';
+import Router from './router';
+import store from './store';
+
+const router = Router(productContext.routerOptions);
+
+router.beforeEach((to, from, next) => {
+	if (to.matched.length === 0) {
+		return next('/workbench/portal');
+	}
+
+	store.dispatch('authenticate').finally(() => {
+		const signedIn = store.state.signedIn;
+	
+		if (signedIn) {
+			if (to.matched.find(match => match.meta.unauthencated === true)) {
+				return next('/');
+			}
+		} else {
+			if (to.matched.find(match => match.meta.authencated === true)) {
+				return next('/signin');
+			}
+		}
+		
+		next();
+	});
 });
 
+const app = new Vue({ store, router, render: h => h(App) });
+
 productContext.beforeAppMountHandler.forEach(handler => handler(app));
+window.addEventListener('load', async function () {
+	const { $http } = Vue;
+	const product = await $http.product.get();
+
+	document.title = product.name;
+
+	app.$mount('#app');
+});

@@ -3,29 +3,49 @@ import VueRouter from 'vue-router';
 
 Vue.use(VueRouter);
 
+import SignIn from './components/pages/SignIn';
+import Workbench from './components/pages/Workbench';
+import WorkbenchPortal from './components/pages/workbench/Portal';
+
 export default function Router(pluginRouterOptions) {
-	return new VueRouter({
+	const router = new VueRouter({
+		fallback: true,
 		routes: [
 			{
-				path: '/signin'
+				path: '/',
+				redirect: '/workbench/portal'
+			},
+			{
+				path: '/signin',
+				component: SignIn,
+				meta: {
+					unauthencated: false
+				},
 			},
 			{
 				path: '/workbench',
+				meta: {
+					authencated: true
+				},
+				component: Workbench,
 				children: [
 					{
-						path: '/portal'
+						path: 'portal',
+						component: WorkbenchPortal
 					},
 					{
-						path: '/project'
+						path: 'project'
 					},
 					{
-						path: '/version'
+						path: 'version'
 					},
 					{
-						path: '/plugin'
+						path: 'plugin'
 					}
 				].concat(pluginRouterOptions)
-			}
-		]
+			},
+		],
 	});
+
+	return router;
 }

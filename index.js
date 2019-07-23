@@ -1,32 +1,12 @@
+const path = require('path');
+
 const Webpack = require('./src/webpack');
 const Server = require('./src/server');
 
 const Source = require('./src/plugin/source');
 const Reporter = require('./src/plugin/reporter');
 const Executer = require('./src/plugin/executor');
-
-const path = require('path');
-
-function normalize(options) {
-	return {
-		plugins: [],
-		server: {
-			model: {
-				store: {
-					pattern: {
-						hash: /.*/
-					}
-				}
-			},
-			Session(app) {
-
-			},
-			serve: {
-				path: path.resolve()
-			}
-		}
-	};
-}
+const normalize = require('./src/normalize');
 
 exports.create = function Product(originOptions) {
 	const options = normalize(originOptions);
@@ -61,6 +41,7 @@ exports.create = function Product(originOptions) {
 	const app = Server(options.server, component.routers);
 	
 	app.context.$product = {
+		name: options.product.name,
 		reporter: component.reporter,
 		source: component.source,
 		executer: component.executer

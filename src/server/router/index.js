@@ -6,7 +6,15 @@ module.exports = [
 	require('./project')
 ].reduce((base, router) => {
 	return base.use(router.routes());
-}, new Router().post('/session/account', async ctx => {
+}, new Router().get('/product', ctx => {
+	ctx.body = {
+		name: ctx.$product.name,
+		version: {
+			core: '0.0.0',
+			product: '1.0.0'
+		}
+	};
+}).post('/session/account', async ctx => {
 	const principal = await ctx.$session.authenticate(ctx);
 
 	if (!principal) {
@@ -24,8 +32,8 @@ module.exports = [
 	ctx.account = principal.account;
 
 	return next();
+}).get('/session/account', async ctx => {
+	ctx.body = ctx.principal;
 }).delete('/session/account', async ctx => {
 	ctx.body = await ctx.$session.destroy(ctx);
-}).get('/session/account', async ctx => {
-	ctx.body = ctx.session;
 }));

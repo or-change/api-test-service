@@ -6,7 +6,7 @@ Vue.use(Vuex);
 export default new Vuex.Store({
 	strict: true,
 	state: {
-		signedin: false,
+		signedIn: false,
 		principal: {
 			administrator: false,
 			name: null
@@ -14,7 +14,7 @@ export default new Vuex.Store({
 	},
 	actions: {
 		async signin({ commit }, credential) {
-			const { data: principal } = await Vue.$http.signin(credential);
+			const { data: principal } = await Vue.$http.principal.signin(credential);
 
 			commit('assignPrincipal', {
 				name: principal.name,
@@ -22,11 +22,11 @@ export default new Vuex.Store({
 			});
 		},
 		async signout({ commit }) {
-			Vue.$http.signout();
+			Vue.$http.principal.signout();
 			commit('resetPrincipal');
 		},
 		async authenticate({ commit }) {
-			const { data: principal } = await Vue.$http.get();
+			const { data: principal } = await Vue.$http.principal.get();
 
 			commit('assignPrincipal', {
 				name: principal.name,
@@ -38,12 +38,12 @@ export default new Vuex.Store({
 		assignPrincipal(state, principal) {
 			const { administrator, name } = principal;
 
-			state.signedin = true;
+			state.signedIn = true;
 			state.principal.administrator = administrator;
 			state.principal.name = name;
 		},
 		resetPrincipal(state) {
-			state.signedin = false;
+			state.signedIn = false;
 			state.principal.administrator = false;
 			state.principal.name = null;
 		}

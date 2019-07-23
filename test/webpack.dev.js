@@ -6,9 +6,10 @@ const { webpack: base } = require('./product');
 
 module.exports = merge(base, {
 	mode: 'development',
+	devtool: '#inline-source-map',
 	devServer: {
 		proxy: {
-			'^/api': `http://localhost:${config.server.port}`
+			'/api': `http://localhost:${config.server.port}`
 		},
 		port: config.devServer.port
 	},

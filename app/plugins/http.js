@@ -8,7 +8,7 @@ export default function install(Vue) {
 	Vue.$http = Vue.prototype.$http = {
 		product: {
 			async get() {
-				const { data: product } = await agent.post('/product');
+				const { data: product } = await agent.get('/product');
 
 				return product;
 			}
