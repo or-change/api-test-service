@@ -5,7 +5,7 @@ module.exports = {
 				type: 'object',
 				properties: {
 					abstract: { type: 'model', symbol: 'ExecutionAbstract' },
-					version: { type: 'model', symbol: 'VersionAbstract' },
+					version: { type: 'model', symbol: 'SourceAbstract' },
 					project: { type: 'model', symbol: 'ProjectAbstract' },
 					report: { type: 'model', symbol: 'Report' }
 				},
@@ -19,7 +19,7 @@ module.exports = {
 
 				}
 			}
-		}
+		};
 	},
 	ExecutionAbstract(options) {
 		return {
@@ -39,7 +39,7 @@ module.exports = {
 					mode: { type: 'object' } //TODO
 				}
 			}
-		}
+		};
 	},
 	ExecutionAbstractList() {
 		return {
@@ -57,6 +57,6 @@ module.exports = {
 
 				}
 			}
-		}
+		};
 	}
-}
+};

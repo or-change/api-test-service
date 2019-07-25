@@ -1,4 +1,4 @@
-module.exports = Object.assign({
+module.exports = {
 	Project(options) {
 		return {
 			schemas: {
@@ -27,7 +27,7 @@ module.exports = Object.assign({
 
 				}
 			}
-		}
+		};
 	},
 	ProjectList() {
 		return {
@@ -53,4 +53,4 @@ module.exports = Object.assign({
 			}
 		};
 	}
-}, require('./Version'))
+};

@@ -1,7 +1,6 @@
 module.exports = {
-	Report: function Report() {
+	Report() {
 		return {
-			symbol: 'Report',
 			schemas: {
 				type: 'object',
 				properties: {
@@ -11,14 +10,14 @@ module.exports = {
 			},
 			methods: {
 				async create(payload) {
-					const {} = payload;
+					// const {} = payload;
 
 				},
 				async update() {
 
 				}
 			}
-		}
+		};
 	},
 	ReportAbstract(options) {
 		return {
@@ -31,6 +30,6 @@ module.exports = {
 				},
 				allowNull: ['name']
 			}
-		}
+		};
 	}
 };

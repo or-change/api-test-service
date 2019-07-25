@@ -37,7 +37,7 @@ export default function Router(pluginRouterOptions) {
 						path: 'project'
 					},
 					{
-						path: 'version'
+						path: 'source'
 					},
 					{
 						path: 'plugin'

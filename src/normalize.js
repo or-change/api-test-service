@@ -4,17 +4,14 @@ const path = require('path');
 module.exports = function normalizeOptions(options) {
 	const finalOptions = {
 		product: {
-			name: 'API Testing Management Default Name',
+			name: 'API Testing Service Default Name',
 			version: '0.0.0'
 		},
-		plugins: [],
 		server: {
-			model: {
-				store: {
-					pattern: {
-						hash: /.*/
-					}
-				}
+			Authorize(symbol) {
+				return async (ctx, next) => {
+					return next();
+				};
 			},
 			Session(app) {
 				app.keys = [Math.random().toString(16).substr(2, 8)];
@@ -52,9 +49,20 @@ module.exports = function normalizeOptions(options) {
 			serve: {
 				path: path.resolve('.public'),
 				maxage: 0,
-				setHeaders: null
+				setHeaders: null,
+				gzip: true
+			},
+			model: {
+				id: 'orchange',
+				pattern: {
+					hash: /.*/
+				},
+				methods: {
+					
+				}
 			}
-		}
+		},
+		plugins: [],
 	};
 	
 	// const {
