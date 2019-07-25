@@ -21,6 +21,7 @@ module.exports = function WebpackBase(entryList, publicPath) {
 	return {
 		entry: {
 			bundle: [
+				'@babel/polyfill/dist/polyfill.min.js',
 				path.resolve(__dirname, '../app/product.js')
 			].concat(entryList).concat([
 				path.resolve(__dirname, '../app/index.js')

@@ -17,22 +17,22 @@ export default function install(Vue) {
 			async signin(credential) {
 				const { type, body } = credential;
 
-				const { data: principal } = await agent.post('/session/account', body, {
+				const { data: principal } = await agent.post('/session/principal', body, {
 					params: { type }
 				});
 
 				return principal;
 			},
 			async signout() {
-				await agent.delete('/session/account');
+				await agent.delete('/session/principal');
 			},
 			async get() {
-				const { data: product } = await agent.get('/session/account');
+				const { data: principal } = await agent.get('/session/principal');
 
-				return product;
+				return principal;
 			},
 			update(account) {
-				return agent.put('/session/account', account);
+				return agent.put('/session/principal', account);
 			}
 		},
 		admin: {

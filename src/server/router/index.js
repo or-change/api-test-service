@@ -4,7 +4,9 @@ const AccountRouter = require('./account');
 const AdminRouter = require('./admin');
 const ProjectRouter = require('./project');
 
-module.exports = function BaseRouter(Authorize) {
+module.exports = function BaseRouter(Middleware) {
+	const { Authorize, Authenticate } = Middleware;
+	
 	const router = {
 		project: ProjectRouter(Authorize),
 		admin: AdminRouter(Authorize),
@@ -16,37 +18,28 @@ module.exports = function BaseRouter(Authorize) {
 			ctx.body = {
 				name: ctx.$product.name,
 				version: {
+					product: ctx.$product.version,
 					core: '0.0.0',
-					product: '1.0.0'
 				}
 			};
 		})
-		.post('/session/account', Authorize('session.signin'), async ctx => {
-			const principal = await ctx.$session.authenticate(ctx);
-		
-			if (!principal) {
-				return ctx.throw(401);
+		.post('/session/principal',
+			Authorize('session.signin'),
+			Authenticate(),
+			ctx => ctx.body = ctx.principal
+		)
+		.use(Authenticate())
+		.get('/session/principal',
+			Authorize('session.account'),
+			ctx => ctx.body = ctx.principal
+		)
+		.delete('/session/principal',
+			Authorize('session.signout'),
+			async ctx => {
+				ctx.body = ctx.principal;
+				await ctx.$session.destroy(ctx);
 			}
-		
-			ctx.body = principal.account;
-		})
-		.use(async (ctx, next) => {
-			const principal = await ctx.$session.getPrincipal(ctx);
-		
-			if (!principal) {
-				return ctx.throw(403);
-			}
-		
-			ctx.account = principal.account;
-		
-			return next();
-		})
-		.get('/session/account', Authorize('session.account'), async ctx => {
-			ctx.body = ctx.principal;
-		})
-		.delete('/session/account', Authorize('session.signout'), async ctx => {
-			ctx.body = await ctx.$session.destroy(ctx);
-		})
+		)
 		.use(router.project.routes())
 		.use(router.admin.routes())
 		.use(router.account.routes());

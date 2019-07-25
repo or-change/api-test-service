@@ -6,6 +6,8 @@ Vue.use(VueRouter);
 import SignIn from './components/pages/SignIn';
 import Workbench from './components/pages/Workbench';
 import WorkbenchPortal from './components/pages/workbench/Portal';
+import WorkbenchSource from './components/pages/workbench/Source';
+import WorkbenchProject from './components/pages/workbench/Project';
 
 export default function Router(pluginRouterOptions) {
 	const router = new VueRouter({
@@ -34,10 +36,12 @@ export default function Router(pluginRouterOptions) {
 						component: WorkbenchPortal
 					},
 					{
-						path: 'project'
+						path: 'project',
+						component: WorkbenchProject
 					},
 					{
-						path: 'source'
+						path: 'source',
+						component: WorkbenchSource
 					},
 					{
 						path: 'plugin'

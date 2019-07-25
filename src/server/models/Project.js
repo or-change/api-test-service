@@ -33,7 +33,7 @@ module.exports = {
 		return {
 			schemas: {
 				type: 'array',
-				items: { type: 'model', symbol: 'Project' }
+				items: { type: 'model', symbol: 'ProjectAbstract' }
 			},
 			methods: {
 				async query() {
@@ -45,11 +45,19 @@ module.exports = {
 			}
 		};
 	},
-	ProjectAbstract() {
+	ProjectAbstract(options) {
 		return {
 			schemas: {
-				type: 'array',
-				items: { type: 'model', symbol: 'Project' }
+				type: 'object',
+				properties: {
+					hash: { type: 'string', pattern: options.pattern.hash },
+					name: { type: 'string', pattern: options.pattern.projectName },
+					owner: { type: 'model', symbol: 'AccountAbstract' },
+					collaborators: {
+						type: 'array',
+						items: { type: 'model', symbol: 'AccountAbstract' }
+					}
+				}
 			}
 		};
 	}

@@ -26,11 +26,11 @@ export default new Vuex.Store({
 			commit('resetPrincipal');
 		},
 		async authenticate({ commit }) {
-			const { data: principal } = await Vue.$http.principal.get();
+			const principal = await Vue.$http.principal.get();
 
 			commit('assignPrincipal', {
-				name: principal.name,
-				administrator: principal.administrator
+				name: principal.account.name,
+				administrator: principal.account.administrator
 			});
 		}
 	},

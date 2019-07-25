@@ -1,0 +1,19 @@
+#app-product-mask {
+	display: none;
+	position: fixed;
+	width: 100%;
+	height: 100%;
+	top: 0;
+	left: 0;
+	z-index: 999999;
+	background: #fff;
+	opacity: 0.05; /* For IE9 */
+}
+
+#app-product-mask.blocked {
+	display: block;
+}
+
+#app-product-mask.blocked.long-blocked {
+	opacity: 0.5;
+}
