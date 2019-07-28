@@ -10,13 +10,16 @@ Vue.use(FibricUi, { size: 'sm' });
 Vue.use(FibricUiWeb);
 Vue.use(http);
 
-const productContext = {
+import SignIn from './components/pages/SignIn';
+
+const context = {
 	routerOptions: [],
-	component: {
+	product: {
 		source: {},
 		executor: {},
 		scanner: {},
-		reporter: {}
+		reporter: {},
+		SignIn
 	},
 	beforeAppMountHandler: []
 };
@@ -27,7 +30,7 @@ product.installerList.forEach(installer => {
 	return installer({
 		router: {
 			add(options) {
-				productContext.routerOptions.push(options);
+				context.routerOptions.push(options);
 			}
 		},
 		source: {
@@ -42,18 +45,18 @@ product.installerList.forEach(installer => {
 
 		},
 		beforeAppMount(handler) {
-			productContext.beforeAppMountHandler.push(handler);
+			context.beforeAppMountHandler.push(handler);
 		}
 	});
 });
 
-Vue.prototype.$product = productContext.component;
+Vue.prototype.$product = context.product;
 
 import App from './components/App';
 import Router from './router';
 import store from './store';
 
-const router = Router(productContext.routerOptions);
+const router = Router(context.routerOptions);
 const mask = document.createElement('div');
 
 mask.id = 'app-product-mask';
@@ -91,7 +94,7 @@ router.beforeEach((to, from, next) => {
 
 const app = new Vue({ store, router, render: h => h(App) });
 
-productContext.beforeAppMountHandler.forEach(handler => handler(app));
+context.beforeAppMountHandler.forEach(handler => handler(app));
 window.addEventListener('load', async function () {
 	document.body.append(mask);
 

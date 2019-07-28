@@ -1,9 +1,8 @@
 <template>
 
 <div>
-	我所有的项目
+插件管理页面
 
-	modal项目创建
 </div>
 
 </template>

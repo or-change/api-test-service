@@ -6,36 +6,38 @@ module.exports = {
 			schemas: {
 				type: 'object',
 				properties: {
-					abstract: { type: 'model', symbol: 'SourceAbstract' },
+					id: { type: 'string' },
+					semver: { type: 'string' },
+					createdAt: { type: 'date' },
 					sturcture: { type: 'model', symbol: 'CaseTree' },
-					// achievement: { type: 'blob' },
 					executions: { type: 'model', symbol: 'ExecutionAbstractList' },
 				}
 			},
-			
-		};
-	},
-	SourceAbstractList() {
-		return {
-			schemas: {
-				type: 'array',
-				items: { type: 'model', symbol: 'SourceAbstract' }
-			},
 			methods: {
-				query() {
+				async create() {
+
+				},
+				async query() {
+
+				},
+				async update() {
+
+				},
+				async delete() {
 
 				}
 			}
 		};
 	},
-	SourceAbstract(options) {
+	SourceList() {
 		return {
 			schemas: {
-				type: 'object',
-				properties: {
-					hash: { type: 'string', pattern: options.pattern.hash },
-					semver: { type: 'string' },
-					createdAt: { type: 'date' }
+				type: 'array',
+				items: { type: 'model', symbol: 'Source' }
+			},
+			methods: {
+				async query() {
+
 				}
 			}
 		};

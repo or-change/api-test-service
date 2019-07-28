@@ -14,7 +14,7 @@ export default new Vuex.Store({
 	},
 	actions: {
 		async signin({ commit }, credential) {
-			const { data: principal } = await Vue.$http.principal.signin(credential);
+			const principal = await Vue.$http.principal.signin(credential);
 
 			commit('assignPrincipal', {
 				name: principal.name,

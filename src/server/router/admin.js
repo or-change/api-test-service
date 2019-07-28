@@ -1,6 +1,8 @@
 const Router = require('koa-router');
 
-module.exports = function AdminRouter(Authorize) {
+module.exports = function AdminRouter(Middleware) {
+	const { Authorize } = Middleware;
+
 	return new Router({ prefix: '/admin' })
 		.use(Authorize('admin.system'))
 		.get('/overview', ctx => {

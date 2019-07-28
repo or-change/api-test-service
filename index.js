@@ -1,14 +1,13 @@
-const path = require('path');
-
 const Webpack = require('./src/webpack');
 const Server = require('./src/server');
+const _package = require('./package.json');
 
 const Source = require('./src/plugin/source');
 const Reporter = require('./src/plugin/reporter');
 const Executer = require('./src/plugin/executor');
 const normalize = require('./src/normalize');
 
-exports.create = function Product(originOptions) {
+exports.create = function Product(originOptions, callback = () => {}) {
 	const options = normalize(originOptions);
 
 	const component = {
@@ -29,19 +28,27 @@ exports.create = function Product(originOptions) {
 		executer(name, options) {
 			component.executer[name] = new Executer(options);
 		},
-		router: {
-			append(router) {
-				component.routers.push(router);
-			}
+		scanner(name, options) {
+
+		},
+		router(router) {
+			component.routers.push(router);
 		}
 	};
 
 	options.plugins.forEach(install => install(context));
+	callback(context);
 
 	const app = Server(options.server, component.routers);
 	
 	app.context.$product = {
-		name: options.product.name,
+		core: {
+			version: _package.version
+		},
+		abstract: {
+			name: options.product.name,
+			version: options.product.version,
+		},
 		reporter: component.reporter,
 		source: component.source,
 		executer: component.executer

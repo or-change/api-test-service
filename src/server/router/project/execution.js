@@ -1,8 +1,9 @@
 const Router = require('koa-router');
 const ReportRouter = require('./report');
 
-module.exports = function ExecutionRouter(Authorize) {
-	const reportRouter = ReportRouter(Authorize);
+module.exports = function ExecutionRouter(Middleware) {
+	const { Authorize } = Middleware;
+	const reportRouter = ReportRouter(Middleware);
 
 	return new Router({ prefix: '/execution' })
 		.get('/', Authorize('execution.query'), async ctx => {

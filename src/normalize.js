@@ -3,7 +3,7 @@ const path = require('path');
 
 module.exports = function normalizeOptions(options) {
 	const UNTRUSTED_PRINCIPAL = {
-		credential: 'untrusted',
+		credential: 'mock',
 		authenticatedAt: new Date(),
 		account: {
 			id: '0000000',
@@ -17,13 +17,12 @@ module.exports = function normalizeOptions(options) {
 	const finalOptions = {
 		product: {
 			name: 'API Testing Service Default Name',
-			version: '0.0.0'
+			version: '0.0.0',
+			namespace: 'octs'
 		},
 		server: {
 			authenticate(ctx) {
-				ctx.principal = ctx.$session.get('principal') || UNTRUSTED_PRINCIPAL;
-	
-				return true;
+				return UNTRUSTED_PRINCIPAL;
 			},
 			authorize(symbol, ctx) {
 				return true;
@@ -53,9 +52,7 @@ module.exports = function normalizeOptions(options) {
 				pattern: {
 					hash: /.*/
 				},
-				methods: {
-					
-				}
+				store: {}
 			}
 		},
 		plugins: [],

@@ -7,7 +7,7 @@
 	left: 0;
 	z-index: 999999;
 	background: #fff;
-	opacity: 0.05; /* For IE9 */
+	opacity: 0.01; /* For IE9 */
 }
 
 #app-product-mask.blocked {

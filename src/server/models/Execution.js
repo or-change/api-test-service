@@ -6,7 +6,7 @@ module.exports = {
 				properties: {
 					abstract: { type: 'model', symbol: 'ExecutionAbstract' },
 					version: { type: 'model', symbol: 'SourceAbstract' },
-					project: { type: 'model', symbol: 'ProjectAbstract' },
+					project: { type: 'model', symbol: 'Project' },
 					report: { type: 'model', symbol: 'Report' }
 				},
 				allowNull: ['report']

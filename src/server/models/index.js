@@ -6,14 +6,30 @@ const Exection = require('./Execution');
 const Source = require('./Source');
 const Report = require('./Report');
 
-const ModelMapping = Object.assign({}, Account, Project, Exection, Source, Report);
+const ModelMapping = Object.assign({
+	Product() {
+		return {
+			schemas: {
+				type: 'object'
+			},
+			methods: {
+				async query() {
 
-module.exports = function Model(options) {
+				},
+				async update() {
+					
+				}
+			}
+		};
+	}
+}, Account, Project, Exection, Source, Report);
+
+module.exports = function Model(options, product) {
 	const { org: name } = options;
 	const models = {};
 
 	for (const symbol in ModelMapping) {
-		const modelOptions = ModelMapping[symbol](options);
+		const modelOptions = ModelMapping[symbol](options, product);
 
 		modelOptions.symbol = symbol;
 		models[symbol] = modelOptions;

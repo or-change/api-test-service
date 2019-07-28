@@ -1,6 +1,6 @@
 const Koa = require('koa');
 const Router = require('koa-router');
-const bodyparser = require('koa-bodyparser');
+const koaBody = require('koa-body');
 const serve = require('koa-static');
 const path = require('path');
 
@@ -17,11 +17,12 @@ module.exports = function Server(options, pluginRouters) {
 			};
 		},
 		Authenticate() {
-			return async function authenticate(ctx, next) {
-				if (await options.authenticate(ctx)) {
-					ctx.$session.set('principal', ctx.principal);
+			return async function authenticate(ctx) {
+				const principal = await options.authenticate(ctx);
 
-					return next();
+				if (principal) {
+					await ctx.$session.set('principal', principal);
+					ctx.body = principal;
 				}
 			};
 		}
@@ -31,7 +32,7 @@ module.exports = function Server(options, pluginRouters) {
 	const baseRouter = BaseRouter(Middleware);
 	const apiRouter = new Router({ prefix: '/api' }).use(baseRouter.routes());
 
-	app.context.$Model = Model(options.model);
+	app.context.$Model = Model(options.model, Object.assign({}, options.product));
 	options.session.install(app);
 	
 	const pluginRouter = new Router({ prefix: '/plugin' });
@@ -40,7 +41,7 @@ module.exports = function Server(options, pluginRouters) {
 	apiRouter.use(pluginRouter.routes());
 	
 	return app
-		.use(bodyparser())
+		.use(koaBody())
 		.use(function session(ctx, next) {
 			ctx.$session = {
 				destroy() {
