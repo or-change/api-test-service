@@ -1,13 +1,29 @@
+const STATE = {
+	FETCHING: 0,
+	
+};
+
 module.exports = {
 	Execution(options) {
 		return {
 			schemas: {
 				type: 'object',
 				properties: {
+					id: { type: 'string' },
+					state: {
+						type: 'object',
+						properties: {
+							length: { type: 'number' },
+							finished: { type: 'number' }
+						}
+					},
+					executor: { type: 'string' },
+					startedAt: { type: 'date' },
+					endedAt: { type: 'date' },
 					abstract: { type: 'model', symbol: 'ExecutionAbstract' },
 					version: { type: 'model', symbol: 'SourceAbstract' },
 					project: { type: 'model', symbol: 'Project' },
-					report: { type: 'model', symbol: 'Report' }
+					log: { type: 'string' }
 				},
 				allowNull: ['report']
 			},
@@ -26,22 +42,11 @@ module.exports = {
 			schemas: {
 				type: 'object',
 				properties: {
-					state: {
-						type: 'object',
-						properties: {
-							length: { type: 'number' },
-							ended: { type: 'number' }
-						}
-					},
-					hash: { type: 'string', pattern: options.pattern.hash },
-					startAt: { type: 'date' },
-					endAt: { type: 'date' },
-					mode: { type: 'object' } //TODO
 				}
 			}
 		};
 	},
-	ExecutionAbstractList() {
+	ExecutionList() {
 		return {
 			symbol: 'ExecutionAbstractList',
 			schemas: {

@@ -7,11 +7,14 @@ module.exports = {
 				type: 'object',
 				properties: {
 					id: { type: 'string' },
+					projectId: { type: 'string' },
+					agent: { type: 'string' },
 					semver: { type: 'string' },
 					createdAt: { type: 'date' },
 					sturcture: { type: 'model', symbol: 'CaseTree' },
 					executions: { type: 'model', symbol: 'ExecutionAbstractList' },
-				}
+				},
+				allowNull: ['structure']
 			},
 			methods: {
 				async create() {
@@ -63,16 +66,7 @@ module.exports = {
 			schemas: {
 				type: 'object',
 				properties: {
-					versionId: { type: 'string', pattern: options.pattern.versionId },
 					root: { type: 'model', symbol: 'CaseTreeNode' }
-				}
-			},
-			methods: {
-				async create() {
-
-				},
-				async query() {
-
 				}
 			}
 		};

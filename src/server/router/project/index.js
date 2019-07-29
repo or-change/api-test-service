@@ -37,12 +37,12 @@ module.exports = function ProjectRouter(Middleware) {
 		.put('/:projectId', Authorize('project.update'), async ctx => {
 			const options = ctx.request.body;
 
-			ctx.body = await ctx.project.update({
+			ctx.body = await ctx.project.$update({
 				name: options.name,
 			});
 		})
 		.delete('/:projectId', Authorize('project.delete'), async ctx => {
-			ctx.body = await ctx.project.delete();
+			ctx.body = await ctx.project.$delete();
 		})
 		.use(sourceRouter.routes());
 };
