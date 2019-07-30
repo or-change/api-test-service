@@ -6,13 +6,16 @@ Vue.use(VueRouter);
 import SignIn from './components/pages/SignIn';
 import Workbench from './components/pages/Workbench';
 import WorkbenchPortal from './components/pages/workbench/Portal';
-import WorkbenchAdmin from './components/pages/workbench/Admin';
 import WorkbenchPlugin from './components/pages/workbench/Plugin';
 
 import WorkbenchProject from './components/pages/workbench/Project/Overview';
 import WorkbenchProjectDetail from './components/pages/workbench/Project/Detail';
 import WorkbenchProjectSource from './components/pages/workbench/Project/Source/Overview';
 import WorkbenchProjectSourceDetail from './components/pages/workbench/Project/Source/Detail';
+
+import WorkbenchAdminAccount from './components/pages/workbench/Admin/Account.vue';
+import WorkbenchAdminProject from './components/pages/workbench/Admin/Project.vue';
+import WorkbenchAdminOverview from './components/pages/workbench/Admin/Overview.vue';
 
 export default function Router(pluginRouterOptions) {
 	const router = new VueRouter({
@@ -58,10 +61,23 @@ export default function Router(pluginRouterOptions) {
 					},
 					{
 						path: 'admin',
-						component: WorkbenchAdmin,
 						meta: {
 							admin: true
-						}
+						},
+						children: [
+							{
+								path: 'account',
+								component: WorkbenchAdminAccount
+							},
+							{
+								path: 'project',
+								component: WorkbenchAdminProject
+							},
+							{
+								path: 'overview',
+								component: WorkbenchAdminOverview
+							}
+						]
 					},
 					{
 						path: 'plugin',

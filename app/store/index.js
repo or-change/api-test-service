@@ -22,8 +22,10 @@ export default new Vuex.Store({
 			});
 		},
 		async signout({ commit }) {
-			Vue.$http.principal.signout();
-			commit('resetPrincipal');
+			return Vue.$http.principal.signout()
+				.then(() => {
+					commit('resetPrincipal');
+				});
 		},
 		async authenticate({ commit }) {
 			const principal = await Vue.$http.principal.get();
