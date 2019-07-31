@@ -13,6 +13,7 @@ import WorkbenchProjectDetail from './components/pages/workbench/Project/Detail'
 import WorkbenchProjectSource from './components/pages/workbench/Project/Source/Overview';
 import WorkbenchProjectSourceDetail from './components/pages/workbench/Project/Source/Detail';
 
+import WorkbenchAdmin from './components/pages/workbench/Admin/Admin.vue';
 import WorkbenchAdminAccount from './components/pages/workbench/Admin/Account.vue';
 import WorkbenchAdminProject from './components/pages/workbench/Admin/Project.vue';
 import WorkbenchAdminOverview from './components/pages/workbench/Admin/Overview.vue';
@@ -61,6 +62,7 @@ export default function Router(pluginRouterOptions) {
 					},
 					{
 						path: 'admin',
+						component: WorkbenchAdmin,
 						meta: {
 							admin: true
 						},

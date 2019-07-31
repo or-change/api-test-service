@@ -16,4 +16,16 @@ export default {
 html {
 	height: 100%;
 }
+
+.button-danger {
+	.ms-button button {
+		background-color: #e81123;
+		border-color: #e81123;
+
+	}
+
+	.ms-button:hover button {
+		background-color: #a80000;
+	}
+}
 </style>

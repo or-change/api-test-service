@@ -55,15 +55,15 @@
 						:menu="[
 							{
 								text: '用户管理',
-								href: '#/workbench/portal',
+								href: '#/workbench/admin/account',
 							},
 							{
 								text: '项目管理',
-								href: ''
+								href: '#/workbench/admin/project'
 							},
 							{
 								text: '总览',
-								href: ''
+								href: '#/workbench/admin/overview'
 							}
 						]"
 						ref="adminMenu"

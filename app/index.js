@@ -3,12 +3,18 @@ import FibricUi from '@or-change/fabric-ui';
 import FibricUiWeb from '@or-change/fabric-ui-web';
 import http from './plugins/http';
 
-import '@or-change/fabric-ui-font';
-import './mask.css';
-
 Vue.use(FibricUi, { size: 'sm' });
 Vue.use(FibricUiWeb);
 Vue.use(http);
+
+import Breadcrumb from './components/utils/Breadcrumb.vue';
+import List from './components/utils/List.vue';
+
+Vue.component('custom-breadcrumb', Breadcrumb);
+Vue.component('custom-list', List);
+
+import '@or-change/fabric-ui-font';
+import './mask.css';
 
 import SignIn from './components/pages/SignIn';
 
@@ -51,6 +57,7 @@ product.installerList.forEach(installer => {
 });
 
 Vue.prototype.$product = context.product;
+Vue.prototype.$fabric.icon.dropdown = 'ms-Icon ms-Icon--CaretSolidDown';
 
 import App from './components/App';
 import Router from './router';

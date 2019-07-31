@@ -1,9 +1,0 @@
-<template>
-
-<div>
-	我所有的项目
-
-	modal项目创建
-</div>
-
-</template>

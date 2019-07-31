@@ -41,9 +41,9 @@ export default function install(Vue) {
 			},
 			project: {
 				get(projectId) {
-
 				},
 				query(filter) {
+					return agent.get('/admin/project', { params: filter });
 
 				},
 				assign(projectId, accountId) {
