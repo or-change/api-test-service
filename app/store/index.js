@@ -9,7 +9,8 @@ export default new Vuex.Store({
 		signedIn: false,
 		principal: {
 			administrator: false,
-			name: null
+			name: null,
+			id: null
 		},
 	},
 	actions: {
@@ -18,7 +19,8 @@ export default new Vuex.Store({
 
 			commit('assignPrincipal', {
 				name: principal.name,
-				administrator: principal.administrator
+				administrator: principal.administrator,
+				id: principal.id
 			});
 		},
 		async signout({ commit }) {
@@ -32,22 +34,25 @@ export default new Vuex.Store({
 
 			commit('assignPrincipal', {
 				name: principal.account.name,
-				administrator: principal.account.administrator
+				administrator: principal.account.administrator,
+				id: principal.account.id
 			});
 		}
 	},
 	mutations: {
 		assignPrincipal(state, principal) {
-			const { administrator, name } = principal;
-
+			const { administrator, name, id } = principal;
+			
 			state.signedIn = true;
 			state.principal.administrator = administrator;
 			state.principal.name = name;
+			state.principal.id = id;
 		},
 		resetPrincipal(state) {
 			state.signedIn = false;
 			state.principal.administrator = false;
 			state.principal.name = null;
+			state.principal.id = null;
 		}
 	}
 });

@@ -35,6 +35,11 @@ export default {
 	font-weight: 500;
 	color: #000;
 }
+
+hr {
+	box-sizing: border-box;
+	overflow: hidden;
+}
 </style>
 
 

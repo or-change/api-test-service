@@ -1,7 +1,7 @@
 <template>
 
 <div>
-插件管理页面
+配置页面
 
 </div>
 

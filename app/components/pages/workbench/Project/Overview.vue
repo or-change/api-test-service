@@ -13,7 +13,7 @@
 				<f-button 
 					text="新建"
 					variant="primary"
-					@click="addProject"
+					@click="show = true"
 				/>
 
 				<f-button
@@ -35,34 +35,126 @@
 		<custom-list
 			:fields="fields"
 			:items="filteredProjectList"
-			:select-mode="projectList.length !== 0 ? 'multi' : 'single'"
+			:select-mode="filteredProjectList.length !== 0 ? 'multi' : 'single'"
 			v-model="selectedProject"
+		>
+			<template slot="row-name" slot-scope="props">
+				<f-link
+					:href="`#/workbench/project/${props.value.id}`"
+				>{{props.value.name}}</f-link>
+			</template>
+		</custom-list>
+
+		<custom-dialog
+			id="create-project"
+			v-model="show" 
+			title="新建项目"
+			ok-text="创建"
+			@ok="addProject"
+		>
+			<f-text-field
+				label="名称："
+				placeholder="project 1"
+				underline
+				v-model="project.name"
 			/>
+			<f-label
+				v-show="fail"
+				style="color: red"
+				class="ms-pt-3"
+			>
+				创建失败！
+			</f-label>
+		</custom-dialog>
 	</div>
 </template>
 
 <script>
-import mixin from '../../../mixin/project';
-
 export default {
 	data() {
 		return {
 			projectList: [],
-			selectedProject: []
+			selectedProject: [],
+			project: {
+				name: ''
+			},
+			show: false,
+			fail: false,
+			fields: [
+				{
+					label: 'Name',
+					key: 'name'
+				},
+				{
+					label: 'Owner',
+					key: 'owner'
+				},
+				{
+					label: 'createdAt',
+					key: 'createdAt'
+				}
+			],
+			filter: {
+				name: null
+			}
 		}
 	},
-	mixins: [mixin],
+	watch:{
+		show() {
+			if (!this.show) {
+				this.project.name = '';
+				this.fail = false;
+			}
+		}
+	},
+	computed: {
+		filteredProjectList() {
+			let filteredProject = this.projectList;
+
+			
+			if (this.filter.name) {
+				const nameReg = new RegExp(this.filter.name);
+
+				filteredProject = filteredProject
+					.filter(project => nameReg.test(project.name));
+
+			}
+				
+			return filteredProject.map(project => {
+				return {
+					id: project.id,
+					name: project.name,
+					owner: project.owner.name,
+					createdAt: project.createdAt
+				};
+			}).sort((a, b) => {
+				return new Date(b.createdAt) - new Date(a.createdAt);
+			});
+		}
+	},
 	methods: {
 		getProject() {
-			this.$http.project.query().then((data) => {
-				this.projectList = data;
+			this.$http.project.query().then((res) => {
+				this.projectList = res.data;
 			})
 		},
 		addProject() {
+			this.fail = false;
 
+			this.$http.project.create(this.project)
+				.then((res) => {
+					this.show = false;
+					this.$router.push(`#/workbench/project/${res.data.id}`);
+				}).catch(() => {
+					this.fail = true;
+				});
 		},
 		deleteProject() {
-
+			Promise.all(this.selectedProject.map(project => {
+				return this.$http.project.delete(project.id);
+			})).then(() => {
+				this.getProject();
+			})
 		},
 		changeSelect(value) {
 			this.selectedProject = value;
@@ -73,14 +165,6 @@ export default {
 	}
 }
 </script>
-
-<style lang="scss">
-.button-group {
-	position: absolute;
-	right: 0;
-	bottom: 0;
-}
-</style>
 
 
 

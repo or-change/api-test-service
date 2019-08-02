@@ -25,67 +25,53 @@
 						我的项目
 					</f-nav-link>
 				</f-nav-item>
-				<f-nav-item>
-					<f-nav-link
-						href="#/workbench/portal"
-					>
-						<i class="ms-Icon ms-Icon--Info"></i>
-						我的信息
-					</f-nav-link>
-				</f-nav-item>
-				<f-nav-item>
-					<f-nav-link
-						href="#/workbench/plugin"
-					>
-						<i class="ms-Icon ms-Icon--DeveloperTools"></i>
-					插件管理
-					</f-nav-link>
-				</f-nav-item>
+			</f-navbar-nav>
+			
+			<f-navbar-nav align="right">
 				<f-nav-button
-					v-if="isAdmin"
-					text="管理员平台"
+					:text="`${name} 已登录`"
 					dropdown
 					triangle
 					icon="ms-Icon ms-Icon--AccountManagement"
-					@click.stop="toggleMenu('adminMenu')"
+					@click.stop="toggleMenu('accountMenu')"
 				>
 					<f-menu
 						slot="menu"
 						size="md"
-						:menu="[
-							{
-								text: '用户管理',
-								href: '#/workbench/admin/account',
-							},
-							{
-								text: '项目管理',
-								href: '#/workbench/admin/project'
-							},
-							{
-								text: '总览',
-								href: '#/workbench/admin/overview'
-							}
-						]"
-						ref="adminMenu"
+						ref="accountMenu"
 						style="top:100%"
-					/>
+						direction="left"
+					>
+						<template slot="menu-body">
+							<f-menu-item
+								:options="{
+									text: '我的信息',
+									href: '#/workbench/account'
+								}"
+								/>
+							<f-menu-sub-item
+								id="sub-menu"
+								:options="{
+									subMenu: menu,
+									size:'md',
+									text: '管理员平台',
+									href: '#/workbench/configuration'
+								}"
+								/>
+							<f-menu-item
+								:options="{
+									text: '退出'
+								}"
+								@actived="signOut"
+								/>
+						</template>
+					</f-menu>
 				</f-nav-button>
-			</f-navbar-nav>
-			
-			<f-navbar-nav align="right">
-				<f-nav-item
-					:text="`用户 : ${name} 已登录`"
-					/>
-				<f-nav-button
-					text="退出"
-					icon="ms-Icon ms-Icon--SignOut"
-					@click="signOut"
-					/>
 			</f-navbar-nav>
 		</f-navbar-collapse>
 	</f-navbar>
 
-	<f-container id="app-workbench-container">
+	<f-container id="app-workbench-container" class="ms-pt-3">
 		<router-view>what</router-view>
 	</f-container>
 </div>
@@ -95,7 +81,25 @@
 <script>
 export default {
 	data() {
-		return {};
+		return {
+			menu: [
+				{
+					text: '用户管理',
+					href: '#/workbench/admin/account',
+					icon: null
+				},
+				{
+					text: '项目管理',
+					href: '#/workbench/admin/project',
+					icon: null
+				},
+				{
+					text: '总览',
+					href: '#/workbench/admin/overview',
+					icon: null
+				}
+			]
+		};
 	},
 	computed: {
 		name() {
@@ -136,8 +140,13 @@ export default {
 	}
 }
 
-#app-workbench-container {
-	padding-top: 100px;
+#sub-menu {
+	ul li a {
+		text-align: center;
+	}
+}
 
+#app-workbench-container {
+	margin-top: 56px;
 }
 </style>

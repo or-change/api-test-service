@@ -4,10 +4,22 @@
 		:fields="fields"
 		:items="items"
 		:select-mode="selectMode"
+		:resizeabled="false"
 		v-model="selected"
 		@input="select"
 		style="overflow: unset;margin-top: 10px"
-		/>
+	>	
+		<template
+			v-for="(field, index) in fields"
+			:slot="`row-${field.key}`"
+			slot-scope="props"
+		>
+			<slot
+				:name="`row-${field.key}`"
+				:value="props.value"
+			></slot>
+    </template>
+	</f-data-list>
 </template>
 
 <script>

@@ -17,6 +17,11 @@ html {
 	height: 100%;
 }
 
+body {
+	height: 100%;
+	border-top: 1px solid transparent;
+}
+
 .button-danger {
 	.ms-button button {
 		background-color: #e81123;
@@ -27,5 +32,11 @@ html {
 	.ms-button:hover button {
 		background-color: #a80000;
 	}
+}
+
+.button-group {
+	position: absolute;
+	right: 0;
+	bottom: 0;
 }
 </style>

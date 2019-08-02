@@ -6,17 +6,21 @@ Vue.use(VueRouter);
 import SignIn from './components/pages/SignIn';
 import Workbench from './components/pages/Workbench';
 import WorkbenchPortal from './components/pages/workbench/Portal';
-import WorkbenchPlugin from './components/pages/workbench/Plugin';
+
 
 import WorkbenchProject from './components/pages/workbench/Project/Overview';
+
+import WorkbenchAccount from './components/pages/workbench/Account.vue';
 import WorkbenchProjectDetail from './components/pages/workbench/Project/Detail';
-import WorkbenchProjectSource from './components/pages/workbench/Project/Source/Overview';
+// import WorkbenchProjectSource from './components/pages/workbench/Project/Source/Overview';
 import WorkbenchProjectSourceDetail from './components/pages/workbench/Project/Source/Detail';
 
 import WorkbenchAdmin from './components/pages/workbench/Admin/Admin.vue';
-import WorkbenchAdminAccount from './components/pages/workbench/Admin/Account.vue';
+import WorkbenchAdminAccount from './components/pages/workbench/Admin/Account/Overview.vue';
+import WorkbenchAdminAccountDetail from './components/pages/workbench/Admin/Account/Detail.vue';
 import WorkbenchAdminProject from './components/pages/workbench/Admin/Project.vue';
 import WorkbenchAdminOverview from './components/pages/workbench/Admin/Overview.vue';
+import WorkbenchConfiguration from './components/pages/workbench/Admin/Configuration.vue';
 
 export default function Router(pluginRouterOptions) {
 	const router = new VueRouter({
@@ -45,6 +49,10 @@ export default function Router(pluginRouterOptions) {
 						component: WorkbenchPortal
 					},
 					{
+						path: 'account',
+						component: WorkbenchAccount
+					},
+					{
 						path: 'project',
 						component: WorkbenchProject
 					},
@@ -52,10 +60,10 @@ export default function Router(pluginRouterOptions) {
 						path: 'project/:projectId',
 						component: WorkbenchProjectDetail
 					},
-					{
-						path: 'project/:projectId/source',
-						component: WorkbenchProjectSource
-					},
+					// {
+					// 	path: 'project/:projectId/source',
+					// 	component: WorkbenchProjectSource
+					// },
 					{
 						path: 'project/:projectId/source/:sourceId',
 						component: WorkbenchProjectSourceDetail
@@ -72,6 +80,10 @@ export default function Router(pluginRouterOptions) {
 								component: WorkbenchAdminAccount
 							},
 							{
+								path: 'account/:accountId',
+								component: WorkbenchAdminAccountDetail
+							},
+							{
 								path: 'project',
 								component: WorkbenchAdminProject
 							},
@@ -82,8 +94,8 @@ export default function Router(pluginRouterOptions) {
 						]
 					},
 					{
-						path: 'plugin',
-						component: WorkbenchPlugin,
+						path: 'configuration',
+						component: WorkbenchConfiguration,
 						meta: {
 							admin: true
 						}

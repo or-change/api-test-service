@@ -37,26 +37,50 @@ export default function install(Vue) {
 		},
 		admin: {
 			overview: {
-
+				get() {
+					return agent.get('/admin/overview');
+				}
 			},
 			project: {
-				get(projectId) {
-				},
 				query(filter) {
 					return agent.get('/admin/project', { params: filter });
 
 				},
 				assign(projectId, accountId) {
-
+					return agent.put('/admin/project/owner', {
+						projectId, accountId
+					});
 				}
 			},
 			version: {
 
+			},
+			account: {
+				create(payload) {
+					return agent.post('/admin/account', payload);
+				},
+				update(payload) {
+					return agent.put('/admin/account', payload);
+				},
+				delete(accountId) {
+					return agent.delete(`/admin/account/${accountId}`);
+				}
+			}
+		},
+		account: {
+			query() {
+				return agent.get('/account');
+			},
+			update(payload) {
+				return agent.put('/account', payload);
+			},
+			get(accountId) {
+				return agent.get(`/account/${accountId}`);
 			}
 		},
 		project: {
-			create() {
-				return agent.post('/project');
+			create(project) {
+				return agent.post('/project', project);
 			},
 			update(projectId, payload) {
 				return agent.put(`/project/${projectId}`, payload);
@@ -80,6 +104,9 @@ export default function install(Vue) {
 							params: filter
 						});
 					},
+					get(sourceId) {
+						return agent.get(`/project/${projectId}/source/${sourceId}`);
+					},
 					delete(sourceId) {
 						return agent.delete(`/project/${projectId}/source/${sourceId}`);
 					},
@@ -101,7 +128,7 @@ export default function install(Vue) {
 							},
 							report(executionId) {
 								return {
-									create(type) {
+									get(type) {
 										return agent.get(`/project/${projectId}/source/${sourceId}/execution/${executionId}/report/${type}`);
 									}
 								};
