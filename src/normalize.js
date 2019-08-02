@@ -24,7 +24,7 @@ module.exports = function normalizeOptions(options) {
 			authenticate(ctx) {
 				return UNTRUSTED_PRINCIPAL;
 			},
-			authorize(symbol, ctx) {
+			authorizer({ symbol, ctx, Model }) {
 				return true;
 			},
 			session: {
