@@ -11,6 +11,7 @@ const SessionPlugin = require('./lib/session-plugin');
 
 const TestServiceModel = require('./src/models');
 const Registry = require('./src/registry');
+const Authorizer = require('./src/authorizer');
 const normalize = require('./src/normalize');
 
 const Router = {
@@ -61,9 +62,7 @@ module.exports = function TestingService(originalOptions, factory = () => {}) {
 				set: options.server.session.set
 			}),
 			AccessControlPlugin({
-				authorize(symbol, ctx) {
-					return options.server.authorize(symbol, ctx, models);
-				}
+				authorize: Authorizer()
 			}),
 			KoaRouterPlugin({
 				prefix: '/api',

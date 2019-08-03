@@ -1,10 +1,13 @@
-module.exports = function BaseRouter(router, { Authorize, authenticate, product, Model, Session }) {
+module.exports = function BaseRouter(router, {
+	Authorize, authenticate, product, Model, Session
+}) {
 	router.get('/product', Authorize('product.query'), ctx => {
 		ctx.body = {
 			name: product.abstract.name,
+			namespace: product.abstract.namespace,
 			version: {
 				product: product.abstract.version,
-				core: product.core.version,
+				core: '0.0.0',
 				plugins: {}
 			},
 			source: [],
@@ -22,13 +25,13 @@ module.exports = function BaseRouter(router, { Authorize, authenticate, product,
 		const principal = await Session.get(ctx, 'principal');
 
 		if (!principal) {
-			return ctx.throw(403);
+			return ctx.throw(403, 'Unauthenticated.');
 		}
 
 		ctx.principal = principal;
 
 		return next();
-	}).get('/session/principal', Authorize('principal.query'), ctx => {
+	}).get('/session/principal', Authorize('principal.get'), ctx => {
 		ctx.body = ctx.principal;
 	}).delete('/session/principal', Authorize('principal.delete'), async ctx => {
 		ctx.body = ctx.principal;

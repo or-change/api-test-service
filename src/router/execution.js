@@ -47,13 +47,13 @@ module.exports = function ExecutionRouter(router, { Authorize, Model, Tester }) 
 		ctx.body = ctx.state.execution;
 	}).delete('/:executionId', Authorize('execution.delete'), async ctx => {
 		ctx.body = await ctx.state.execution.$delete();
-	}).get('/:executionId/report/:reporterType', async ctx => {
+	}).get('/:executionId/report/:type', Authorize('execution.report.get'), async ctx => {
 		const { project, source, execution } = ctx.state;
-		const { reporterType: type } = ctx.params;
+		const { type } = ctx.params;
 		const { Reporter } = Tester.Reporter[type];
 
 		if (!Reporter) {
-			return ctx.throw(404, `Report type is '${type}' is NOT found.`);
+			return ctx.throw(400, `Reporter type is '${type}' is NOT defined.`);
 		}
 		
 		if (execution.endedAt === null) {

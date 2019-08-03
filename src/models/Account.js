@@ -29,13 +29,18 @@ module.exports = {
 		};
 	},
 	AccountList(options) {
+		const selector = {
+			name: options.queryAccountByName,
+			all: options.queryAccountAll
+		};
+
 		return {
 			schemas: {
 				type: 'array',
 				items: { type: 'model', symbol: 'Account' }
 			},
 			methods: {
-				query({ mode, query }) {
+				query({ selector, args }) {
 					return options.account.list.query(payload);
 				}
 			}

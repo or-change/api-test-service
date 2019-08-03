@@ -2,7 +2,7 @@ const session = require('koa-session');
 const path = require('path');
 
 const STORE_METHODS = [
-	'getAccountById', 'createAccount', 'destroyAccount', 'updateAccount',
+	'getAccountById', 'createAccount', 'destroyAccount', 'updateAccount', 'queryAccountAll',
 	'queryAccountByName', 'getProjectById', 'createProject', 'updateProject',
 	'destroyProject', 'queryProjectByOwnerId', 'getSourceById', 'createSource',
 	'destroySource', 'querySourceByProjectId', 'createExecution', 'getExecutionById',

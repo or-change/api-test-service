@@ -19,6 +19,9 @@ module.exports = TestingService({
 			queryAccountByName() {
 
 			},
+			queryAccountAll() {
+
+			},
 			getProjectById() {
 
 			},
