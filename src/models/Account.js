@@ -4,8 +4,13 @@ module.exports = {
 			schemas: {
 				type: 'object',
 				properties: {
-					abstract: { type: 'model', symbol: 'AccountAbstract' }
-				}
+					administrator: { type: 'boolean' },
+					id: { type: 'string' },
+					name: { type: 'string' },
+					email: { type: 'string' },
+					avatar: { type: 'string' }
+				},
+				allowNull: ['email']
 			},
 			methods: {
 				create(payload) {
@@ -30,28 +35,10 @@ module.exports = {
 				items: { type: 'model', symbol: 'Account' }
 			},
 			methods: {
-				query(payload) {
+				query({ mode, query }) {
 					return options.account.list.query(payload);
-				},
-				delete(payload) {
-					return options.account.list.delete(payload);
 				}
 			}
 		};
-	},
-	AccountAbstract() {
-		return {
-			schemas: {
-				type: 'object',
-				properties: {
-					administrator: { type: 'boolean' },
-					id: { type: 'string' },
-					name: { type: 'string' },
-					email: { type: 'string' },
-					avatar: { type: 'string' }
-				},
-				allowNull: ['email']
-			}
-		};
-	},
+	}
 };

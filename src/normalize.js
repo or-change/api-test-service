@@ -1,7 +1,15 @@
 const session = require('koa-session');
 const path = require('path');
 
-module.exports = function normalizeOptions(options) {
+const STORE_METHODS = [
+	'getAccountById', 'createAccount', 'destroyAccount', 'updateAccount',
+	'queryAccountByName', 'getProjectById', 'createProject', 'updateProject',
+	'destroyProject', 'queryProjectByOwnerId', 'getSourceById', 'createSource',
+	'destroySource', 'querySourceByProjectId', 'createExecution', 'getExecutionById',
+	'updateExecution', 'destroyExecution', 'querExecutionBySourceId', 'createExecutionReport'
+];
+
+module.exports = function normalizeOptions(options = {}) {
 	const UNTRUSTED_PRINCIPAL = {
 		credential: 'mock',
 		authenticatedAt: new Date(),
@@ -14,6 +22,10 @@ module.exports = function normalizeOptions(options) {
 		}
 	};
 
+	if (typeof options !== 'object') {
+		throw new Error('Invalid `options`, object expected.');
+	}
+
 	const finalOptions = {
 		product: {
 			name: 'API Testing Service Default Name',
@@ -24,7 +36,7 @@ module.exports = function normalizeOptions(options) {
 			authenticate(ctx) {
 				return UNTRUSTED_PRINCIPAL;
 			},
-			authorizer({ symbol, ctx, Model }) {
+			authorize({ symbol, ctx, Model }) {
 				return true;
 			},
 			session: {
@@ -47,13 +59,10 @@ module.exports = function normalizeOptions(options) {
 				maxage: 0,
 				gzip: true
 			},
-			model: {
-				id: 'orchange',
-				pattern: {
-					hash: /.*/
-				},
-				store: {}
-			}
+		},
+		model: {
+			id: 'orchange',
+			store: {}
 		},
 		plugins: [],
 	};
@@ -61,19 +70,24 @@ module.exports = function normalizeOptions(options) {
 	const {
 		product: _product = finalOptions.product,
 		server: _server = finalOptions.server,
+		model: _model = finalOptions.model,
 		plugins: _plugins = finalOptions.plugins
 	} = options;
 
 	if (typeof _product !== 'object') {
-		throw new Error('Invalid options.product, object expected.');
+		throw new TypeError('Invalid `options.product`, object expected.');
 	}
 
 	if (typeof _server !== 'object') {
-		throw new Error('Invalid options.server, object expected.');
+		throw new TypeError('Invalid `options.server`, object expected.');
+	}
+
+	if (typeof _model !== 'object') {
+		throw new TypeError('Invalid `options.model`, object expected.');
 	}
 
 	if (!Array.isArray(_plugins)) {
-		throw new Error('Invalid options.plugins, array expected.');
+		throw new TypeError('Invalid `options.plugins`, array expected.');
 	}
 
 	if (_product) {
@@ -83,11 +97,11 @@ module.exports = function normalizeOptions(options) {
 		} = _product;
 
 		if (typeof _name !== 'string') {
-			throw new Error('Invalid options.product.name, string expected.');
+			throw new TypeError('Invalid options.product.name, string expected.');
 		}
 
 		if (typeof _version !== 'string') {
-			throw new Error('Invalid options.product.version, string expected.');
+			throw new TypeError('Invalid options.product.version, string expected.');
 		}
 
 		finalOptions.product.name = _name;
@@ -100,27 +114,22 @@ module.exports = function normalizeOptions(options) {
 			authenticate: _authenticate = finalOptions.server.authorize,
 			session: _session = finalOptions.server.session,
 			serve: _serve = finalOptions.server.serve,
-			model: _model = finalOptions.server.model
 		} = _server;
 
 		if (typeof _authorize !== 'function') {
-			throw new Error('Invalid options.server.authorize, function expected.');
+			throw new TypeError('Invalid options.server.authorize, function expected.');
 		}
 
 		if (typeof _authenticate !== 'function') {
-			throw new Error('Invalid options.server.authenticate, function expected.');
+			throw new TypeError('Invalid options.server.authenticate, function expected.');
 		}
 
 		if (typeof _session !== 'object') {
-			throw new Error('Invalid options.server.session, object expected.');
+			throw new TypeError('Invalid options.server.session, object expected.');
 		}
 
 		if (typeof _serve !== 'object') {
-			throw new Error('Invalid options.server.serve, object expected.');
-		}
-
-		if (typeof _model !== 'object') {
-			throw new Error('Invalid options.server.model, object expected.');
+			throw new TypeError('Invalid options.server.serve, object expected.');
 		}
 
 		finalOptions.server.authorize = _authorize;
@@ -135,19 +144,19 @@ module.exports = function normalizeOptions(options) {
 			} = _session;
 
 			if (typeof _install !== 'function') {
-				throw new Error('Invalid options.server.session.install, function expected.');
+				throw new TypeError('Invalid `options.server.session.install`, function expected.');
 			}
 
 			if (typeof _destroy !== 'function') {
-				throw new Error('Invalid options.server.session.destroy, function expected.');
+				throw new TypeError('Invalid `options.server.session.destroy`, function expected.');
 			}
 
 			if (typeof _set !== 'function') {
-				throw new Error('Invalid options.server.session.set, function expected.');
+				throw new TypeError('Invalid `options.server.session.set`, function expected.');
 			}
 
 			if (typeof _get !== 'function') {
-				throw new Error('Invalid options.server.session.get, function expected.');
+				throw new TypeError('Invalid `options.server.session.get`, function expected.');
 			}
 
 			finalOptions.server.session.install = _install;
@@ -164,15 +173,15 @@ module.exports = function normalizeOptions(options) {
 			} = _serve;
 
 			if (typeof _path !== 'string' || !path.isAbsolute(_path)) {
-				throw new Error('Invalid options.server.serve.path, absolute path string expected.');
+				throw new TypeError('Invalid `options.server.serve.path`, absolute path string expected.');
 			}
 
 			if (typeof _maxage !== 'number' || _maxage < 0) {
-				throw new Error('Invalid options.server.serve.maxage, number >0 expected.');
+				throw new TypeError('Invalid `options.server.serve.maxage`, number >0 expected.');
 			}
 
 			if (typeof _gzip !== 'boolean') {
-				throw new Error('Invalid options.server.serve.gzip, boolean expected.');
+				throw new TypeError('Invalid `options.server.serve.gzip`, boolean expected.');
 			}
 
 			finalOptions.server.serve.path = _path;
@@ -181,6 +190,41 @@ module.exports = function normalizeOptions(options) {
 		}
 
 		finalOptions.server.model = _model;
+	}
+
+	if (_model) {
+		const {
+			id: _id = finalOptions.model.id,
+			store: _store
+		} = _model;
+
+		if (typeof _id !== 'string') {
+			throw new TypeError('Invalid `options.model.id`, string expected.');
+		}
+
+		if (_store === undefined) {
+			throw new ReferenceError('Required `options.model.store` is NOT defined.');
+		}
+
+		if (typeof _store !== 'object') {
+			throw new TypeError('Invalid `options.model.store`, object expected.');
+		}
+
+		finalOptions.model.id = _id;
+		
+		if (_store) {
+			finalOptions.model.store = STORE_METHODS.reduce((store, methodName) => {
+				const method = _store[methodName];
+
+				if (typeof method !== 'function') {
+					throw new TypeError(`Invalid 'options.model.store.${methodName}', function expected.`);
+				}
+
+				store[methodName] = method;
+
+				return store;
+			}, {});
+		}
 	}
 	
 	if (_plugins) {

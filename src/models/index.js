@@ -4,9 +4,8 @@ const Account = require('./Account');
 const Project = require('./Project');
 const Exection = require('./Execution');
 const Source = require('./Source');
-const Report = require('./Report');
 
-const ModelMapping = Object.assign({}, Account, Project, Exection, Source, Report);
+const ModelMapping = Object.assign({}, Account, Project, Exection, Source);
 
 module.exports = function Model(options) {
 	const { org: name } = options;

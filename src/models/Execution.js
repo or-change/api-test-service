@@ -1,10 +1,7 @@
-const STATE = {
-	FETCHING: 0,
-	
-};
+const STATUS = { IDEL: -1, FETCHING: 0, INSTALLING: 1, RUNNING: 2, END: 3 };
 
 module.exports = {
-	Execution(options) {
+	ProjectSourceExecution(options) {
 		return {
 			schemas: {
 				type: 'object',
@@ -14,18 +11,22 @@ module.exports = {
 						type: 'object',
 						properties: {
 							length: { type: 'number' },
-							finished: { type: 'number' }
+							ended: { type: 'number' }
 						}
 					},
+					status: {
+						type: 'number',
+						range: [
+							STATUS.FETCHING, STATUS.INSTALLING,
+							STATUS.RUNNING, STATUS.END
+						]
+					},
 					executor: { type: 'string' },
-					startedAt: { type: 'date' },
+					createdAt: { type: 'date' },
 					endedAt: { type: 'date' },
-					abstract: { type: 'model', symbol: 'ExecutionAbstract' },
-					version: { type: 'model', symbol: 'SourceAbstract' },
-					project: { type: 'model', symbol: 'Project' },
-					log: { type: 'string' }
+					report: { type: 'model', symbol: 'ProjectSourceExecutionReport' }
 				},
-				allowNull: ['report']
+				allowNull: ['report', 'endedAt', 'state']
 			},
 			methods: {
 				async create() {
@@ -33,32 +34,42 @@ module.exports = {
 				},
 				async delete(payload) {
 
+				},
+				async query() {
+
+				},
+				async update() {
+
 				}
 			}
 		};
 	},
-	ExecutionAbstract(options) {
+	ProjectSourceExecutionList() {
 		return {
-			schemas: {
-				type: 'object',
-				properties: {
-				}
-			}
-		};
-	},
-	ExecutionList() {
-		return {
-			symbol: 'ExecutionAbstractList',
 			schemas: {
 				type: 'array',
-				items: { type: 'model', symbol: 'ExecutionAbstract' }
+				items: { type: 'model', symbol: 'ProjectSourceExecution' }
 			},
 			methods: {
 				async query(payload) {
 
-				},
-				async delete(payload) {
-					const { hashList } = payload;
+				}
+			}
+		};
+	},
+	ProjectSourceExecutionReport(options) {
+		return {
+			schemas: {
+				type: 'object',
+				properties: {
+					hash: { type: 'string' },
+					createdAt: { type: 'date' },
+					body: { type: 'string' }
+				}
+			},
+			methods: {
+				async create(payload) {
+					// const {} = payload;
 
 				}
 			}

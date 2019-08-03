@@ -4,18 +4,11 @@ module.exports = {
 			schemas: {
 				type: 'object',
 				properties: {
-					schemas: {
-						type: 'object',
-						properties: {
-							id: { type: 'string', pattern: options.pattern.hash },
-							name: { type: 'string', pattern: options.pattern.projectName },
-							owner: { type: 'model', symbol: 'AccountAbstract' },
-							collaborators: {
-								type: 'array',
-								items: { type: 'model', symbol: 'AccountAbstract' }
-							}
-						}
-					}
+					id: { type: 'string' },
+					name: { type: 'string' },
+					ownerId: { type: 'string' },
+					createdAt: { type: 'date' },
+					// collaborators: { type: 'model', symbol: 'ProjectCollaboratorList' }
 				}
 			},
 			methods: {
@@ -42,6 +35,44 @@ module.exports = {
 			},
 			methods: {
 				async query() {
+
+				}
+			}
+		};
+	},
+	ProjectCollaborator() {
+		return {
+			schemas: {
+				type: 'object',
+				properties: {
+					account: { type: 'model', symbol: 'Account' },
+					joinedAt: { type: 'date' },
+				},
+			},
+			methods: {
+				create() {
+
+				},
+				delete() {
+
+				}
+			}
+		};
+	},
+	ProjectCollaboratorList() {
+		return {
+			schemas: {
+				type: 'array',
+				items: { type: 'model', symbol: 'ProjectCollaborator' }
+			},
+			methods: {
+				query() {
+
+				},
+				create() {
+
+				},
+				delete() {
 
 				}
 			}
