@@ -31,8 +31,7 @@ exports.Store = function Store() {
 			Scanner: {},
 			Executor: {},
 			SourceAgent: {},
-			Reporter: {},
-			plugins: []
+			Reporter: {}
 		}
 	};
 };

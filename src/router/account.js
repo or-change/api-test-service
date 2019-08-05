@@ -1,13 +1,7 @@
-module.exports = function ExecutionRouter(router, { Authorize, Model }) {
-	router.get('/', Authorize('account.query'), async ctx => {
-		ctx.body = Model.AccountList.query({
-			selector: 'name',
-			args: {
-				name: ctx.query.name
-			}
-		});
-	}).param(':accountId', (accountId, ctx, next) => {
-		const account = Model.Account.query(accountId);
+module.exports = function ExecutionRouter(router, { Authorize, Model, Session }) {
+	async function getAccount(ctx, next) {
+		const { accountId } = ctx.params;
+		const account = await Model.Account.query(accountId);
 
 		if (!account) {
 			return ctx.throw(404, 'Account is NOT found.');
@@ -16,36 +10,58 @@ module.exports = function ExecutionRouter(router, { Authorize, Model }) {
 		ctx.state.account = account;
 
 		return next();
-	}).get('/:accountId', Authorize('account.get'), ctx => {
-		ctx.body = ctx.state.account;
-	}).put('/:accountId', Authorize('account.update'), async ctx => {
-		const { email, name, avatar } = ctx.request.body;
-		const items = {};
+	}
 
-		if (email) {
-			if (typeof email !== 'string') {
+	router.get('/', Authorize('account.query'), async ctx => {
+		const accountList = await Model.AccountList.query({
+			selector: 'name',
+			args: {
+				name: ctx.query.name
+			}
+		});
+
+		ctx.body = accountList.$data;
+	}).get('/:accountId', Authorize('account.get'), getAccount, ctx => {
+		ctx.body = ctx.state.account.$data;
+	}).put('/:accountId', Authorize('account.update'), getAccount, async ctx => {
+		if (ctx.params.accountId !== ctx.principal.account.id) {
+			return ctx.throw(403);
+		}
+
+		const { account } = ctx.state;
+		const finalOptions = ctx.state.account.$data;
+		const {
+			email: _email = finalOptions.email,
+			name: _name = finalOptions.name,
+			avatar: _avatar = finalOptions.avatar
+		} = ctx.request.body;
+
+		if (_email) {
+			if (typeof _email !== 'string') {
 				return ctx.throw(400, 'Invalid `request.body.email`, string expacted.');
 			}
 
-			items.email = email;
+			finalOptions.email = _email;
 		}
 
-		if (name) {
-			if (typeof name !== 'string') {
+		if (_name) {
+			if (typeof _name !== 'string') {
 				return ctx.throw(400, 'Invalid `request.body.name`, string expacted.');
 			}
 
-			items.name = name;
+			finalOptions.name = _name;
 		}
 
-		if (avatar) {
-			if (typeof avatar !== 'string') {
+		if (_avatar) {
+			if (typeof _avatar !== 'string') {
 				return ctx.throw(400, 'Invalid `request.body.avatar`, string expacted.');
 			}
 
-			items.avatar = avatar;
+			finalOptions.avatar = _avatar;
 		}
 
-		ctx.body = await ctx.state.account.$update();
+		await account.$update(finalOptions);
+		ctx.principal.account = ctx.body = account.$data;
+		Session.set(ctx, 'principal', ctx.principal);
 	});
 };

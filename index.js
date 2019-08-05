@@ -23,16 +23,18 @@ const Router = {
 	Execution: require('./src/router/execution')
 };
 
-module.exports = function TestingService(originalOptions, factory = () => {}) {
+module.exports = function Examiner(originalOptions, factory = () => {}) {
 	const options = normalize(originalOptions);
 	const publicPath = path.resolve(options.server.serve.path);
 	const models = TestServiceModel(options.model);
 	
-	const store = new Registry.Store();
-	const manager = new Registry.Manager(store);
+	const store = Registry.Store();
+	const manager = Registry.Manager(store);
+	const pluginList = [];
 
 	options.plugins.forEach(plugin => {
-		store.pluginRouterList.push({
+		pluginList.push({
+			id: plugin.id,
 			name: plugin.name,
 			version: plugin.version,
 			description: plugin.description
@@ -112,7 +114,16 @@ module.exports = function TestingService(originalOptions, factory = () => {}) {
 		injection: {
 			Tester: store.Tester,
 			Model: models,
-			authenticate: options.server.authenticate
+			authenticate(ctx) {
+				return options.server.authenticate(ctx, models);
+			},
+			summary: {
+				plugins: pluginList,
+				source: Object.keys(store.Tester.SourceAgent),
+				executor: Object.keys(store.Tester.Executor),
+				scanner: Object.keys(store.Tester.Scanner),
+				reporter: Object.keys(store.Tester.Reporter)
+			}
 		},
 		Server,
 		webapck: {

@@ -19,19 +19,19 @@ module.exports = {
 				delete(payload) {
 					return options.account.delete(payload);
 				},
-				update(payload) {
-					return options.account.update(payload);
+				update(items) {
+					return options.store.updateAccount(this.id, items);
 				},
-				query(payload) {
-					return options.account.query(payload);
+				query(accountId) {
+					return options.store.getAccountById(accountId);
 				}
 			}
 		};
 	},
 	AccountList(options) {
 		const selector = {
-			name: options.queryAccountByName,
-			all: options.queryAccountAll
+			name: options.store.queryAccountByName,
+			all: options.store.queryAccountAll
 		};
 
 		return {
@@ -40,8 +40,8 @@ module.exports = {
 				items: { type: 'model', symbol: 'Account' }
 			},
 			methods: {
-				query({ selector, args }) {
-					return options.account.list.query(payload);
+				async query({ selector: type, args }) {
+					return await selector[type](args);
 				}
 			}
 		};

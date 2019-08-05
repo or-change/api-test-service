@@ -33,7 +33,7 @@ module.exports = function normalizeOptions(options = {}) {
 			namespace: 'octs'
 		},
 		server: {
-			authenticate(ctx) {
+			authenticate(ctx, Model) {
 				return UNTRUSTED_PRINCIPAL;
 			},
 			authorize({ symbol, ctx, Model }) {
@@ -230,12 +230,12 @@ module.exports = function normalizeOptions(options = {}) {
 	if (_plugins) {
 		const plugins = finalOptions.plugins = [];
 
-		_plugins.forEach((installer, index) => {
-			if (typeof installer !== 'function') {
-				throw new Error(`Invalid options.plugins[${index}], function expected.`);
+		_plugins.forEach((options, index) => {
+			if (typeof options !== 'object') {
+				throw new Error(`Invalid options.plugins[${index}], object expected.`);
 			}
 
-			plugins.push(installer);
+			plugins.push(options);
 		});
 	}
 

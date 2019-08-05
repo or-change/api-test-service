@@ -1,5 +1,5 @@
 {
-  "name": "@or-change/test-service",
+  "name": "@or-change/oc-examiner",
   "version": "0.1.0",
   "description": "",
   "main": "index.js",
@@ -23,7 +23,7 @@
     "@babel/polyfill": "^7.4.4",
     "@babel/preset-env": "^7.5.5",
     "@babel/runtime": "^7.5.5",
-    "@or-change/data-hub": "^0.1.1",
+    "@or-change/data-hub": "^0.1.2",
     "@or-change/fabric-ui": "^0.2.1",
     "@or-change/fabric-ui-font": "0.0.2",
     "@or-change/fabric-ui-web": "^0.1.2",
@@ -31,7 +31,6 @@
     "babel-loader": "^8.0.6",
     "css-loader": "^3.1.0",
     "file-loader": "^4.1.0",
-    "html-webpack-plugin": "^3.2.0",
     "koa": "^2.7.0",
     "koa-body": "^4.1.0",
     "koa-router": "^7.4.0",
@@ -47,12 +46,13 @@
     "vue-style-loader": "^4.1.2",
     "vue-template-compiler": "^2.6.10",
     "vuex": "^3.1.1",
-    "webpack": "^4.38.0",
+    "webpack": "^4.39.1",
     "webpack-cli": "^3.3.6",
     "webpack-dev-server": "^3.7.2",
     "webpack-merge": "^4.2.1"
   },
   "devDependencies": {
-    "mocha": "^6.2.0"
+    "mocha": "^6.2.0",
+    "html-webpack-plugin": "^3.2.0"
   }
 }

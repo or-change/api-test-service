@@ -1,9 +1,9 @@
 const META_TEST = [
 	function withPrincipal(ctx) {
-		return Boolean(ctx.principal);
+		return Boolean(ctx.session.principal);
 	},
 	function withoutPrincipal(ctx) {
-		return !ctx.principal;
+		return !ctx.session.principal;
 	},
 	function administratorOnly(ctx) {
 		return ctx.principal.account.administrator;
@@ -39,7 +39,7 @@ const SYMBOL_META = {
 	'execution.get':          [1, 0, 0, 1, 0],
 	'execution.delete':       [1, 0, 0, 1, 1],
 	'execution.report.get':   [1, 0, 0, 1, 1],
-	'admin':                  [1, 0, 1, 0, 0]
+	'admin.system':           [1, 0, 1, 0, 1]
 };
 
 function normalize() {
@@ -47,8 +47,6 @@ function normalize() {
 }
 
 module.exports = function Authorizer() {
-	
-
 	return function authorize(symbol, ctx) {
 		const table = SYMBOL_META[symbol];
 
@@ -57,8 +55,12 @@ module.exports = function Authorizer() {
 		}
 
 		const hasViolation = table.some((needTest, index) => {
-			needTest && !META_TEST[index](ctx);
+			return needTest && !META_TEST[index](ctx);
 		});
+
+		if (hasViolation) {
+			ctx.throw(403);
+		}
 
 		return !hasViolation;
 	};
