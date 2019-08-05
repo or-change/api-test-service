@@ -1,15 +1,22 @@
 module.exports = function ProjectRouter(router, { Authorize, Model }) {
 	router.get('/', Authorize('project.query'), async ctx => {
-		ctx.body = await Model.ProjectList.query({
-			ownerId: ctx.principal.account.id
+		const projectList = await Model.ProjectList.query({
+			selector: 'ownerId',
+			args: {
+				ownerId: ctx.principal.account.id
+			}
 		});
-	}).post('/', Authorize('project.create'), async ctx => {
-		const options = ctx.request.body;
 
-		ctx.body = await Model.Project.create({
-			name: options.name,
+		ctx.body = projectList.$data;
+	}).post('/', Authorize('project.create'), async ctx => {
+		const { name } = ctx.request.body;
+
+		const project = await Model.Project.create({
+			name,
 			ownerId: ctx.principal.account.id
 		});
+
+		ctx.body = project.$data;
 	}).param('projectId', async (projectId, ctx, next) => {
 		const project = await Model.Project.query(projectId);
 
@@ -20,15 +27,17 @@ module.exports = function ProjectRouter(router, { Authorize, Model }) {
 		ctx.state.project = project;
 		
 		return next();
-	}).post('/:projectId', Authorize('project.get'), async ctx => {
-		ctx.body = ctx.project;
+	}).get('/:projectId', Authorize('project.get'), async ctx => {
+		ctx.body = ctx.state.project.$data;
 	}).put('/:projectId', Authorize('project.update'), async ctx => {
-		const options = ctx.request.body;
+		const { project } = ctx.state;
 
-		ctx.body = await ctx.project.$update({
-			name: options.name,
-		});
+		await project.$update({ name: ctx.request.body.name });
+		ctx.body = project.$data;
 	}).delete('/:projectId', Authorize('project.delete'), async ctx => {
-		ctx.body = await ctx.project.$delete();
+		const { project } = ctx.state;
+		
+		await project.$delete();
+		ctx.body = project.$data;
 	});
 };

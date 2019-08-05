@@ -1,5 +1,7 @@
 module.exports = {
 	Project(options) {
+
+
 		return {
 			schemas: {
 				type: 'object',
@@ -12,30 +14,35 @@ module.exports = {
 				}
 			},
 			methods: {
-				async create() {
-
+				async create({ name, ownerId }) {
+					return options.store.createProject({ name, ownerId });
 				},
-				async update() {
-
+				async update(items) {
+					return options.store.updateProject(this.id, items);
 				},
-				async query() {
-
+				async query(projectId) {
+					return options.store.getProjectById(projectId);
 				},
 				async delete() {
-
+					return options.store.destroyProject(this.id);
 				}
 			}
 		};
 	},
-	ProjectList() {
+	ProjectList(options) {
+		const selector = {
+			ownerId: options.store.queryProjectByOwnerId,
+			all: options.store.queryProjectAll
+		};
+
 		return {
 			schemas: {
 				type: 'array',
 				items: { type: 'model', symbol: 'Project' }
 			},
 			methods: {
-				async query() {
-
+				async query({ selector: type, args }) {
+					return await selector[type](args);
 				}
 			}
 		};

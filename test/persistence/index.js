@@ -12,7 +12,11 @@ const Data = {
 		});
 	},
 	Project() {
+		return mock.project.map(project => {
+			project.createdAt = new Date(project.createdAt);
 
+			return Object.assign({}, project);
+		});
 	},
 	Source() {
 
@@ -76,20 +80,50 @@ exports.DB = function DB() {
 		queryAccountAll() {
 			return data.account;
 		},
-		getProjectById() {
-
+		getProjectById(id) {
+			return data.project.find(project => project.id === id) || null;
 		},
-		createProject() {
+		createProject({ name, ownerId }) {
+			const newProject = {
+				name,
+				ownerId,
+				id: Math.random().toFixed(20).substr(2, 8),
+				createdAt: new Date()
+			};
 
+			data.project.push(newProject);
+
+			return newProject;
 		},
-		updateProject() {
+		updateProject(id, items) {
+			const project = data.project.find(project => project.id === id);
 
+			if (!project) {
+				throw new Error('No project.');
+			}
+
+			for (const key in project) {
+				if (items[key] !== undefined) {
+					project[key] = items[key];
+				}
+			}
+
+			return project;
 		},
-		destroyProject() {
+		destroyProject(id) {
+			const index = data.project.findIndex(project => project.id === id);
 
+			if (index === -1) {
+				throw new Error('No project.');
+			}
+
+			return data.project.splice(index, 1)[0];
 		},
-		queryProjectByOwnerId() {
-
+		queryProjectByOwnerId({ ownerId }) {
+			return data.project.filter(project => project.ownerId === ownerId);
+		},
+		queryProjectAll() {
+			return data.project;
 		},
 		getSourceById() {
 
