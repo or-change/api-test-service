@@ -27,8 +27,7 @@ const context = {
 	product: {
 		source: {},
 		executor: {},
-		scanner: {},
-		reporter: {},
+		// reporter: {},
 		SignIn
 	},
 	beforeAppMountHandler: []
@@ -74,7 +73,7 @@ mask.id = 'app-product-mask';
 
 router.beforeEach((to, from, next) => {
 	if (to.matched.length === 0) {
-		return next('/workbench/portal');
+		return next('/workbench/project');
 	}
 
 	mask.className = 'blocked';

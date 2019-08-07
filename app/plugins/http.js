@@ -53,7 +53,9 @@ export default function install(Vue) {
 				}
 			},
 			version: {
-
+				update(payload) {
+					return agent.put('/admin/product', payload);
+				}
 			},
 			account: {
 				create(payload) {

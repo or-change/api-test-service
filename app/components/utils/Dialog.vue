@@ -22,10 +22,10 @@
 				<f-button 
 					theme="primary"
 					:text="okText"
-					@click.native="ok" />
+					@click="ok" />
 				<f-button
 					:text="cancelText"
-					@click.native="cancel" />
+					@click="cancel" />
 			</div>
 		</div>
 	</f-modal>

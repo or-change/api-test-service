@@ -39,4 +39,12 @@ body {
 	right: 0;
 	bottom: 0;
 }
+
+.col-130 {
+	width: 130px !important;
+}
+
+.col-100 {
+	width: 100px !important;
+}
 </style>

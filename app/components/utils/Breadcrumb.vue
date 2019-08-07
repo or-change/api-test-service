@@ -32,13 +32,14 @@ export default {
 
 <style lang="scss">
 .ms-breadcrumb-item.active {
-	font-weight: 500;
+	font-weight: 600;
 	color: #000;
 }
 
 hr {
-	box-sizing: border-box;
-	overflow: hidden;
+	border-style: solid;
+	border-width: 1px 0 0 0;
+	color: #323130;
 }
 </style>
 

@@ -5,7 +5,7 @@ Vue.use(VueRouter);
 
 import SignIn from './components/pages/SignIn';
 import Workbench from './components/pages/Workbench';
-import WorkbenchPortal from './components/pages/workbench/Portal';
+// import WorkbenchPortal from './components/pages/workbench/Portal';
 
 
 import WorkbenchProject from './components/pages/workbench/Project/Overview';
@@ -14,6 +14,7 @@ import WorkbenchAccount from './components/pages/workbench/Account.vue';
 import WorkbenchProjectDetail from './components/pages/workbench/Project/Detail';
 // import WorkbenchProjectSource from './components/pages/workbench/Project/Source/Overview';
 import WorkbenchProjectSourceDetail from './components/pages/workbench/Project/Source/Detail';
+import WorkbenchProjectReporter from './components/pages/workbench/Project/Source/Report.vue';
 
 import WorkbenchAdmin from './components/pages/workbench/Admin/Admin.vue';
 import WorkbenchAdminAccount from './components/pages/workbench/Admin/Account/Overview.vue';
@@ -28,7 +29,7 @@ export default function Router(pluginRouterOptions) {
 		routes: [
 			{
 				path: '/',
-				redirect: '/workbench/portal'
+				redirect: '/workbench/project'
 			},
 			{
 				path: '/signin',
@@ -44,10 +45,10 @@ export default function Router(pluginRouterOptions) {
 				},
 				component: Workbench,
 				children: [
-					{
-						path: 'portal',
-						component: WorkbenchPortal
-					},
+					// {
+					// 	path: 'portal',
+					// 	component: WorkbenchPortal
+					// },
 					{
 						path: 'account',
 						component: WorkbenchAccount
@@ -67,6 +68,10 @@ export default function Router(pluginRouterOptions) {
 					{
 						path: 'project/:projectId/source/:sourceId',
 						component: WorkbenchProjectSourceDetail
+					},
+					{
+						path: 'project/:projectId/source/:sourceId/execution/:executinoId/reporter',
+						component: WorkbenchProjectReporter
 					},
 					{
 						path: 'admin',
@@ -90,15 +95,12 @@ export default function Router(pluginRouterOptions) {
 							{
 								path: 'overview',
 								component: WorkbenchAdminOverview
+							},
+							{
+								path: 'configuration',
+								component: WorkbenchConfiguration
 							}
 						]
-					},
-					{
-						path: 'configuration',
-						component: WorkbenchConfiguration,
-						meta: {
-							admin: true
-						}
 					}
 				].concat(pluginRouterOptions)
 			},

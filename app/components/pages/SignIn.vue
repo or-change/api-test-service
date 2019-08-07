@@ -2,7 +2,7 @@
 
 <f-container>
 	<f-row>
-		<f-col offset="5" col="2">
+		<f-col offset="5" col="2" style="margin-top: 200px;">
 			<form class="ms-p-2 ms-bordered">
 				<f-text-field
 					class="ms-mb-2"
@@ -19,7 +19,7 @@
 				/>
 				<f-button
 					:disabled="!credential.username || !credential.password"
-					@click.native="signIn"
+					@click="signIn"
 					variant="primary"
 					text="Sign In"
 				/>
@@ -43,7 +43,7 @@ export default {
 	methods: {
 		async signIn() {
 			await this.$store.dispatch('signin', this.credential);
-			this.$router.push('/workbench/portal');
+			this.$router.push('/workbench/project');
 		}
 	}
 }

@@ -10,12 +10,6 @@
 		
 		<f-row class="ms-my-3" style="position: relative">
 			<div class="button-group">
-				<f-button 
-					text="新建"
-					variant="primary"
-					@click="show = true"
-				/>
-
 				<f-button
 					class="button-danger"
 					text="删除"
@@ -30,6 +24,13 @@
 					placeholder="输入查找项目名称"
 					v-model="filter.name" />
 			</f-col>
+			<f-button 
+				text="新建"
+				variant="primary"
+				@click="show = true"
+				style="margin-top: 18px;"
+				class="ms-ml-3"
+			/>
 		</f-row>
 
 		<custom-list
@@ -154,6 +155,7 @@ export default {
 				return this.$http.project.delete(project.id);
 			})).then(() => {
 				this.getProject();
+				this.selectedProject = [];
 			})
 		},
 		changeSelect(value) {

@@ -9,14 +9,14 @@
 
 		<f-navbar-collapse id="navbar">
 			<f-navbar-nav>
-				<f-nav-item>
+				<!-- <f-nav-item>
 					<f-nav-link
 						href="#/workbench/portal"
 					>
 						<i class="ms-Icon ms-Icon--AllApps"></i>
 						我的概览
 					</f-nav-link>
-				</f-nav-item>
+				</f-nav-item> -->
 				<f-nav-item>
 					<f-nav-link
 						href="#/workbench/project"
@@ -50,12 +50,13 @@
 								}"
 								/>
 							<f-menu-sub-item
+								v-if="isAdmin"
 								id="sub-menu"
 								:options="{
 									subMenu: menu,
 									size:'md',
 									text: '管理员平台',
-									href: '#/workbench/configuration'
+									href: '#/workbench/admin/configuration'
 								}"
 								/>
 							<f-menu-item

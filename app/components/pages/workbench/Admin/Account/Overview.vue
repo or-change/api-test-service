@@ -15,12 +15,6 @@
 		
 		<f-row class="ms-my-3" style="position: relative">
 			<div class="button-group">
-				<f-button 
-					text="新建"
-					variant="primary"
-					@click="show = true"
-				/>
-
 				<f-button
 					class="button-danger"
 					text="删除"
@@ -53,6 +47,13 @@
 					multi-select
 				/>
 			</f-col>
+			<f-button 
+				text="新建"
+				variant="primary"
+				@click="show = true"
+				style="margin-top: 18px;"
+				class="ms-ml-3"
+			/>
 		</f-row>
 
 		<custom-list
@@ -156,6 +157,7 @@ export default {
 				return this.$http.admin.account.delete(account.id);
 			})).then(() => {
 				this.getAccount();
+				this.selectedAccount = [];
 			})
 		},
 		addAccount() {

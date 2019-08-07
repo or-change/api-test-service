@@ -16,16 +16,10 @@
 			/>
 
 		<f-row>
-			<f-col col="8">
+			<f-col col="9">
 				<f-label size="lg" class="ms-mb-2">项目源代码列表</f-label>
 				<f-row class="ms-mb-2" style="position: relative">
 					<div class="button-group">
-						<f-button 
-							text="上传"
-							variant="primary"
-							@click="show = true"
-						/>
-
 						<f-button
 							class="button-danger"
 							text="删除"
@@ -42,6 +36,12 @@
 							multi-select
 						/>
 					</f-col>
+					<f-button 
+						text="上传"
+						variant="primary"
+						@click="show = true"
+						class="ms-ml-3"
+					/>
 				</f-row>
 
 				<custom-list
@@ -75,7 +75,7 @@
 					</template>
 				</custom-list>
 			</f-col>
-			<f-col col="3" offset="1">
+			<f-col col="3" class="ms-pl-3">
 				<f-label size="lg" class="ms-mb-2">项目信息</f-label>
 				<f-text-field
 					label="项目名称"
@@ -89,12 +89,12 @@
 					underline
 					readonly
 					v-model="project.owner.name" />
-				<f-text-field
+				<!-- <f-text-field
 					class="ms-mt-3"
 					label="项目参与者"
 					underline
 					readonly
-					v-model="collaborators" />
+					v-model="collaborators" /> -->
 				<f-text-field
 					class="ms-mt-3"
 					label="创建时间"
@@ -161,7 +161,7 @@ export default {
 				owner: {
 					name: '无'
 				},
-				collaborators: []
+				// collaborators: []
 			},
 			sourceList: [],
 			source: {
@@ -206,11 +206,11 @@ export default {
 		projectId() {
 			return this.$route.params.projectId;
 		},
-		collaborators() {
-			return this.project.collaborators
-				.map(collaborator => collaborator.name)
-				.join(' ');
-		},
+		// collaborators() {
+		// 	return this.project.collaborators
+		// 		.map(collaborator => collaborator.name)
+		// 		.join(' ');
+		// },
 		filteredSourceList() {
 			let filteredSourceList = this.sourceList;
 				
@@ -292,6 +292,7 @@ export default {
 				return this.sourcePlugin.delete(source.id);
 			})).then(() => {
 				this.getSourceList();
+				this.selectedSourceList = [];
 			});
 		},
 		getSourceList() {

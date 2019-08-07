@@ -7,7 +7,6 @@
 		:resizeabled="false"
 		v-model="selected"
 		@input="select"
-		style="overflow: unset;margin-top: 10px"
 	>	
 		<template
 			v-for="(field, index) in fields"
@@ -26,8 +25,7 @@
 export default {
 	data() {
 		return {
-			selected: null,
-			perPage: 2,
+			selected: null
 		}
 	},
 	props: {
@@ -43,6 +41,10 @@ export default {
 		selectMode: {
 			type: String,
 			default: null
+		},
+		perPage: {
+			type: Number,
+			default: 10
 		}
 	},
 	watch: {
