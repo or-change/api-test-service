@@ -101,8 +101,8 @@ module.exports = function Examiner(originalOptions, factory = () => {}) {
 					{
 						prefix: '/plugin',
 						Router(router, injection) {
-							store.pluginRouterList.forEach(PluginRouter => {
-								router.use(PluginRouter(injection).routes());
+							store.pluginRouterList.forEach(PluginRouterInstaller => {
+								PluginRouterInstaller(router, injection);
 							});
 						}
 					}

@@ -7,6 +7,7 @@ module.exports = {
 					id: { type: 'string' },
 					projectId: { type: 'string' },
 					agent: { type: 'string' },
+					initialized: { type: 'boolean' },
 					semver: { type: 'string' },
 					createdAt: { type: 'date' },
 					structure: { type: 'object' },
@@ -17,11 +18,11 @@ module.exports = {
 				async create({ projectId, agent, semver }) {
 					return options.store.createSource({ projectId, agent, semver });
 				},
-				async query(id) {
-					return options.store.getSourceById(id);
+				async query({ sourceId, projectId }) {
+					return options.store.getSourceById(sourceId, projectId);
 				},
 				async delete() {
-					return options.store.destroySource(this.id);
+					return options.store.destroySource(this.id, this.projectId);
 				},
 				async update({ structure }) {
 					return options.store.setSourceStructure(this.id, structure);

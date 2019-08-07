@@ -23,23 +23,11 @@ module.exports = function SourceRouter(router, { Authorize, Model, Tester }) {
 			return ctx.throw(400, `Unsupported source type ${type}.`);
 		}
 
-		const source = await Model.Source.create({
+		ctx.body = await Model.Source.create({
 			semver,
 			projectId: project.id,
 			agent: type
 		});
-
-		(async function () {
-			const agent = await SourceAgent(source.id);
-
-			await agent.setup(ctx);
-
-			const sturcture = await parseStructure(agent);
-
-			source.$update({ sturcture });
-		}());
-
-		ctx.body = source;
 	}).param('sourceId', async (sourceId, ctx, next) => {
 		const { project } = ctx.state;
 		const source = await Model.Source.query({

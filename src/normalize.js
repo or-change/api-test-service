@@ -6,7 +6,7 @@ const STORE_METHODS = [
 	'queryAccountByName', 'getProjectById', 'createProject', 'updateProject',
 	'destroyProject', 'queryProjectByOwnerId', 'getSourceById', 'createSource',
 	'destroySource', 'querySourceByProjectId', 'createExecution', 'getExecutionById',
-	'updateExecution', 'destroyExecution', 'queryExecutionBySourceId', 'createExecutionReport'
+	'updateExecution', 'destroyExecution', 'queryExecutionBySourceId'
 ];
 
 module.exports = function normalizeOptions(options = {}) {

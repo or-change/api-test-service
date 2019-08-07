@@ -1,38 +1,59 @@
 [
 	{
-		"state": {
+		"id": "awels23",
+		"sourceId": "b55af102",
+		"progress": {
 			"length": 100,
 			"ended": 100
 		},
-		"hash": "awels23",
-		"startAt": "2019-08-10 01:08:08",
-		"endAt": "2019-08-10 01:18:08"
+		"status": 3,
+		"error": null,
+		"executor": "basic.local",
+		"createdAt": "2019-08-10 01:08:08",
+		"endedAt": "2019-08-10 01:18:08",
+		"log": null,
+		"result": null
 	},
 	{
-		"state": {
+		"id": "elwirly",
+		"sourceId": "b55af102",
+		"progress": {
 			"length": 100,
 			"ended": 90
 		},
-		"hash": "elwirly",
-		"startAt": "2019-08-9 01:08:08",
-		"endAt": "2019-08-9 01:10:08"
+		"status": 3,
+		"error": null,
+		"executor": "basic.local",
+		"createdAt": "2019-08-9 01:08:08",
+		"endedAt": "2019-08-9 01:10:08",
+		"log": null,
+		"result": null
 	},
 	{
-		"state": {
+		"id": "seliky7",
+		"sourceId": "b55af102",
+		"progress": {
 			"length": 100,
 			"ended": 50
 		},
-		"hash": "seliky7",
-		"startAt": "2019-08-08 01:08:08",
-		"endAt": "2019-08-08 01:11:08"
+		"status": 3,
+		"error": null,
+		"executor": "basic.local",
+		"createdAt": "2019-08-08 01:08:08",
+		"endedAt": null,
+		"log": null,
+		"result": null
 	},
 	{
-		"state": {
-			"length": 100,
-			"ended": 100
-		},
-		"hash": "setyui7",
-		"startAt": "2019-08-11 01:08:08",
-		"endAt": "2019-08-11 01:10:08"
+		"id": "setyui7",
+		"sourceId": "b55af102",
+		"progress": null,
+		"status": -1,
+		"error": null,
+		"executor": "basic.local",
+		"createdAt": "2019-08-11 01:08:08",
+		"endedAt": null,
+		"log": null,
+		"result": null
 	}
 ]  

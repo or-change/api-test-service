@@ -26,8 +26,12 @@ const Data = {
 		});
 	},
 	Execution() {
+		return mock.execution.map(execution => {
+			execution.createdAt = new Date(execution.createdAt);
 
-	},
+			return Object.assign({}, execution);
+		});
+	}
 };
 
 exports.DB = function DB() {
@@ -43,7 +47,7 @@ exports.DB = function DB() {
 			return data.account.find(account => account.id === id);
 		},
 		createAccount({ name, administrator, email, avatar }) {
-			const id = Math.random().toFixed(20).substr(2, 8);
+			const id = Math.random().toString(16).substr(2, 8);
 			const account = {
 				id, name, administrator, email, avatar
 			};
@@ -91,7 +95,7 @@ exports.DB = function DB() {
 			const newProject = {
 				name,
 				ownerId,
-				id: Math.random().toFixed(20).substr(2, 8),
+				id: Math.random().toString(16).substr(2, 8),
 				createdAt: new Date()
 			};
 
@@ -129,26 +133,30 @@ exports.DB = function DB() {
 		queryProjectAll() {
 			return data.project;
 		},
-		getSourceById() {
-
+		getSourceById(sourceId, projectId) {
+			return data.source.find(source => {
+				return source.id === sourceId && source.projectId === projectId;
+			}) || null;
 		},
 		createSource({ projectId, agent, semver }) {
 			const newSource = {
 				projectId,
 				agent,
+				initialized: false,
 				semver,
-				id: Math.random().toFixed(20).substr(2, 8),
+				id: Math.random().toString(16).substr(2, 8),
 				createdAt: new Date(),
 				structure: null
 			};
 
-			data.project.push(newSource);
+			data.source.push(newSource);
 
 			return newSource;
-
 		},
-		destroySource() {
-			const index = data.source.findIndex(source => source.id === id);
+		destroySource(sourceId, projectId) {
+			const index = data.source.findIndex(source => {
+				return source.id === sourceId && source.projectId === projectId;
+			});
 
 			if (index === -1) {
 				throw new Error('No source.');
@@ -156,20 +164,24 @@ exports.DB = function DB() {
 
 			return data.source.splice(index, 1)[0];
 		},
-		setSourceStructure(id, structure) {
-			const source = data.source.find(source => source.id === id);
+		setSourceStructure(sourceId, projectId, structure) {
+			const source = data.source.find(source => {
+				return source.id === sourceId && source.projectId === projectId;
+			});
 
 			if (!source) {
 				throw new Error('No source.');
 			}
 
 			source.structure = structure;
+			source.initialized = true;
 
 			return source;
 		},
-		querySourceByProjectId({ projectId }) {
+		querySourceByProjectId({ projectId, initialized = true }) {
 			return data.source.filter(source => {
-				return source.projectId === projectId;
+				return source.projectId === projectId &&
+					source.initialized === initialized;
 			}).map(project => {
 				const abstract = Object.assign({}, project);
 
@@ -178,28 +190,73 @@ exports.DB = function DB() {
 				return abstract;
 			});
 		},
-		createExecution() {
+		createExecution({ sourceId, executor }) {
+			const execution = {
+				id: Math.random().toString(16).substr(2, 8),
+				sourceId,
+				executor,
+				progress: null,
+				status: -1,
+				error: null,
+				createdAt: new Date(),
+				endedAt: null,
+				log: null,
+				result: null
+			};
 
+			data.execution.push(execution);
+
+			return execution;
 		},
-		getExecutionById() {
+		getExecutionById(executionId, sourceId) {
+			const executionData = data.execution.find(execution => {
+				return execution.id === executionId && execution.sourceId === sourceId;
+			});
 
+			if (!executionData) {
+				return null;
+			}
+
+			const execution =  Object.assign({}, executionData);
+
+			execution.createdAt = new Date(execution.createAt);
+			execution.endedAt = execution.endedAt && new Date(execution.endedAt);
+
+			return execution;
 		},
 		updateExecution() {
 
 		},
-		destroyExecution() {
+		destroyExecution(executionId, sourceId) {
+			const index = data.execution.findIndex(execution => {
+				return execution.id === executionId && execution.sourceId === sourceId;
+			});
 
+			if (index === -1) {
+				return null;
+			}
+
+			const execution =  Object.assign({}, data.execution.splice(index, 1)[0]);
+
+			execution.createdAt = new Date(execution.createAt);
+			execution.endedAt = execution.endedAt && new Date(execution.endedAt);
+
+			return execution;
 		},
-		queryExecutionBySourceId() {
+		queryExecutionBySourceId({ sourceId }) {
+			return data.execution.filter(execution => {
+				return execution.sourceId === sourceId;
+			}).map(execution => {
+				const abstract = Object.assign({}, execution);
 
-		},
-		createExecutionReport() {
+				abstract.createdAt = new Date(abstract.createdAt);
+				abstract.endedAt = abstract.endedAt && new Date(abstract.endedAt);
+				delete abstract.log;
 
+				return abstract;
+			});
 		}
 	};
 
-	return {
-		store,
-		data
-	};
+	return { store, data };
 };

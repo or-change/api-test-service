@@ -1,18 +1,18 @@
 module.exports = function ExecutionRouter(router, { Authorize, Model, Tester }) {
 	router.get('/', Authorize('execution.query'), async ctx => {
-		const { project, source } = ctx.state;
-
-		return Model.ExecutionList.query({
-			projectId: project.id,
-			sourceId: source.id
+		ctx.body = await Model.ExecutionList.query({
+			selector: 'sourceId',
+			args: {
+				sourceId: ctx.state.source.id
+			}
 		});
 	}).post('/', Authorize('execution.create'), async ctx => {
-		const { project, source } = ctx.state;
-		const { executor: executorType } = ctx.query;
-		const execute = Tester.Executor[executorType];
+		const { source } = ctx.state;
+		const { executor: type } = ctx.request.body;
+		const execute = Tester.Executor[type];
 
 		if (!execute) {
-			return ctx.throw(400, `Unsupported executor type ${executorType}.`);
+			return ctx.throw(400, `Unsupported executor type ${type}.`);
 		}
 
 		const SourceAgent = Tester.SourceAgent[source.agent];
@@ -21,19 +21,14 @@ module.exports = function ExecutionRouter(router, { Authorize, Model, Tester }) 
 			return ctx.throw(422, `Source agent '${source.agent}' is NOT available.`);
 		}
 
-		const sourceAgent = await SourceAgent.from(source.id);
-		const execution = ctx.body = await Model.Execution.create({
-			projectId: project.id,
-			sourceId: source.id
-		});
-		
-		execute({ source: sourceAgent, model: execution });
-	}).param(':executionId', (executionId, ctx, next) => {
-		const { project, source } = ctx.state;
-		const execution = Model.Execution.query({
-			executionId,
-			projectId: project.id,
+		ctx.body = await Model.Execution.create({
 			sourceId: source.id,
+			executor: type
+		});
+	}).param('executionId', async (executionId, ctx, next) => {
+		const execution = await Model.Execution.query({
+			executionId,
+			sourceId: ctx.state.source.id
 		});
 
 		if (!execution) {
