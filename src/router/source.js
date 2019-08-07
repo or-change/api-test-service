@@ -1,29 +1,45 @@
+const fs = require('fs');
+
 module.exports = function SourceRouter(router, { Authorize, Model, Tester }) {
+	async function parseStructure(agent) {
+
+	}
+
 	router.get('/', Authorize('source.query'), async ctx => {
 		const { project } = ctx.state;
 
 		ctx.body = await Model.SourceList.query({
-			projectId: project.id
+			selector: 'projectId',
+			args: {
+				projectId: project.id
+			}
 		});
 	}).post('/', Authorize('source.create'), async ctx => {
-		const { agentType } = ctx.query;
-		const { semver } = ctx.request.body;
+		const { project } = ctx.state;
+		const { semver, agent: type } = ctx.request.body;
+		const SourceAgent = Tester.SourceAgent[type];
 
-		const Agent = Tester.SourceAgent[agentType];
-
-		if (!Agent) {
-			return ctx.throw(400, `Unsupported source type ${agentType}.`);
+		if (!SourceAgent) {
+			return ctx.throw(400, `Unsupported source type ${type}.`);
 		}
 
-		const agent = new Agent(ctx);
-		const source = ctx.body = await Model.Source.create({ semver });
+		const source = await Model.Source.create({
+			semver,
+			projectId: project.id,
+			agent: type
+		});
 
 		(async function () {
-			await agent.fetch();
-			const sturcture = await agent.scan();
+			const agent = await SourceAgent(source.id);
 
-			await source.$update({ sturcture });
+			await agent.setup(ctx);
+
+			const sturcture = await parseStructure(agent);
+
+			source.$update({ sturcture });
 		}());
+
+		ctx.body = source;
 	}).param('sourceId', async (sourceId, ctx, next) => {
 		const { project } = ctx.state;
 		const source = await Model.Source.query({
@@ -41,17 +57,16 @@ module.exports = function SourceRouter(router, { Authorize, Model, Tester }) {
 	}).get('/:sourceId', Authorize('source.get'), async ctx => {
 		ctx.body = ctx.state.source;
 	}).delete('/:sourceId', Authorize('source.delete'), async ctx => {
-		ctx.body = await ctx.state.source.delete();
+		ctx.body = await ctx.state.source.$delete();
 	}).get('/:sourceId/pack', Authorize('source.pack.get'), async ctx => {
 		const { source } = ctx.state;
-		const agentType = source.agent;
-		const Agent = ctx.$product.source[agentType];
-		
-		if (!Agent) {
-			return ctx.throw(422, `Source agent '${agentType}' is NOT available.`);
+		const SourceAgent = Tester.SourceAgent[source.agent];
+
+		if (!SourceAgent) {
+			return ctx.throw(400, `Unsupported source type ${source.agent}.`);
 		}
 
-		const agent = await Agent.from(source.id);
+		const agent = new SourceAgent(source.id);
 
 		if (!agent) {
 			return ctx.throw(410, 'Source pack is gone.');

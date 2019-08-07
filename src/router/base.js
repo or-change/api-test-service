@@ -13,7 +13,6 @@ module.exports = function BaseRouter(router, {
 			source: summary.source,
 			reporter: summary.reporter,
 			executor: summary.executor,
-			scanner: summary.scanner
 		};
 	}).post('/session/principal', Authorize('principal.create'), async (ctx) => {
 		const success = await authenticate(ctx);
@@ -31,7 +30,7 @@ module.exports = function BaseRouter(router, {
 		const authedAt = Date.now();
 		const account = await Model.Account.query(accountId);
 
-		ctx.body = Session.set(ctx, 'principal', { authedAt, credential, account: account.$data });
+		ctx.body = Session.set(ctx, 'principal', { authedAt, credential, account });
 	}).use(async (ctx, next) => {
 		const principal = await Session.get(ctx, 'principal');
 

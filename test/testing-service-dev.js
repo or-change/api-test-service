@@ -1,11 +1,24 @@
-const TestingService = require('..');
+const Examiner = require('..');
 const BasicSuitePlugin = require('../plugin/base');
 const Persistence = require('./persistence');
+const fs = require('fs');
+const path = require('path');
 
 const db = Persistence.DB();
 const PASSWORD_REG = /\w{4,20}/;
 
-module.exports = TestingService({
+const tempPath = path.join(__dirname, '.temp');
+
+try {
+	const stats = fs.statSync(tempPath);
+} catch (error) {
+	fs.mkdirSync(tempPath);
+}
+
+module.exports = Examiner({
+	temp: {
+		path: tempPath
+	},
 	server: {
 		async authenticate(ctx, Model) {
 			const {

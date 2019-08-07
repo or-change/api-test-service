@@ -1,5 +1,5 @@
 module.exports = {
-	ProjectSource() {
+	Source(options) {
 		return {
 			schemas: {
 				type: 'object',
@@ -9,32 +9,48 @@ module.exports = {
 					agent: { type: 'string' },
 					semver: { type: 'string' },
 					createdAt: { type: 'date' },
-					structure: { type: 'string' },
+					structure: { type: 'object' },
 				},
 				allowNull: ['structure']
 			},
 			methods: {
-				async create() {
-
+				async create({ projectId, agent, semver }) {
+					return options.store.createSource({ projectId, agent, semver });
 				},
-				async query() {
-
+				async query(id) {
+					return options.store.getSourceById(id);
 				},
 				async delete() {
-
+					return options.store.destroySource(this.id);
+				},
+				async update({ structure }) {
+					return options.store.setSourceStructure(this.id, structure);
 				}
 			}
 		};
 	},
-	ProjectSourceList() {
+	SourceList(options) {
+		const selector = {
+			projectId: options.store.querySourceByProjectId
+		};
+
 		return {
 			schemas: {
 				type: 'array',
-				items: { type: 'model', symbol: 'ProjectSource' }
+				items: {
+					type: 'object',
+					properties: {
+						id: { type: 'string' },
+						projectId: { type: 'string' },
+						agent: { type: 'string' },
+						semver: { type: 'string' },
+						createdAt: { type: 'date' },
+					}
+				},
 			},
 			methods: {
-				async query() {
-
+				async query({ selector: type, args }) {
+					return await selector[type](args);
 				}
 			}
 		};

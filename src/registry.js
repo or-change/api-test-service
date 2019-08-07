@@ -1,10 +1,7 @@
 exports.Manager = function Registry({ Tester, pluginRouterList, webpackEntryList }) {
 	return {
-		scanner(name, factory) {
-			return Tester.Scanner[name] = factory;
-		},
-		executor(name, factory) {
-			return Tester.Executor[name] = factory;
+		executor(name, execute) {
+			return Tester.Executor[name] = execute;
 		},
 		sourceAgent(name, factory) {
 			return Tester.SourceAgent[name] = factory;
@@ -28,7 +25,6 @@ exports.Store = function Store() {
 		pluginRouterList: [],
 		webpackEntryList: [],
 		Tester: {
-			Scanner: {},
 			Executor: {},
 			SourceAgent: {},
 			Reporter: {}

@@ -13,16 +13,14 @@ module.exports = function ExecutionRouter(router, { Authorize, Model, Session })
 	}
 
 	router.get('/', Authorize('account.query'), async ctx => {
-		const accountList = await Model.AccountList.query({
+		ctx.body = await Model.AccountList.query({
 			selector: 'name',
 			args: {
 				name: ctx.query.name
 			}
 		});
-
-		ctx.body = accountList.$data;
 	}).get('/:accountId', Authorize('account.get'), getAccount, ctx => {
-		ctx.body = ctx.state.account.$data;
+		ctx.body = ctx.state.account;
 	}).put('/:accountId', Authorize('account.update'), getAccount, async ctx => {
 		if (ctx.params.accountId !== ctx.principal.account.id) {
 			return ctx.throw(403);
@@ -61,7 +59,7 @@ module.exports = function ExecutionRouter(router, { Authorize, Model, Session })
 		}
 
 		await account.$update(finalOptions);
-		ctx.principal.account = ctx.body = account.$data;
+		ctx.principal.account = ctx.body = account;
 		Session.set(ctx, 'principal', ctx.principal);
 	});
 };

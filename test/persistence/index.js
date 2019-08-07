@@ -19,7 +19,11 @@ const Data = {
 		});
 	},
 	Source() {
+		return mock.source.map(source => {
+			source.createdAt = new Date(source.createdAt);
 
+			return Object.assign({}, source);
+		});
 	},
 	Execution() {
 
@@ -128,14 +132,51 @@ exports.DB = function DB() {
 		getSourceById() {
 
 		},
-		createSource() {
+		createSource({ projectId, agent, semver }) {
+			const newSource = {
+				projectId,
+				agent,
+				semver,
+				id: Math.random().toFixed(20).substr(2, 8),
+				createdAt: new Date(),
+				structure: null
+			};
+
+			data.project.push(newSource);
+
+			return newSource;
 
 		},
 		destroySource() {
+			const index = data.source.findIndex(source => source.id === id);
 
+			if (index === -1) {
+				throw new Error('No source.');
+			}
+
+			return data.source.splice(index, 1)[0];
 		},
-		querySourceByProjectId() {
+		setSourceStructure(id, structure) {
+			const source = data.source.find(source => source.id === id);
 
+			if (!source) {
+				throw new Error('No source.');
+			}
+
+			source.structure = structure;
+
+			return source;
+		},
+		querySourceByProjectId({ projectId }) {
+			return data.source.filter(source => {
+				return source.projectId === projectId;
+			}).map(project => {
+				const abstract = Object.assign({}, project);
+
+				delete abstract.structure;
+
+				return abstract;
+			});
 		},
 		createExecution() {
 
@@ -149,7 +190,7 @@ exports.DB = function DB() {
 		destroyExecution() {
 
 		},
-		querExecutionBySourceId() {
+		queryExecutionBySourceId() {
 
 		},
 		createExecutionReport() {

@@ -18,7 +18,7 @@ const Router = {
 	Base: require('./src/router/base'),
 	Admin: require('./src/router/admin'),
 	Account: require('./src/router/account'),
-	Product: require('./src/router/project'),
+	Project: require('./src/router/project'),
 	Source: require('./src/router/source'),
 	Execution: require('./src/router/execution')
 };
@@ -31,6 +31,8 @@ module.exports = function Examiner(originalOptions, factory = () => {}) {
 	const store = Registry.Store();
 	const manager = Registry.Manager(store);
 	const pluginList = [];
+	
+	const temp = { path: options.temp.path };
 
 	options.plugins.forEach(plugin => {
 		pluginList.push({
@@ -40,14 +42,16 @@ module.exports = function Examiner(originalOptions, factory = () => {}) {
 			description: plugin.description
 		});
 		
-		plugin.install(manager);
+		plugin.install(manager, { temp, Model: models, Tester: store.Tester });
 	});
 
 	factory(manager);
 
 	const Server = ProductKoaServer({
 		factory(app, { Router, Session }) {
-			app.use(koaBody());
+			app.use(koaBody({
+				multipart: true
+			}));
 			Session.install(app);
 			app.use(Router());
 			app.use(serve(publicPath, {
@@ -72,14 +76,14 @@ module.exports = function Examiner(originalOptions, factory = () => {}) {
 				children: [
 					{
 						prefix: '/project',
-						Router: Router.Product,
+						Router: Router.Project,
 						children: [
 							{
-								prefix: '/source',
+								prefix: '/:projectId/source',
 								Router: Router.Source,
 								children: [
 									{
-										prefix: '/execution',
+										prefix: '/:sourceId/execution',
 										Router: Router.Execution
 									}
 								]
@@ -114,6 +118,7 @@ module.exports = function Examiner(originalOptions, factory = () => {}) {
 		injection: {
 			Tester: store.Tester,
 			Model: models,
+			temp,
 			authenticate(ctx) {
 				return options.server.authenticate(ctx, models);
 			},
@@ -121,7 +126,6 @@ module.exports = function Examiner(originalOptions, factory = () => {}) {
 				plugins: pluginList,
 				source: Object.keys(store.Tester.SourceAgent),
 				executor: Object.keys(store.Tester.Executor),
-				scanner: Object.keys(store.Tester.Scanner),
 				reporter: Object.keys(store.Tester.Reporter)
 			}
 		},

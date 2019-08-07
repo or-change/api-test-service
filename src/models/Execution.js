@@ -24,7 +24,7 @@ module.exports = {
 					executor: { type: 'string' },
 					createdAt: { type: 'date' },
 					endedAt: { type: 'date' },
-					report: { type: 'model', symbol: 'ProjectSourceExecutionReport' }
+					report: { type: 'string' }
 				},
 				allowNull: ['report', 'endedAt', 'state']
 			},
@@ -52,24 +52,6 @@ module.exports = {
 			},
 			methods: {
 				async query(payload) {
-
-				}
-			}
-		};
-	},
-	ProjectSourceExecutionReport(options) {
-		return {
-			schemas: {
-				type: 'object',
-				properties: {
-					hash: { type: 'string' },
-					createdAt: { type: 'date' },
-					body: { type: 'string' }
-				}
-			},
-			methods: {
-				async create(payload) {
-					// const {} = payload;
 
 				}
 			}

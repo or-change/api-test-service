@@ -6,7 +6,7 @@ const STORE_METHODS = [
 	'queryAccountByName', 'getProjectById', 'createProject', 'updateProject',
 	'destroyProject', 'queryProjectByOwnerId', 'getSourceById', 'createSource',
 	'destroySource', 'querySourceByProjectId', 'createExecution', 'getExecutionById',
-	'updateExecution', 'destroyExecution', 'querExecutionBySourceId', 'createExecutionReport'
+	'updateExecution', 'destroyExecution', 'queryExecutionBySourceId', 'createExecutionReport'
 ];
 
 module.exports = function normalizeOptions(options = {}) {
@@ -31,6 +31,9 @@ module.exports = function normalizeOptions(options = {}) {
 			name: 'API Testing Service Default Name',
 			version: '0.0.0',
 			namespace: 'octs'
+		},
+		temp: {
+			path: path.resolve('.temp')
 		},
 		server: {
 			authenticate(ctx, Model) {
@@ -69,6 +72,7 @@ module.exports = function normalizeOptions(options = {}) {
 
 	const {
 		product: _product = finalOptions.product,
+		temp: _temp = finalOptions.temp,
 		server: _server = finalOptions.server,
 		model: _model = finalOptions.model,
 		plugins: _plugins = finalOptions.plugins
@@ -76,6 +80,10 @@ module.exports = function normalizeOptions(options = {}) {
 
 	if (typeof _product !== 'object') {
 		throw new TypeError('Invalid `options.product`, object expected.');
+	}
+
+	if (typeof _temp !== 'object') {
+		throw new TypeError('Invalid `options.temp`, object expected.');
 	}
 
 	if (typeof _server !== 'object') {
@@ -106,6 +114,16 @@ module.exports = function normalizeOptions(options = {}) {
 
 		finalOptions.product.name = _name;
 		finalOptions.product.version = _version;
+	}
+
+	if (_temp) {
+		const {
+			path: _path = finalOptions.temp.path
+		} = _temp;
+
+		if (typeof _path !== 'string' || !path.isAbsolute(_path)) {
+			throw new TypeError('Invalid options.temp.path, absolute path string expected.');
+		}
 	}
 
 	if (_server) {
