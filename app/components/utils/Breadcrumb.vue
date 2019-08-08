@@ -30,17 +30,4 @@ export default {
 }
 </script>
 
-<style lang="scss">
-.ms-breadcrumb-item.active {
-	font-weight: 600;
-	color: #000;
-}
-
-hr {
-	border-style: solid;
-	border-width: 1px 0 0 0;
-	color: #323130;
-}
-</style>
-
 

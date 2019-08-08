@@ -58,13 +58,6 @@
 				placeholder="选择项目负责人"
 				v-model="selectOwner"
 			/>
-			<f-label
-				v-show="fail"
-				style="color: red"
-				class="ms-pt-3"
-			>
-				更换失败！
-			</f-label>
 		</custom-dialog>
 	</div>
 </template>
@@ -76,7 +69,6 @@ export default {
 			projectList: [],
 			show: false,
 			selectOwner: null,
-			fail: false,
 			accountList: [],
 			selectedProject: [],
 			fields: [
@@ -109,7 +101,15 @@ export default {
 			})
 		},
 		filteredProjectList() {
-			let filteredProject = this.projectList;
+			let filteredProject = this.projectList.map(project => {
+				const account = this.accountList.find(account => account.id === project.ownerId);
+
+				if (account) {
+					project.owner = account.name;
+				}
+
+				return project;
+			});
 
 			
 			if (this.filter.name) {
@@ -122,17 +122,10 @@ export default {
 				
 			if (this.filter.owner && this.filter.owner.length !== 0) {
 				filteredProject = filteredProject
-					.filter(project => this.filter.owner.indexOf(project.owner.id) !== -1);
+					.filter(project => this.filter.owner.indexOf(project.ownerId) !== -1);
 			}
 			
-			return filteredProject.map(project => {
-				return {
-					id: project.id,
-					name: project.name,
-					owner: project.owner.name,
-					createdAt: project.createdAt
-				};
-			}).sort((a, b) => {
+			return filteredProject.sort((a, b) => {
 				return new Date(b.createdAt) - new Date(a.createdAt);
 			});
 		}
@@ -140,53 +133,34 @@ export default {
 	watch: {
 		show() {
 			if (!this.show) {
-				this.fail = false;
 				this.selectOwner = null;
 			}
 		}
 	},
 	methods: {
-		getProject() {
-			this.$http.admin.project.query().then((res) => {
-				this.projectList = res.data;
-			})
+		async queryProject() {
+			this.projectList = await this.$http.admin.project.query();
 		},
-		assignOwner() {
-			this.fail = false;
-
+		async assignOwner() {
 			if (this.selectedProject.length === 0 || this.selectOwner === null) {
 				this.show = false;
 			}
 
-			Promise.all(this.selectedProject
-				.map(project => this.$http.admin.project.assign(project.id, this.selectOwner)))
-				.then(() => {
-					this.show = false;
-					this.getProject();
-				}).catch(() => {
-					this.fail = true;
-				})
+			await Promise.all(this.selectedProject
+				.map(project => this.$http.admin.project.assign(project.id, this.selectOwner)));
+
+			this.show = false;
+			await this.queryProject();
 		},
-		getAccountList() {
-			this.$http.account.query().then((res) => {
-				this.accountList = res.data;
-			});
+		async getAccountList() {
+			this.accountList = await this.$http.account.query();
 		}
 	},
 	mounted() {
-		this.getProject();
+		this.queryProject();
 		this.getAccountList();
 	}
 }
 </script>
-
-<style lang="scss">
-.button-group {
-	position: absolute;
-	right: 0;
-	bottom: 0;
-}
-</style>
-
 
 

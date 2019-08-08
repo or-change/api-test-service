@@ -7,8 +7,12 @@
 					href: '#/workbench/admin/configuration'
 				},
 				{
+					text: '用户列表',
+					href: `#/workbench/admin/account`
+				},
+				{
 					text: account.name ? account.name : `用户: ${accountId}`,
-					href: '#/workbench/admin/project'
+					href: `#/workbench/admin/account/${accountId}`
 				}
 			]"
 			/>
@@ -21,11 +25,11 @@
 						:options="[
 							{
 								text: '是',
-								value: '1'
+								value: 1
 							},
 							{
 								text: '否',
-								value: '-1'
+								value: 0
 							}
 						]"
 						placeholder="是否为管理员"
@@ -38,10 +42,7 @@
 					variant="primary"
 					text="更新"
 					@click="updateAccount"
-				/> 
-
-				<f-label :class="['field-label', message.state]">
-					{{ message.content }}</f-label>
+				/>
 			</div>
 	</div>
 </template>
@@ -50,10 +51,7 @@
 export default {
 	data() {
 		return {
-			account: {
-				name: '',
-				administrator: '-1'
-			}
+			account: {}
 		}
 	},
 	computed: {
@@ -62,26 +60,16 @@ export default {
 		}
 	},
 	methods: {
-		getAccount() {
-			this.$http.account.get(this.accountId).then(res => {
-				const { name, administrator } = res.data;
-
-				this.account.name = name;
-				this.account.administrator = administrator ? '1' : '-1';
-			});
+		async getAccount() {
+			this.account = await this.$http.account.get(this.accountId);
+			this.account.administrator = this.account.administrator ? 1 : 0;
 		},
-		updateAccount() {
-			this.resetMessage();
-
-			this.$http.account.update({
-				administrator: this.account.administrator === '1' ? true : false
-			}).then(res => {
-				this.getAccount();
-
-				this.setMessage('success', '用户更新成功！');
-			}).catch(() => {
-				this.setMessage('fail', '用户更新失败！');
+		async updateAccount() {
+			await this.$http.admin.account.update(this.accountId, {
+				administrator: !!this.account.administrator
 			});
+
+			await this.getAccount();
 		}
 	},
 	mounted() {
@@ -89,14 +77,5 @@ export default {
 	}
 }
 </script>
-
-<style lang="scss">
-.field-label {
-	display: inline;
-	height: 26px;
-	line-height: 26px;
-	vertical-align:top
-}
-</style>
 
 

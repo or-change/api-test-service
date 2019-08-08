@@ -67,6 +67,10 @@
 					:href="`#/workbench/admin/account/${props.value.id}`"
 				>{{props.value.name}}</f-link>
 			</template>
+
+			<template slot="row-administrator" slot-scope="props">
+				<span>{{props.value.administrator ? '是' : '否'}}</span>
+			</template>
 		</custom-list>
 
 		<custom-dialog
@@ -81,14 +85,33 @@
 				placeholder="account 1"
 				underline
 				v-model="account.name"
+				required
 			/>
-			<f-label
-				v-show="fail"
-				style="color: red"
-				class="ms-pt-3"
-			>
-				创建失败！
-			</f-label>
+			<f-text-field
+				class="ms-mt-2"
+				label="邮箱："
+				placeholder="email 1"
+				underline
+				v-model="account.email"
+				required
+			/>
+			<div>
+				<f-label class="ms-my-2">管理员：</f-label>
+				<f-dropdown
+					:options="[
+						{
+							text: '是',
+							value: 1
+						},
+						{
+							text: '否',
+							value: -1
+						}
+					]"
+					placeholder="选择项目负责人"
+					v-model="account.administrator"
+				/>
+			</div>
 		</custom-dialog>
 	</div>
 </template>
@@ -119,9 +142,10 @@ export default {
 				}
 			],
 			account: {
-				name: ''
-			},
-			fail: false
+				name: '',
+				email: '',
+				administrator: -1
+			}
 		}
 	},
 	computed: {
@@ -147,33 +171,29 @@ export default {
 		show() {
 			if (!this.show) {
 				this.account.name = '';
-				this.fail = false;
 			}
 		}
 	},
 	methods: {
-		deleteAccount() {
-			Promise.all(this.selectedAccount.map(account => {
+		async deleteAccount() {
+			await Promise.all(this.selectedAccount.map(account => {
 				return this.$http.admin.account.delete(account.id);
-			})).then(() => {
-				this.getAccount();
-				this.selectedAccount = [];
-			})
-		},
-		addAccount() {
-			this.fail = false;
+			}));
 
-			this.$http.admin.account.create(this.account).then(() => {
-				this.show = false;
-				this.getAccount();
-			}).catch(() => {
-				this.fail = true;
-			});
+			await this.getAccount();
+			this.selectedAccount = [];
 		},
-		getAccount() {
-			this.$http.account.query().then((res) => {
-				this.accountList = res.data;
-			})
+		async addAccount() {
+			const { name, email, administrator } = this.account;
+			await this.$http.admin.account.create({
+				name, email, administrator: !!administrator
+			});
+
+			this.show = false;
+			this.getAccount();
+		},
+		async getAccount() {
+			this.accountList = await this.$http.account.query();
 		}
 	},
 	mounted () {

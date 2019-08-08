@@ -59,13 +59,6 @@
 				underline
 				v-model="project.name"
 			/>
-			<f-label
-				v-show="fail"
-				style="color: red"
-				class="ms-pt-3"
-			>
-				创建失败！
-			</f-label>
 		</custom-dialog>
 	</div>
 </template>
@@ -80,15 +73,10 @@ export default {
 				name: ''
 			},
 			show: false,
-			fail: false,
 			fields: [
 				{
 					label: 'Name',
 					key: 'name'
-				},
-				{
-					label: 'Owner',
-					key: 'owner'
 				},
 				{
 					label: 'createdAt',
@@ -104,7 +92,6 @@ export default {
 		show() {
 			if (!this.show) {
 				this.project.name = '';
-				this.fail = false;
 			}
 		}
 	},
@@ -121,49 +108,35 @@ export default {
 
 			}
 				
-			return filteredProject.map(project => {
-				return {
-					id: project.id,
-					name: project.name,
-					owner: project.owner.name,
-					createdAt: project.createdAt
-				};
-			}).sort((a, b) => {
-				return new Date(b.createdAt) - new Date(a.createdAt);
+			return filteredProject.sort((a, b) => {
+				return b.createdAt - a.createdAt;
 			});
 		}
 	},
 	methods: {
-		getProject() {
-			this.$http.project.query().then((res) => {
-				this.projectList = res.data;
-			})
+		async queryProject() {
+			this.projectList = await this.$http.project.query();
 		},
-		addProject() {
-			this.fail = false;
+		async addProject() {
+			const project = await this.$http.project.create(this.project);
 
-			this.$http.project.create(this.project)
-				.then((res) => {
-					this.show = false;
-					this.$router.push(`#/workbench/project/${res.data.id}`);
-				}).catch(() => {
-					this.fail = true;
-				});
+			this.show = false;
+			this.$router.push(`/workbench/project/${project.id}`);
 		},
-		deleteProject() {
-			Promise.all(this.selectedProject.map(project => {
+		async deleteProject() {
+			await Promise.all(this.selectedProject.map(project => {
 				return this.$http.project.delete(project.id);
-			})).then(() => {
-				this.getProject();
-				this.selectedProject = [];
-			})
+			}));
+
+			this.projectList = await this.queryProject();
+			this.selectedProject = [];
 		},
 		changeSelect(value) {
 			this.selectedProject = value;
 		}
 	},
 	mounted() {
-		this.getProject();
+		this.queryProject();
 	}
 }
 </script>

@@ -29,7 +29,7 @@
 			
 			<f-navbar-nav align="right">
 				<f-nav-button
-					:text="`${name} 已登录`"
+					:text="`${name}`"
 					dropdown
 					triangle
 					icon="ms-Icon ms-Icon--AccountManagement"
@@ -120,34 +120,11 @@ export default {
 				menu.show();
 			}
 		},
-		signOut() {
-			this.$store.dispatch('signout')
-				.then(() => {
-					this.$router.go(0); //push无作用
-				})
+		async signOut() {
+			await this.$store.dispatch('signout')
+			
+			this.$router.push('/');
 		}
 	}
 }
 </script>
-
-<style lang="scss">
-.ms-nav-item {
-	.ms-nav-link i {
-		vertical-align: top;
-	}
-
-	.ms-button-lg a, .ms-button-lg button {
-		padding-left: 0px;
-	}
-}
-
-#sub-menu {
-	ul li a {
-		text-align: center;
-	}
-}
-
-#app-workbench-container {
-	margin-top: 56px;
-}
-</style>

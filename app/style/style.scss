@@ -1,0 +1,184 @@
+html {
+	height: 100%;
+}
+
+body {
+	height: 100%;
+	border-top: 1px solid transparent;
+}
+
+.button-danger {
+	.ms-button button {
+		background-color: #e81123;
+		border-color: #e81123;
+
+	}
+
+	.ms-button:hover button {
+		background-color: #a80000;
+	}
+}
+
+.button-group {
+	position: absolute;
+	right: 0;
+	bottom: 0;
+}
+
+.col-130 {
+	width: 130px !important;
+}
+
+.col-100 {
+	width: 100px !important;
+}
+
+.ms-nav-item {
+	.ms-nav-link i {
+		vertical-align: top;
+	}
+
+	.ms-button-lg a, .ms-button-lg button {
+		padding-left: 0px;
+	}
+}
+
+#sub-menu {
+	ul li a {
+		text-align: center;
+	}
+}
+
+#app-workbench-container {
+	margin-top: 56px;
+}
+
+#placeholder {
+	display: inline-block;
+	width: 100px;
+	height: 100px;
+	background-color: grey;
+}
+
+#account-detail {
+	.ms-row {
+		height: 100%;
+
+		.ms-col {
+			height: 100%;
+		}
+	}
+}
+
+.field-label {
+	display: inline;
+	height: 26px;
+	line-height: 26px;
+	vertical-align:top
+}
+
+#admin-configuration {
+	.navigation {
+		&.ms-button a, .ms-button button {
+			text-align: left;
+		}
+
+		&.ms-button-group-vertical .ms-button-no-split .ms-button-dropdown {
+			position: relative;
+		}
+	}
+}
+
+.button-group {
+	position: absolute;
+	right: 0;
+	bottom: 0;
+}
+
+.fail {
+	color: red;
+}
+
+.success {
+	color: green;
+}
+
+#download {
+	height: 100%;
+
+	.ms-button {
+		background-color: transparent;
+		height: 100%;
+	}
+
+	.ms-button.ms-button-no-split.ms-button-standard .ms-button-disabled {
+		background-color: transparent;
+	}
+}
+
+#project-detail {
+	i {
+		font-size: 16px;
+	}
+}
+
+.ms-tab-link .ms-tab-title.ms-tab-title-active {
+	border: 1px solid transparent
+}
+
+.ms-dropdown-options button {
+	display: block;
+}
+
+#execution-container {
+	p {
+		position: relative;
+		margin: 0 0 3px 0;
+	}
+
+	p.suit {
+		color: #323130;
+		font-size: 18px;
+		font-weight: 600;
+	}
+
+	p.test {
+		color: #605e5c;
+		font-size: 14px;
+	}
+
+	.ms-button-container {
+		vertical-align: middle;
+
+		.ms-button {
+			background-color: transparent;
+		}
+	}
+
+	#search-reporter-online {
+		.ms-button-label {
+			overflow: unset;
+		}
+	}
+}
+
+#abstract-container {
+	overflow: auto;
+}
+
+.ms-breadcrumb-item.active {
+	font-weight: 600;
+	color: #000;
+}
+
+hr {
+	border-style: solid;
+	border-width: 1px 0 0 0;
+	color: #323130;
+}
+
+.custom-list {
+	.ms-list {
+		position: relative;
+	}
+}

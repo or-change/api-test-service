@@ -26,7 +26,6 @@
 							label="姓名"
 							placeholder="输入用户姓名"
 							underline
-							@focus="resetMessage"
 							v-model="account.name" />
 					</f-col>
 					<f-col col="3" offset="1">
@@ -34,7 +33,6 @@
 							label="邮箱"
 							placeholder="输入用户邮箱"
 							underline
-							@focus="resetMessage"
 							v-model="account.email" />
 					</f-col>
 					<f-col col="2" offset="1">
@@ -49,7 +47,6 @@
 						<f-button variant="primary" text="更新" @click="updateAccount" />
 					</f-col>
 				</f-row>
-				<f-label :class="message.state">{{ message.content }}</f-label>
 			</f-col>
 		</f-row>
 	</div>
@@ -59,15 +56,7 @@
 export default {
 	data() {
 		return {
-			account: {
-				name: '',
-				email: '',
-				administrator: false
-			},
-			message: {
-				state: '',
-				content: ''
-			}
+			account: {}
 		}
 	},
 	computed: {
@@ -76,26 +65,15 @@ export default {
 		}
 	},
 	methods: {
-		getAccount() {
-			this.$http.account.get(this.accountId).then(res => {
-				this.account = res.data;
-			})
+		async getAccount() {
+			this.account = await this.$http.account.get(this.accountId);
 		},
 		changePortrait() {
-
+			// 换头像
 		},
-		updateAccount() {
-			this.resetMessage();
-
-			this.$http.account.update(this.account).then(() => {
-				this.setMessage('success', '用户更新成功！');
-			}).catch(() => {
-					this.setMessage('fail', '用户更新失败！');
-			});
-		},
-		resetMessage() {
-			this.message.state = '';
-			this.message.content = '';
+		async updateAccount() {
+			await this.$http.account.update(this.account.id, this.account);
+			await this.getAccount();
 		}
 	},
 	mounted() {
@@ -103,24 +81,5 @@ export default {
 	}
 }
 </script>
-
-<style lang="scss">
-#placeholder {
-	display: inline-block;
-	width: 100px;
-	height: 100px;
-	background-color: grey;
-}
-
-#account-detail {
-	.ms-row {
-		height: 100%;
-
-		.ms-col {
-			height: 100%;
-		}
-	}
-}
-</style>
 
 

@@ -43,7 +43,16 @@ export default function install(Vue) {
 			},
 			project: {
 				query(filter) {
-					return agent.get('/admin/project', { params: filter });
+					return agent.get('/admin/project', { params: filter }).then(({data}) => {
+						return data.map(project => {
+							return {
+								id: project.id,
+								name: project.name,
+								ownerId: project.ownerId,
+								createdAt: new Date(project.createdAt)
+							};
+						});
+					});
 
 				},
 				assign(projectId, accountId) {
@@ -61,8 +70,8 @@ export default function install(Vue) {
 				create(payload) {
 					return agent.post('/admin/account', payload);
 				},
-				update(payload) {
-					return agent.put('/admin/account', payload);
+				update(accountId, payload) {
+					return agent.put(`/admin/account/${accountId}`, payload);
 				},
 				delete(accountId) {
 					return agent.delete(`/admin/account/${accountId}`);
@@ -71,18 +80,44 @@ export default function install(Vue) {
 		},
 		account: {
 			query() {
-				return agent.get('/account');
+				return agent.get('/account').then(({data}) => {
+					return data.map(account => {
+						return {
+							id: account.id,
+							name: account.name,
+							email: account.email,
+							avatar: account.avatar,
+							administrator: account.administrator
+						};
+					});
+				});
 			},
-			update(payload) {
-				return agent.put('/account', payload);
+			update(accountId, payload) {
+				return agent.put(`/account/${accountId}`, payload).then(({data}) => {
+					return {
+						id: data.id,
+						name: data.name,
+						email: data.email,
+						avatar: data.avatar,
+						administrator: data.administrator
+					};
+				});
 			},
 			get(accountId) {
-				return agent.get(`/account/${accountId}`);
+				return agent.get(`/account/${accountId}`).then(({data}) => {
+					return {
+						id: data.id,
+						name: data.name,
+						email: data.email,
+						avatar: data.avatar,
+						administrator: data.administrator
+					};
+				});
 			}
 		},
 		project: {
 			create(project) {
-				return agent.post('/project', project);
+				return agent.post('/project', project).then(({data}) => data);
 			},
 			update(projectId, payload) {
 				return agent.put(`/project/${projectId}`, payload);
@@ -91,10 +126,26 @@ export default function install(Vue) {
 				return agent.delete(`/project/${projectId}`);
 			},
 			query(filter) {
-				return agent.get('/project', { params: filter });
+				return agent.get('/project', { params: filter }).then(({data}) => {
+					return data.map(project => {
+						return {
+							id: project.id,
+							name: project.name,
+							ownerId: project.ownerId,
+							createdAt: new Date(project.createdAt)
+						};
+					});
+				});
 			},
 			get(projectId) {
-				return agent.get(`/project/${projectId}`);
+				return agent.get(`/project/${projectId}`).then(({data}) => {
+					return {
+						id: data.id,
+						name: data.name,
+						ownerId: data.ownerId,
+						createdAt: new Date(data.createdAt)
+					};
+				});
 			},
 			source(projectId) {
 				return {
@@ -104,10 +155,30 @@ export default function install(Vue) {
 					query(filter) {
 						return agent.get(`/project/${projectId}/source`, {
 							params: filter
+						}).then(({data}) => {
+							return data.map(source => {
+								return {
+									id: source.id,
+									projectId: data.projectId,
+									agent: data.agent,
+									semver: source.semver,
+									avaliable: source.avaliable,
+									createdAt: new Date(source.createdAt),
+								};
+							});
 						});
 					},
 					get(sourceId) {
-						return agent.get(`/project/${projectId}/source/${sourceId}`);
+						return agent.get(`/project/${projectId}/source/${sourceId}`).then(({data}) => {
+							return {
+								id: data.id,
+								projectId: data.projectId,
+								agent: data.agent,
+								structure: data.structure,
+								semver: data.semver,
+								createdAt: new Date(data.createdAt)
+							};
+						});
 					},
 					delete(sourceId) {
 						return agent.delete(`/project/${projectId}/source/${sourceId}`);
@@ -123,10 +194,35 @@ export default function install(Vue) {
 							query(filter) {
 								return agent.get(`/project/${projectId}/source/${sourceId}/execution`, {
 									params: filter
+								}).then(({data}) => {
+									return data.map(execution => {
+										return {
+											id: execution.id,
+											progress: execution.state,
+											status: execution.status,
+											executor: execution.executor,
+											createdAt: new Date(execution.createdAt),
+											endedAt: execution.endedAt && new Date(execution.endedAt),
+											log: execution.log,
+											result: execution.result
+										};
+									});
 								});
 							},
 							get(executionId) {
-								return agent.get(`/project/${projectId}/source/${sourceId}/execution/${executionId}`);
+								return agent.get(`/project/${projectId}/source/${sourceId}/execution/${executionId}`)
+									.then(({data}) => {
+										return {
+											id: data.id,
+											state: data.state,
+											status: data.status,
+											executor: data.executor,
+											createdAt: new Date(data.createdAt),
+											endedAt: data.endedAt && new Date(data.endedAt),
+											log: data.log,
+											result: data.result
+										};
+									});
 							},
 							report(executionId) {
 								return {

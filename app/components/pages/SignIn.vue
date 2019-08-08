@@ -42,7 +42,10 @@ export default {
 	},
 	methods: {
 		async signIn() {
-			await this.$store.dispatch('signin', this.credential);
+			await this.$store.dispatch('signin', {
+				type: 'simple',
+				body: this.credential
+			});
 			this.$router.push('/workbench/project');
 		}
 	}

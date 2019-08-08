@@ -27,7 +27,15 @@
 
 				<f-row style="position: relative" class="ms-mb-2">
 					<f-col col="2">
-						<f-datepicker v-model="filter.startAt" label="开始时间" overlaid size="sm" />
+						<f-datepicker v-model="filter.createdAt" label="开始时间" overlaid size="sm" />
+					</f-col>
+					<f-col col="2" class="ms-ml-2">
+						<f-label>执行器</f-label>
+						<f-dropdown
+							:options="executorOptions"
+							placeholder="选择执行器"
+							v-model="filter.executor"
+						/>
 					</f-col>
 					<f-button 
 						text="执行"
@@ -50,22 +58,12 @@
 								/>
 							</f-col>
 							<div class="button-group">
-								<f-label
-									:class="[
-										'ms-mt-1',
-										'ms-ml-3',
-										message.state
-									]"
-									style="display: inline-block; vertical-align: baseline"
-								>
-									{{ message.content }}
-								</f-label>
 								<f-button
 									class="button-danger"
 									text="删除"
 									variant="primary"
 									:disabled="completed.selected.length === 0"
-									@click="deleteExecution"
+									@click="deleteExecution(completed.selected)"
 								/>
 							</div>
 						</f-row>
@@ -99,7 +97,7 @@
 									size="lg" tag="a"
 									:border="false"
 									icon="ms-Icon ms-Icon--CRMReport"
-									:href="`#/workbench/project/${projectId}/source/${sourceId}/execution/${item.value.hash}/reporter`"
+									:href="`#/workbench/project/${projectId}/source/${sourceId}/execution/${item.value.id}/reporter`"
 									title="查看在线报告"
 								/>
 							</template>
@@ -109,7 +107,7 @@
 									size="lg"
 									:border="false"
 									icon="ms-Icon ms-Icon--DownloadDocument"
-									@click="show = true; completed.downloadExecutionId = item.value.hash"
+									@click="show = true; completed.downloadExecutionId = item.value.id"
 									title="下载测试报告"
 								/>
 							</template>
@@ -123,6 +121,14 @@
 									:options="options"
 									placeholder="选择执行进度"
 									v-model="unfinished.filter.progress"
+								/>
+							</f-col>
+							<f-col col="2" class="ms-ml-2">
+								<f-label>执行状态</f-label>
+								<f-dropdown
+									:options="statusOptions"
+									placeholder="选择执行状态"
+									v-model="unfinished.filter.status"
 								/>
 							</f-col>
 						</f-row>
@@ -149,11 +155,40 @@
 							</template>
 						</custom-list>
 					</f-tab-item>
+					<f-tab-item title="异常执行">
+						<f-row style="position: relative" class="ms-my-2">
+							<f-col col="2">
+								<f-label>执行状态</f-label>
+								<f-dropdown
+									:options="statusOptions"
+									placeholder="选择执行状态"
+									v-model="abnormal.filter.status"
+								/>
+							</f-col>
+							<div class="button-group">
+								<f-button
+									class="button-danger"
+									text="删除"
+									variant="primary"
+									:disabled="abnormal.selected.length === 0"
+									@click="deleteExecution(abnormal.selected)"
+								/>
+							</div>
+						</f-row>
+
+						<custom-list
+							:fields="abnormal.field"
+							:items="filteredAbnormal"
+							:select-mode="filteredAbnormal.length !== 0 ? 'multi' : 'single'"
+							v-model="abnormal.selected"
+						>
+						</custom-list>
+					</f-tab-item>
 				</f-tabs>
 			</f-col>
 			<f-col col="4" class="ms-pl-3">
 				<f-label size="lg" class="ms-mb-2">
-					{{selectedExecution ? `执行结果：${selectedExecution.hash}` : `源码摘要: 版本${source.semver}`}}
+					{{selectedExecution ? `执行结果：${selectedExecution.id}` : `源码摘要: 版本${source.semver}`}}
 				</f-label>
 				<div :style="{height: `${abstractHeight}px`}" id="abstract-container">
 					<p
@@ -174,315 +209,15 @@
 			ok-text="下载"
 			@ok="downloadReporter"
 		>
-			<f-label
-				v-show="fail"
-				style="color: red"
-				class="ms-pt-3"
-			>
-				下载失败！
-			</f-label>
 		</custom-dialog>
 	</div>
 </template>
 
 <script>
-function constructList(tree, result = [], level = 0) {
-	tree.children.forEach(node => {
-		result.push({
-			level,
-			only: node.only,
-			skip: node.skip,
-			title: node.title,
-			type: node.type
-		});
-
-		if (node.children) {
-			const newLevel = level + 1;
-
-			constructList(node, result, newLevel);
-		}
-	});
-
-	return result;
-}
+import mixin from './detail.js';
 
 export default {
-	data() {
-		return {
-			sourcePlugin: null,
-			executionPlugin: null,
-			source: {
-				semver: '',
-				createdAt: '',
-				execution: null,
-				structure: null
-			},
-			projectName: null,
-			executionList: [],
-			selectedExecution: null,
-			completed: {
-				selected: [],
-				field: [
-					{
-						label: 'ID',
-						key: 'hash',
-						class: 'ms-w-auto'
-					},
-					{
-						label: 'StartAt',
-						key: 'startAt',
-						class: 'col-130'
-					},
-					{
-						label: 'EndAt',
-						key: 'endAt',
-						class: 'col-130'
-					},
-					{
-						label: 'Pass Rate',
-						key: 'passRate'
-					},
-					{	
-						label: 'Reporter',
-						key: 'reporter',
-						class: 'col-100'
-					},
-					{
-						label: 'Download',
-						key: 'download',
-						class: 'col-100'
-					}
-				],
-				filter: {
-					passRate: ''
-				},
-				downloadExecutionId: null
-			},
-			unfinished: {
-				field: [
-					{
-						label: 'ID',
-						key: 'hash',
-						class: 'ms-w-auto'
-					},
-					{
-						label: 'StartAt',
-						key: 'startAt',
-						class: 'col-130'
-					},
-					{
-						label: 'State',
-						key: 'state'
-					},
-					{
-						label: 'Progress',
-						key: 'progress'
-					}
-				],
-				filter: {
-					progress: ''
-				}
-			},
-			filter: {
-				startAt: null
-			},
-			options: [
-				{
-					text: '>=10%',
-					value: 10
-				},
-				{
-					text: '>=50%',
-					value: 50
-				},
-				{
-					text: '==100%',
-					value: 100
-				}
-			],
-			abstractHeight: '100%',
-			type: 0,
-			show: false,
-			fail: false
-		}
-	},
-	computed: {
-		sourceId() {
-			return this.$route.params.sourceId;
-		},
-		projectId() {
-			return this.$route.params.projectId;
-		},
-		abstract() {
-			if (this.source.structure) {
-				return constructList(this.source.structure);
-			}
-
-			return [];
-		},
-		filteredCompleted() {
-			let filteredExecutionList = this.executionList
-				.map((execution) => {
-					const { hash, startAt, endAt, state } = execution;
-
-					return {
-						hash, startAt, endAt, progress: (state.ended / state.length) * 100
-					};
-				})
-				.filter(execution => execution.progress === 100);
-
-			if (this.filter.startAt) {
-				filteredExecutionList = filteredExecutionList
-					.filter(execution => new Date(execution.startAt).getTime() >= new Date(this.filter.startAt).getTime())
-			}
-
-			if (this.completed.filter.passRate !== '') {
-				filteredExecutionList = filteredExecutionList
-					.filter(execution => {
-						return execution.passRate >= this.completed.filter.passRate;
-					});
-			}
-
-			return filteredExecutionList;
-		},
-		filteredUnfinished() {
-			let filteredExecutionList = this.executionList
-				.map((execution) => {
-					const { hash, startAt, endAt, state } = execution;
-
-					return {
-						hash, startAt, endAt, progress: (state.ended / state.length) * 100
-					};
-				})
-				.filter(execution => execution.progress < 100);
-
-			if (this.filter.startAt) {
-				filteredExecutionList = filteredExecutionList
-					.filter(execution => new Date(execution.startAt).getTime() >= new Date(this.filter.startAt).getTime())
-			}
-
-			if (this.unfinished.filter.progress !== '') {
-				filteredExecutionList = filteredExecutionList
-					.filter(execution => {
-						return execution.progress >= this.unfinished.filter.progress;
-					});
-			}
-
-			return filteredExecutionList;
-		}
-	},
-	methods: {
-		getProject() {
-			this.$http.project.get(this.projectId)
-				.then(res => {
-					this.projectName = res.data.name;
-				})
-		},
-		getSource() {
-			this.sourcePlugin.get(this.sourceId)
-				.then(res => {
-					this.source = res.data;
-				});
-		},
-		getExecutionList() {
-			this.executionPlugin.query().then((res) => {
-				this.executionList = res.data;
-			});
-		},
-		startExecution() {
-			this.executionPlugin.start({}).then(() => {
-				this.getExecutionList();
-			}).catch(() => {
-				// TODO 执行失败
-			});
-		},
-		deleteExecution() {
-			this.resetMessage();
-
-			return Promise.all(this.completed.selected.map(execution => {
-				return this.executionPlugin.delete(execution.hash);
-			})).then(() => {
-				this.getExecutionList();
-				this.completed.selected = [];
-				this.setMessage('success', '删除成功！');
-			}).catch(() => {
-				// TODO 删除失败
-				this.setMessage('fail', '删除失败！');
-			});
-		},
-		getHeight() {
-			const height = document.body.clientHeight;
-
-			this.abstractHeight = height - 170;
-		},
-		getExecuteResult(execution) {
-			this.selectedExecution = execution;
-		},
-		downloadReporter() {
-
-		}
-	},
-	mounted() {
-		this.sourcePlugin = this.$http.project.source(this.projectId);
-		this.executionPlugin = this.sourcePlugin.execution(this.sourceId);
-
-		this.getSource();
-		this.getProject();
-		this.getExecutionList();
-		this.getHeight();
-
-		window.addEventListener('resize', this.getHeight);
-	},
-	destroyed() {
-		window.removeEventListener('resize', this.getHeight);
-	}
+	mixins: [mixin]
 }
 </script>
-
-<style lang="scss">
-.ms-tab-link .ms-tab-title.ms-tab-title-active {
-	border: 1px solid transparent
-}
-
-.ms-dropdown-options button {
-	display: block;
-}
-
-#execution-container {
-	p {
-		position: relative;
-		margin: 0 0 3px 0;
-	}
-
-	p.suit {
-		color: #323130;
-		font-size: 18px;
-		font-weight: 600;
-	}
-
-	p.test {
-		color: #605e5c;
-		font-size: 14px;
-	}
-
-	.ms-button-container {
-		vertical-align: middle;
-
-		.ms-button {
-			background-color: transparent;
-		}
-	}
-
-	#search-reporter-online {
-		.ms-button-label {
-			overflow: unset;
-		}
-	}
-}
-
-#abstract-container {
-	overflow: auto;
-}
-</style>
-
 

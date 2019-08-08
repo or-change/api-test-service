@@ -63,11 +63,3 @@ export default {
 }
 </script>
 
-<style lang="scss">
-.custom-list {
-	.ms-list {
-		position: relative;
-	}
-}
-</style>
-

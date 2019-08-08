@@ -56,20 +56,21 @@
 						>{{props.value.semver}}</f-link>
 					</template>
 
-					<template slot="row-state" slot-scope="props">
+					<template slot="row-avaliable" slot-scope="props">
 						<i
 							class="success ms-Icon ms-Icon--CompletedSolid"
-							v-show="props.value.state"></i>
+							v-show="props.value.avaliable"></i>
 						<i
 							class="fail ms-Icon ms-Icon--ErrorBadge"
-							v-show="!props.value.state"></i>
+							v-show="!props.value.avaliable"></i>
 					</template>
 
 					<template slot="row-download" slot-scope="props">
 						<f-button
 							id="download"
-							icon="ms-Icon ms-Icon--DrillDownSolid"
+							icon="ms-Icon ms-Icon--CloudDownload"
 							:border="false"
+							:disabled="!props.value.avaliable"
 							@click="downloadSource"
 						/>
 					</template>
@@ -81,20 +82,7 @@
 					label="项目名称"
 					placeholder="输入项目名称"
 					underline
-					@focus="resetMessage"
 					v-model="project.name" />
-				<f-text-field
-					class="ms-mt-3"
-					label="项目负责人"
-					underline
-					readonly
-					v-model="project.owner.name" />
-				<!-- <f-text-field
-					class="ms-mt-3"
-					label="项目参与者"
-					underline
-					readonly
-					v-model="collaborators" /> -->
 				<f-text-field
 					class="ms-mt-3"
 					label="创建时间"
@@ -107,14 +95,6 @@
 					variant="primary"
 					@click="updateProject"
 				/>
-
-				<!-- <f-button
-					class="button-danger"
-					text="删除"
-					variant="primary"
-					@click="deleteProject"
-				/> -->
-
 				<f-label
 					:class="[
 						'ms-mt-1',
@@ -140,13 +120,6 @@
 				underline
 				v-model="source.semver"
 			/>
-			<f-label
-				v-show="fail"
-				style="color: red"
-				class="ms-pt-3"
-			>
-				上传失败！
-			</f-label>
 		</custom-dialog>
 	</div>
 </template>
@@ -155,22 +128,15 @@
 export default {
 	data() {
 		return {
-			projectName: null,
 			project: {
-				name: '',
-				owner: {
-					name: '无'
-				},
-				// collaborators: []
+				name: ''
 			},
 			sourceList: [],
 			source: {
 				semver: ''
 			},
-			sourcePlugin: null,
 			selectedSourceList: [],
 			show: false,
-			fail: false,
 			filter: {
 				semver: []
 			},
@@ -180,15 +146,19 @@ export default {
 					key: 'semver'
 				},
 				{
-					label: 'State',
-					key: 'state'
+					label: 'Avaliable',
+					key: 'avaliable'
+				},
+				{
+					label: 'Agent',
+					key: 'agent'
 				},
 				{
 					label: 'CreatedAt',
 					key: 'createdAt'
 				},
 				{
-					label: 'Download',
+					label: '',
 					key: 'download'
 				}
 			]
@@ -198,7 +168,6 @@ export default {
 		show() {
 			if (!this.show) {
 				this.source.semver = '';
-				this.fail = false;
 			}
 		}
 	},
@@ -206,11 +175,9 @@ export default {
 		projectId() {
 			return this.$route.params.projectId;
 		},
-		// collaborators() {
-		// 	return this.project.collaborators
-		// 		.map(collaborator => collaborator.name)
-		// 		.join(' ');
-		// },
+		projectName() {
+			return this.project.name;
+		},
 		filteredSourceList() {
 			let filteredSourceList = this.sourceList;
 				
@@ -219,15 +186,8 @@ export default {
 					.filter(source => this.filter.semver.indexOf(source.semver) !== -1);
 			}
 			
-			return filteredSourceList.map(source => {
-				return {
-					id: source.id,
-					semver: source.semver,
-					state: source.structure ? true : false,
-					createdAt: source.createdAt
-				};
-			}).sort((a, b) => {
-				return new Date(b.createdAt) - new Date(a.createdAt);
+			return filteredSourceList.sort((a, b) => {
+				return b.createdAt - a.createdAt;
 			});
 		},
 		semverList() {
@@ -247,94 +207,39 @@ export default {
 		}
 	},
 	methods: {
-		getProject() {
-			this.$http.project.get(this.projectId)
-				.then(res => {
-					this.project = res.data;
-					this.projectName = res.data.name;
-				})
+		async getProject() {
+			this.project = await this.$http.project.get(this.projectId);
 		},
-		updateProject() {
-			this.resetMessage();
-
-			return this.$http.project.update(this.projectId, {
+		async updateProject() {
+			await this.$http.project.update(this.projectId, {
 				name: this.project.name
-			})
-				.then(() => {
-					this.setMessage('success', '项目更新成功！');
-				}).catch(() => {
-					this.setMessage('fail', '项目更新失败！');
-				});
-		},
-		// deleteProject() {
-		// 	this.resetMessage();
-
-		// 	return this.$http.project.delete(this.projectId)
-		// 		.then(() => {
-		// 			this.$router.push('#/workbench/project');
-		// 		}).catch(() => {
-		// 			this.setMessage('fail', '项目删除失败！');
-		// 		});
-		// },
-		uploadSource() {
-			this.fail = false;
-
-			return this.sourcePlugin.create(this.source)
-				.then(() => {
-					this.getSourceList();
-				})
-				.catch(() => {
-					this.fail = true;
-				});
-		},
-		deleteSource() {
-			Promise.all(this.selectedSourceList.map(source => {
-				return this.sourcePlugin.delete(source.id);
-			})).then(() => {
-				this.getSourceList();
-				this.selectedSourceList = [];
 			});
+			
+			await this.getProject();
 		},
-		getSourceList() {
-			this.sourcePlugin.query()
-				.then((res) => {
-					this.sourceList = res.data;
-				});
+		async uploadSource() {
+			await this.$http.project.source(this.projectId).create(this.source)
+			
+			await	this.getSourceList();
+		},
+		async deleteSource() {
+			await Promise.all(this.selectedSourceList.map(source => {
+				return this.$http.project.source(this.projectId).delete(source.id);
+			}));
+
+			await this.getSourceList();
+			this.selectedSourceList = [];
+		},
+		async getSourceList() {
+			this.sourceList = await this.$http.project.source(this.projectId).query();
 		},
 		downloadSource() {
 
 		}
 	},
 	mounted() {
-		this.sourcePlugin = this.$http.project.source(this.projectId);
-
 		this.getProject();
 		this.getSourceList();
 	}
 }
 </script>
-
-<style lang="scss">
-.fail {
-	color: red;
-}
-
-.success {
-	color: green;
-}
-
-#download {
-	height: 100%;
-
-	.ms-button {
-		background-color: transparent;
-		height: 100%;
-	}
-}
-
-#project-detail {
-	i {
-		font-size: 16px;
-	}
-}
-</style>

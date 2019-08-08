@@ -15,7 +15,7 @@
 					href: `#/workbench/project/${projectId}`
 				},
 				{
-					text: semver,
+					text: source.semver,
 					href: `#/workbench/project/${projectId}/source/${sourceId}`
 				},
 				{
@@ -32,57 +32,10 @@
 </template>
 
 <script>
-export default {
-	data() {
-		return {
-			semver: null,
-			projectName: null
-		}
-	},
-	computed: {
-		sourceId() {
-			return this.$route.params.sourceId;
-		},
-		projectId() {
-			return this.$route.params.projectId;
-		},
-		executionId() {
-			return this.$route.params.executionId;
-		}
-	},
-	methods: {
-		getProject() {
-			this.$http.project.get(this.projectId)
-				.then(res => {
-					this.projectName = res.data.name;
-				})
-		},
-		getSource() {
-			this.$http.project.source(this.projectId).get(this.sourceId)
-				.then(res => {
-					this.semver = res.data.semver;
-				});
-		},
-		getReporter() {
-			this.$http.project.source(this.projectId).source(this.sourceId)
-				.report(this.executionId)
-				.then(res => {
+import mixin from './mixin';
 
-				});
-		}
-	},
-	mounted() {
-		this.getProject();
-		this.getSource();
-	}
+export default {
+	mixins: [mixin]
 }
 </script>
-
-<style lang="scss">
-#reporter-container {
-	// h3 {
-	// 	text-align: center;
-	// }
-}
-</style>
 

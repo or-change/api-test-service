@@ -2,12 +2,10 @@ import Vue from 'vue';
 import FibricUi from '@or-change/fabric-ui';
 import FibricUiWeb from '@or-change/fabric-ui-web';
 import http from './plugins/http';
-import message from './plugins/message';
 
 Vue.use(FibricUi, { size: 'sm' });
 Vue.use(FibricUiWeb);
 Vue.use(http);
-Vue.use(message);
 
 import Breadcrumb from './components/utils/Breadcrumb.vue';
 import List from './components/utils/List.vue';
@@ -18,7 +16,8 @@ Vue.component('custom-list', List);
 Vue.component('custom-dialog', Dialog);
 
 import '@or-change/fabric-ui-font';
-import './mask.css';
+import './style/mask.css';
+import './style/style.scss';
 
 import SignIn from './components/pages/SignIn';
 
