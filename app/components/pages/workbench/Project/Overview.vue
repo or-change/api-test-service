@@ -44,6 +44,10 @@
 					:href="`#/workbench/project/${props.value.id}`"
 				>{{props.value.name}}</f-link>
 			</template>
+
+			<template slot="row-createdAt" slot-scope="props">
+				{{props.value.createdAt | dateFormat}}
+			</template>
 		</custom-list>
 
 		<custom-dialog

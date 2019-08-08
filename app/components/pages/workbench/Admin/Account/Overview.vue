@@ -42,7 +42,7 @@
 							value: -1
 						}
 					]"
-					placeholder="选择项目负责人"
+					placeholder="是否为管理员"
 					v-model="filter.admin"
 					multi-select
 				/>

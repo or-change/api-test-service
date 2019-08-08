@@ -2,10 +2,12 @@ import Vue from 'vue';
 import FibricUi from '@or-change/fabric-ui';
 import FibricUiWeb from '@or-change/fabric-ui-web';
 import http from './plugins/http';
+import dateFormat from './plugins/dateFormat';
 
 Vue.use(FibricUi, { size: 'sm' });
 Vue.use(FibricUiWeb);
 Vue.use(http);
+Vue.use(dateFormat);
 
 import Breadcrumb from './components/utils/Breadcrumb.vue';
 import List from './components/utils/List.vue';

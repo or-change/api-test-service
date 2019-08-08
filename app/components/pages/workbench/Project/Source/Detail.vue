@@ -35,12 +35,13 @@
 							:options="executorOptions"
 							placeholder="选择执行器"
 							v-model="filter.executor"
+							multi-select
 						/>
 					</f-col>
 					<f-button 
 						text="执行"
 						variant="primary"
-						@click="startExecution"
+						@click="executionDialog = true"
 						style="margin-top: 18px;"
 						class="ms-ml-3"
 					/>
@@ -63,7 +64,7 @@
 									text="删除"
 									variant="primary"
 									:disabled="completed.selected.length === 0"
-									@click="deleteExecution(completed.selected)"
+									@click="deleteExecution(completed)"
 								/>
 							</div>
 						</f-row>
@@ -85,10 +86,31 @@
 											style="margin: 20px 0;"
 										/>
 									</f-col>
-									<f-col col="3">
+									<f-col col="3" class="ms-center">
 										{{`${item.value.passRate}%`}}
 									</f-col>
 								</f-row>
+							</template>
+
+							<template slot="row-id" slot-scope="item">
+								<f-button
+									:text="item.value.id"
+									:border="false"
+									title="查看执行摘要信息"
+									@click="selectedExecution = item.value"
+								/>
+							</template>
+
+							<template slot="row-executor" slot-scope="item">
+								{{ item.value.executor | executorFilter }}
+							</template>
+
+							<template slot="row-createdAt" slot-scope="item">
+								{{ item.value.createdAt | dateFormat }}
+							</template>
+
+							<template slot="row-endedAt" slot-scope="item">
+								{{ item.value.endedAt | dateFormat }}
 							</template>
 
 							<template slot="row-reporter" slot-scope="item">
@@ -129,6 +151,7 @@
 									:options="statusOptions"
 									placeholder="选择执行状态"
 									v-model="unfinished.filter.status"
+									multi-select
 								/>
 							</f-col>
 						</f-row>
@@ -148,10 +171,22 @@
 											style="margin: 20px 0;"
 										/>
 									</f-col>
-									<f-col col="3">
+									<f-col col="3" class="ms-center">
 										{{`${item.value.progress}%`}}
 									</f-col>
 								</f-row>
+							</template>
+
+							<template slot="row-status" slot-scope="item">
+								{{ item.value.status | statusFilter }}
+							</template>
+
+							<template slot="row-executor" slot-scope="item">
+								{{ item.value.executor | executorFilter }}
+							</template>
+
+							<template slot="row-createdAt" slot-scope="item">
+								{{ item.value.createdAt | dateFormat }}
 							</template>
 						</custom-list>
 					</f-tab-item>
@@ -163,6 +198,7 @@
 									:options="statusOptions"
 									placeholder="选择执行状态"
 									v-model="abnormal.filter.status"
+									multi-select
 								/>
 							</f-col>
 							<div class="button-group">
@@ -171,7 +207,7 @@
 									text="删除"
 									variant="primary"
 									:disabled="abnormal.selected.length === 0"
-									@click="deleteExecution(abnormal.selected)"
+									@click="deleteExecution(abnormal)"
 								/>
 							</div>
 						</f-row>
@@ -182,6 +218,17 @@
 							:select-mode="filteredAbnormal.length !== 0 ? 'multi' : 'single'"
 							v-model="abnormal.selected"
 						>
+							<template slot="row-status" slot-scope="item">
+								{{ item.value.status | statusFilter }}
+							</template>
+
+							<template slot="row-executor" slot-scope="item">
+								{{ item.value.executor | executorFilter }}
+							</template>
+
+							<template slot="row-createdAt" slot-scope="item">
+								{{ item.value.createdAt | dateFormat }}
+							</template>
 						</custom-list>
 					</f-tab-item>
 				</f-tabs>
@@ -203,6 +250,14 @@
 			</f-col>
 		</f-row>
 		<custom-dialog
+			id="start-execution"
+			v-model="executionDialog" 
+			title=""
+			ok-text=""
+			@ok="startExecution"
+		>
+		</custom-dialog>
+		<custom-dialog
 			id="get-reporter"
 			v-model="show" 
 			title="下载测试报告"
@@ -214,10 +269,41 @@
 </template>
 
 <script>
-import mixin from './detail.js';
+import mixin from './action';
+
+const statusMapping = {
+	'-1': '空闲',
+	'0': '拉取代码',
+	'1': '安装',
+	'2': '正在运行',
+	'3': '结束'
+};
 
 export default {
-	mixins: [mixin]
+	mixins: [mixin],
+	filters: {
+		statusFilter(value) {
+			return statusMapping[value];
+		},
+		executorFilter(value) {
+			return value;
+		}
+	},
+	computed: {
+		executorOptions() {
+			return [];
+		},
+		statusOptions() {
+			const statusValue = Object.keys(statusMapping);
+
+			return statusValue.map(status => {
+				return {
+					value: Number(status),
+					text: statusMapping[status]
+				}
+			});
+		}
+	}
 }
 </script>
 

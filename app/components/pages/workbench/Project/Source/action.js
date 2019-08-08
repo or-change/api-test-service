@@ -40,26 +40,27 @@ export default {
 					{	
 						label: 'Reporter',
 						key: 'reporter',
-						class: 'col-100'
+						class: 'col-90'
 					},
 					{
 						label: 'Download',
 						key: 'download',
-						class: 'col-100'
+						class: 'col-90'
 					},
 					{
 						label: 'Executor',
-						key: 'executor'
+						key: 'executor',
+						class: 'col-100'
 					},
 					{
 						label: 'CreatedAt',
 						key: 'createdAt',
-						class: 'col-130'
+						class: 'col-100'
 					},
 					{
-						label: 'EndAt',
-						key: 'endAt',
-						class: 'col-130'
+						label: 'EndedAt',
+						key: 'endedAt',
+						class: 'col-100'
 					}
 				],
 				filter: {
@@ -80,7 +81,7 @@ export default {
 					},
 					{
 						label: 'Status',
-						key: 'Status'
+						key: 'status'
 					},
 					{
 						label: 'Executor',
@@ -94,7 +95,7 @@ export default {
 				],
 				filter: {
 					progress: '',
-					status: ''
+					status: []
 				}
 			},
 			abnormal: {
@@ -106,7 +107,11 @@ export default {
 					},
 					{
 						label: 'Status',
-						key: 'Status'
+						key: 'status'
+					},
+					{
+						label: 'Error',
+						key: 'error'
 					},
 					{
 						label: 'Executor',
@@ -119,13 +124,13 @@ export default {
 					}
 				],
 				filter: {
-					status: ''
+					status: []
 				},
 				selected: []
 			},
 			filter: {
 				createdAt: null,
-				executor: null
+				executor: []
 			},
 			options: [
 				{
@@ -143,7 +148,8 @@ export default {
 			],
 			abstractHeight: '100%',
 			type: 0,
-			show: false
+			show: false,
+			executionDialog: false
 		};
 	},
 	mixins: [mixin],
@@ -163,16 +169,28 @@ export default {
 					.filter(execution => execution.createdAt >= this.filter.createdAt);
 			}
 
-			if (this.filter.executor) {
+			if (this.filter.executor && this.filter.executor.length !== 0) {
 				filteredExecutionList = filteredExecutionList
-					.filter(execution => execution.executor >= this.filter.executor);
+					.filter(execution => this.filter.executor.indexOf(execution.executor) !== -1);
 			}
 
-			return filteredExecutionList;
+			return filteredExecutionList.sort((a, b) => b.createdAt - a.createdAt);
 		},
 		filteredCompleted() {
 			let filteredExecutionList = this.filteredExecutionList
-				.filter(execution => execution.progress && execution.progress.ended === execution.progress.length);
+				.filter(execution => execution.progress && execution.progress.ended === execution.progress.length)
+				.map((execution) => {
+					const {
+						id, status, executor, createdAt,
+						result, endedAt
+					} = execution;
+
+					return {
+						id, status, executor, createdAt,
+						endedAt,
+						passRate: 10
+					};
+				});
 
 			if (this.completed.filter.passRate !== '') {
 				filteredExecutionList = filteredExecutionList
@@ -185,7 +203,17 @@ export default {
 		},
 		filteredUnfinished() {
 			let filteredExecutionList = this.filteredExecutionList
-				.filter(execution => execution.progress && execution.progress.ended < execution.progress.length && execution.status !== 3);
+				.filter(execution => ((execution.progress && execution.progress.ended < execution.progress.length) || execution.status !== 3) && !execution.error)
+				.map((execution) => {
+					const {
+						id, status, executor, createdAt, progress
+					} = execution;
+
+					return {
+						id, status, executor, createdAt,
+						progress: progress ? progress.ended / progress.length * 100 : 0
+					};
+				});
 
 			if (this.unfinished.filter.progress !== '') {
 				filteredExecutionList = filteredExecutionList
@@ -194,10 +222,10 @@ export default {
 					});
 			}
 
-			if (this.unfinished.filter.status !== '') {
+			if (this.unfinished.filter.status && this.unfinished.filter.status.length !== 0) {
 				filteredExecutionList = filteredExecutionList
 					.filter(execution => {
-						return execution.status === this.unfinished.filter.status;
+						return this.unfinished.filter.status.indexOf(execution.status) !== -1;
 					});
 			}
 
@@ -205,22 +233,16 @@ export default {
 		},
 		filteredAbnormal() {
 			let filteredExecutionList = this.filteredExecutionList
-				.filter(execution => !execution.progress && execution.status !== 3);
+				.filter(execution => !execution.progress && execution.error);
 
-			if (this.abnormal.filter.status !== '') {
+			if (this.abnormal.filter.status && this.abnormal.filter.status.length !== 0) {
 				filteredExecutionList = filteredExecutionList
 					.filter(execution => {
-						return execution.status === this.abnormal.filter.status;
+						return this.abnormal.filter.status.indexOf(execution.status) !== -1;
 					});
 			}
 
 			return filteredExecutionList;
-		},
-		executorOptions() {
-			return [];
-		},
-		statusOptions() {
-			return [];
 		}
 	},
 	methods: {
@@ -232,13 +254,13 @@ export default {
 
 			await this.getExecutionList();
 		},
-		async deleteExecution(selected) {
-			await Promise.all(selected.map(execution => {
-				return this.$http.project.source(this.projectId).execution(this.sourceId).delete(execution.hash);
+		async deleteExecution(options) {
+			await Promise.all(options.selected.map(execution => {
+				return this.$http.project.source(this.projectId).execution(this.sourceId).delete(execution.id);
 			}));
 
 			await this.getExecutionList();
-			this.completed.selected = [];
+			options.selected = [];
 		},
 		getHeight() {
 			const height = document.body.clientHeight;

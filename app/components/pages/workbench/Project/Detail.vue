@@ -36,6 +36,23 @@
 							multi-select
 						/>
 					</f-col>
+					<f-col col="2" sm="4" md="4" lg="2" class="ms-ml-2">
+						<f-dropdown
+							:options="[
+								{
+									text: '可用',
+									value: 1
+								},
+								{
+									text: '不可用',
+									value: 0
+								}
+							]"
+							placeholder="选择是否可用"
+							v-model="filter.initialized"
+							multi-select
+						/>
+					</f-col>
 					<f-button 
 						text="上传"
 						variant="primary"
@@ -56,13 +73,13 @@
 						>{{props.value.semver}}</f-link>
 					</template>
 
-					<template slot="row-avaliable" slot-scope="props">
+					<template slot="row-initialized" slot-scope="props">
 						<i
 							class="success ms-Icon ms-Icon--CompletedSolid"
-							v-show="props.value.avaliable"></i>
+							v-show="props.value.initialized"></i>
 						<i
 							class="fail ms-Icon ms-Icon--ErrorBadge"
-							v-show="!props.value.avaliable"></i>
+							v-show="!props.value.initialized"></i>
 					</template>
 
 					<template slot="row-download" slot-scope="props">
@@ -70,9 +87,12 @@
 							id="download"
 							icon="ms-Icon ms-Icon--CloudDownload"
 							:border="false"
-							:disabled="!props.value.avaliable"
+							:disabled="!props.value.initialized"
 							@click="downloadSource"
 						/>
+					</template>
+					<template slot="row-createdAt" slot-scope="props">
+						{{ props.value.createdAt | dateFormat }}
 					</template>
 				</custom-list>
 			</f-col>
@@ -88,23 +108,13 @@
 					label="创建时间"
 					underline
 					readonly
-					v-model="project.createdAt" />
+					:value="project.createdAt | dateFormat" />
 				<f-button
 					class="ms-mt-3"
 					text="更新"
 					variant="primary"
 					@click="updateProject"
 				/>
-				<f-label
-					:class="[
-						'ms-mt-1',
-						'ms-ml-3',
-						message.state
-					]"
-					style="display: inline-block; vertical-align: baseline"
-				>
-					{{ message.content }}
-				</f-label>
 			</f-col>
 		</f-row>
 		<custom-dialog
@@ -120,6 +130,8 @@
 				underline
 				v-model="source.semver"
 			/>
+
+			<component ref="upload-source"></component>
 		</custom-dialog>
 	</div>
 </template>
@@ -131,6 +143,7 @@ export default {
 			project: {
 				name: ''
 			},
+			projectName: '',
 			sourceList: [],
 			source: {
 				semver: ''
@@ -138,7 +151,8 @@ export default {
 			selectedSourceList: [],
 			show: false,
 			filter: {
-				semver: []
+				semver: [],
+				initialized: []
 			},
 			fields: [
 				{
@@ -146,8 +160,8 @@ export default {
 					key: 'semver'
 				},
 				{
-					label: 'Avaliable',
-					key: 'avaliable'
+					label: 'Initialized',
+					key: 'initialized'
 				},
 				{
 					label: 'Agent',
@@ -175,15 +189,17 @@ export default {
 		projectId() {
 			return this.$route.params.projectId;
 		},
-		projectName() {
-			return this.project.name;
-		},
 		filteredSourceList() {
 			let filteredSourceList = this.sourceList;
 				
 			if (this.filter.semver && this.filter.semver.length !== 0) {
 				filteredSourceList = filteredSourceList
 					.filter(source => this.filter.semver.indexOf(source.semver) !== -1);
+			}
+
+			if (this.filter.initialized && this.filter.initialized.length !== 0) {
+				filteredSourceList = filteredSourceList
+					.filter(source => this.filter.initialized.indexOf(source.initialized ? 1 : 0) !== -1);
 			}
 			
 			return filteredSourceList.sort((a, b) => {
@@ -209,6 +225,7 @@ export default {
 	methods: {
 		async getProject() {
 			this.project = await this.$http.project.get(this.projectId);
+			this.projectName = this.project.name;
 		},
 		async updateProject() {
 			await this.$http.project.update(this.projectId, {

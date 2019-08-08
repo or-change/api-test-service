@@ -42,16 +42,16 @@ export default function install(Vue) {
 				}
 			},
 			project: {
-				query(filter) {
-					return agent.get('/admin/project', { params: filter }).then(({data}) => {
-						return data.map(project => {
-							return {
-								id: project.id,
-								name: project.name,
-								ownerId: project.ownerId,
-								createdAt: new Date(project.createdAt)
-							};
-						});
+				async query(filter) {
+					const {data: projectList} = await agent.get('/admin/project', { params: filter });
+
+					return projectList.map(project => {
+						return {
+							id: project.id,
+							name: project.name,
+							ownerId: project.ownerId,
+							createdAt: new Date(project.createdAt)
+						};
 					});
 
 				},
@@ -79,45 +79,44 @@ export default function install(Vue) {
 			}
 		},
 		account: {
-			query() {
-				return agent.get('/account').then(({data}) => {
-					return data.map(account => {
-						return {
-							id: account.id,
-							name: account.name,
-							email: account.email,
-							avatar: account.avatar,
-							administrator: account.administrator
-						};
-					});
+			async query() {
+				const { data: accountList } = await agent.get('/account');
+
+				return accountList.map(account => {
+					return {
+						id: account.id,
+						name: account.name,
+						email: account.email,
+						avatar: account.avatar,
+						administrator: account.administrator
+					};
 				});
 			},
 			update(accountId, payload) {
-				return agent.put(`/account/${accountId}`, payload).then(({data}) => {
-					return {
-						id: data.id,
-						name: data.name,
-						email: data.email,
-						avatar: data.avatar,
-						administrator: data.administrator
-					};
-				});
+				return agent.put(`/account/${accountId}`, payload);
 			},
-			get(accountId) {
-				return agent.get(`/account/${accountId}`).then(({data}) => {
-					return {
-						id: data.id,
-						name: data.name,
-						email: data.email,
-						avatar: data.avatar,
-						administrator: data.administrator
-					};
-				});
+			async get(accountId) {
+				const { data: account } = await agent.get(`/account/${accountId}`);
+
+				return {
+					id: account.id,
+					name: account.name,
+					email: account.email,
+					avatar: account.avatar,
+					administrator: account.administrator
+				};
 			}
 		},
 		project: {
-			create(project) {
-				return agent.post('/project', project).then(({data}) => data);
+			async create(project) {
+				const { data: result } = await agent.post('/project', project);
+
+				return {
+					id: result.id,
+					name: result.name,
+					ownerId: result.ownerId,
+					createdAt: new Date(result.createdAt)
+				};
 			},
 			update(projectId, payload) {
 				return agent.put(`/project/${projectId}`, payload);
@@ -125,60 +124,60 @@ export default function install(Vue) {
 			delete(projectId) {
 				return agent.delete(`/project/${projectId}`);
 			},
-			query(filter) {
-				return agent.get('/project', { params: filter }).then(({data}) => {
-					return data.map(project => {
-						return {
-							id: project.id,
-							name: project.name,
-							ownerId: project.ownerId,
-							createdAt: new Date(project.createdAt)
-						};
-					});
-				});
-			},
-			get(projectId) {
-				return agent.get(`/project/${projectId}`).then(({data}) => {
+			async query(filter) {
+				const { data: projectList} = await agent.get('/project', { params: filter });
+
+				return projectList.map(project => {
 					return {
-						id: data.id,
-						name: data.name,
-						ownerId: data.ownerId,
-						createdAt: new Date(data.createdAt)
+						id: project.id,
+						name: project.name,
+						ownerId: project.ownerId,
+						createdAt: new Date(project.createdAt)
 					};
 				});
+			},
+			async get(projectId) {
+				const { data: project} = await agent.get(`/project/${projectId}`);
+
+				return {
+					id: project.id,
+					name: project.name,
+					ownerId: project.ownerId,
+					createdAt: new Date(project.createdAt)
+				};
 			},
 			source(projectId) {
 				return {
 					create(payload) {
 						return agent.put(`/project/${projectId}/source`, payload);
 					},
-					query(filter) {
-						return agent.get(`/project/${projectId}/source`, {
+					async query(filter) {
+						const { data: sourceList} = await agent.get(`/project/${projectId}/source`, {
 							params: filter
-						}).then(({data}) => {
-							return data.map(source => {
-								return {
-									id: source.id,
-									projectId: data.projectId,
-									agent: data.agent,
-									semver: source.semver,
-									avaliable: source.avaliable,
-									createdAt: new Date(source.createdAt),
-								};
-							});
 						});
-					},
-					get(sourceId) {
-						return agent.get(`/project/${projectId}/source/${sourceId}`).then(({data}) => {
+
+						return sourceList.map(source => {
 							return {
-								id: data.id,
-								projectId: data.projectId,
-								agent: data.agent,
-								structure: data.structure,
-								semver: data.semver,
-								createdAt: new Date(data.createdAt)
+								id: source.id,
+								projectId: source.projectId,
+								agent: source.agent,
+								semver: source.semver,
+								initialized: source.initialized,
+								createdAt: new Date(source.createdAt),
 							};
 						});
+					},
+					async get(sourceId) {
+						const { data: source} = await agent.get(`/project/${projectId}/source/${sourceId}`);
+						
+						return {
+							id: source.id,
+							projectId: source.projectId,
+							agent: source.agent,
+							structure: source.structure,
+							semver: source.semver,
+							createdAt: new Date(source.createdAt)
+						};
 					},
 					delete(sourceId) {
 						return agent.delete(`/project/${projectId}/source/${sourceId}`);
@@ -191,38 +190,38 @@ export default function install(Vue) {
 							delete(executionId) {
 								return agent.delete(`/project/${projectId}/source/${sourceId}/execution/${executionId}`);
 							},
-							query(filter) {
-								return agent.get(`/project/${projectId}/source/${sourceId}/execution`, {
+							async query(filter) {
+								const {data: executionList } = await agent.get(`/project/${projectId}/source/${sourceId}/execution`, {
 									params: filter
-								}).then(({data}) => {
-									return data.map(execution => {
-										return {
-											id: execution.id,
-											progress: execution.state,
-											status: execution.status,
-											executor: execution.executor,
-											createdAt: new Date(execution.createdAt),
-											endedAt: execution.endedAt && new Date(execution.endedAt),
-											log: execution.log,
-											result: execution.result
-										};
-									});
+								});
+
+								return executionList.map(execution => {
+									return {
+										id: execution.id,
+										progress: execution.progress,
+										status: execution.status,
+										error: execution.error,
+										executor: execution.executor,
+										createdAt: new Date(execution.createdAt),
+										endedAt: execution.endedAt && new Date(execution.endedAt),
+										log: execution.log,
+										result: execution.result
+									};
 								});
 							},
-							get(executionId) {
-								return agent.get(`/project/${projectId}/source/${sourceId}/execution/${executionId}`)
-									.then(({data}) => {
-										return {
-											id: data.id,
-											state: data.state,
-											status: data.status,
-											executor: data.executor,
-											createdAt: new Date(data.createdAt),
-											endedAt: data.endedAt && new Date(data.endedAt),
-											log: data.log,
-											result: data.result
-										};
-									});
+							async get(executionId) {
+								const {data: execution } = await agent.get(`/project/${projectId}/source/${sourceId}/execution/${executionId}`);
+								
+								return {
+									id: execution.id,
+									state: execution.state,
+									status: execution.status,
+									executor: execution.executor,
+									createdAt: new Date(execution.createdAt),
+									endedAt: execution.endedAt && new Date(execution.endedAt),
+									log: execution.log,
+									result: execution.result
+								};
 							},
 							report(executionId) {
 								return {

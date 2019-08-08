@@ -20,7 +20,7 @@ export default {
 			this.projectName = project.name;
 		},
 		async getSource() {
-			this.source = this.$http.project.source(this.projectId).get(this.sourceId);
+			this.source = await this.$http.project.source(this.projectId).get(this.sourceId);
 		}
 	},
 	mounted() {

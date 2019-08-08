@@ -81,20 +81,13 @@ export default {
 		}
 	},
 	methods: {
-		getProduction() {
-			this.$http.product.get()
-				.then(res => {
-					const { name, version } = res;
-					this.production = {
-						name, version
-					};
-				})
+		async getProduction() {
+			this.production = this.$http.product.get();
 		},
-		updateProduction() {
-			this.$http.admin.version.update(this.production)
-				.then(() => {
-				}).catch(() => {
-				})
+		async updateProduction() {
+			await this.$http.admin.version.update(this.production);
+
+			this.getProduction();
 		}
 	},
 	mounted() {

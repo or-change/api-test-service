@@ -35,7 +35,12 @@
 import mixin from './mixin';
 
 export default {
-	mixins: [mixin]
+	mixins: [mixin],
+	computed: {
+		executionId() {
+			return this.$route.params.executionId;
+		}
+	}
 }
 </script>
 
