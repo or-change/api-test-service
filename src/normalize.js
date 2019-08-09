@@ -6,7 +6,7 @@ const STORE_METHODS = [
 	'queryAccountByName', 'getProjectById', 'createProject', 'updateProject',
 	'destroyProject', 'queryProjectByOwnerId', 'getSourceById', 'createSource',
 	'destroySource', 'querySourceByProjectId', 'createExecution', 'getExecutionById',
-	'updateExecution', 'destroyExecution', 'queryExecutionBySourceId'
+	'updateExecution', 'destroyExecution', 'queryExecutionBySourceId', 'setSourceStructure'
 ];
 
 module.exports = function normalizeOptions(options = {}) {
@@ -33,6 +33,9 @@ module.exports = function normalizeOptions(options = {}) {
 			namespace: 'octs'
 		},
 		temp: {
+			path: path.resolve('.temp')
+		},
+		scanner: {
 			path: path.resolve('.temp')
 		},
 		server: {
@@ -73,6 +76,7 @@ module.exports = function normalizeOptions(options = {}) {
 	const {
 		product: _product = finalOptions.product,
 		temp: _temp = finalOptions.temp,
+		scanner: _scanner = finalOptions.scanner,
 		server: _server = finalOptions.server,
 		model: _model = finalOptions.model,
 		plugins: _plugins = finalOptions.plugins
@@ -84,6 +88,10 @@ module.exports = function normalizeOptions(options = {}) {
 
 	if (typeof _temp !== 'object') {
 		throw new TypeError('Invalid `options.temp`, object expected.');
+	}
+
+	if (typeof _scanner !== 'object') {
+		throw new TypeError('Invalid `options.scanner`, object expected.');
 	}
 
 	if (typeof _server !== 'object') {
@@ -120,6 +128,16 @@ module.exports = function normalizeOptions(options = {}) {
 		const {
 			path: _path = finalOptions.temp.path
 		} = _temp;
+
+		if (typeof _path !== 'string' || !path.isAbsolute(_path)) {
+			throw new TypeError('Invalid options.temp.path, absolute path string expected.');
+		}
+	}
+
+	if (_scanner) {
+		const {
+			path: _path = finalOptions.scanner.path
+		} = _scanner;
 
 		if (typeof _path !== 'string' || !path.isAbsolute(_path)) {
 			throw new TypeError('Invalid options.temp.path, absolute path string expected.');

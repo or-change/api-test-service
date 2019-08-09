@@ -1,10 +1,6 @@
 const fs = require('fs');
 
 module.exports = function SourceRouter(router, { Authorize, Model, Tester }) {
-	async function parseStructure(agent) {
-
-	}
-
 	router.get('/', Authorize('source.query'), async ctx => {
 		const { project } = ctx.state;
 
@@ -30,12 +26,9 @@ module.exports = function SourceRouter(router, { Authorize, Model, Tester }) {
 		});
 	}).param('sourceId', async (sourceId, ctx, next) => {
 		const { project } = ctx.state;
-		const source = await Model.Source.query({
-			projectId: project.id,
-			sourceId
-		});
+		const source = await Model.Source.query({ sourceId });
 
-		if (!source) {
+		if (!source || source.projectId !== project.id) {
 			return ctx.throw(404, 'Source is NOT found.');
 		}
 

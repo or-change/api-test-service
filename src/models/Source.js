@@ -18,11 +18,11 @@ module.exports = {
 				async create({ projectId, agent, semver }) {
 					return options.store.createSource({ projectId, agent, semver });
 				},
-				async query({ sourceId, projectId }) {
-					return options.store.getSourceById(sourceId, projectId);
+				async query({ sourceId }) {
+					return options.store.getSourceById(sourceId);
 				},
 				async delete() {
-					return options.store.destroySource(this.id, this.projectId);
+					return options.store.destroySource(this.id);
 				},
 				async update({ structure }) {
 					return options.store.setSourceStructure(this.id, structure);

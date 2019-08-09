@@ -26,12 +26,9 @@ module.exports = function ExecutionRouter(router, { Authorize, Model, Tester }) 
 			executor: type
 		});
 	}).param('executionId', async (executionId, ctx, next) => {
-		const execution = await Model.Execution.query({
-			executionId,
-			sourceId: ctx.state.source.id
-		});
+		const execution = await Model.Execution.query({ executionId });
 
-		if (!execution) {
+		if (!execution || execution.sourceId !== ctx.state.source.id) {
 			return ctx.throw(404, 'Execution is NOT found.');
 		}
 

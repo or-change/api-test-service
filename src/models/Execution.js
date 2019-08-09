@@ -39,10 +39,10 @@ module.exports = {
 					return options.store.createExecution({ sourceId, executor });
 				},
 				async delete() {
-					return options.store.destroyExecution(this.id, this.sourceId);
+					return options.store.destroyExecution(this.id);
 				},
-				async query({ sourceId, executionId }) {
-					return options.store.getExecutionById(executionId, sourceId);
+				async query({ executionId }) {
+					return options.store.getExecutionById(executionId);
 				},
 				async update() {
 

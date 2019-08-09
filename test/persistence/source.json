@@ -31,7 +31,7 @@
 		"semver": "0.1.1",
 		"agent": "basic.local",
 		"createdAt": "2019-01-01",
-		"initialized": true,
+		"initialized": false,
 		"structure": null,
 		"projectId": "be67b3cf"
 	}

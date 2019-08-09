@@ -133,10 +133,8 @@ exports.DB = function DB() {
 		queryProjectAll() {
 			return data.project;
 		},
-		getSourceById(sourceId, projectId) {
-			return data.source.find(source => {
-				return source.id === sourceId && source.projectId === projectId;
-			}) || null;
+		getSourceById(sourceId) {
+			return data.source.find(source => source.id === sourceId) || null;
 		},
 		createSource({ projectId, agent, semver }) {
 			const newSource = {
@@ -153,24 +151,20 @@ exports.DB = function DB() {
 
 			return newSource;
 		},
-		destroySource(sourceId, projectId) {
-			const index = data.source.findIndex(source => {
-				return source.id === sourceId && source.projectId === projectId;
-			});
+		destroySource(sourceId) {
+			const index = data.source.findIndex(source => source.id === sourceId);
 
 			if (index === -1) {
-				throw new Error('No source.');
+				return null;
 			}
 
 			return data.source.splice(index, 1)[0];
 		},
-		setSourceStructure(sourceId, projectId, structure) {
-			const source = data.source.find(source => {
-				return source.id === sourceId && source.projectId === projectId;
-			});
+		setSourceStructure(sourceId, structure) {
+			const source = data.source.find(source => source.id === sourceId);
 
 			if (!source) {
-				throw new Error('No source.');
+				return null;
 			}
 
 			source.structure = structure;
@@ -208,10 +202,8 @@ exports.DB = function DB() {
 
 			return execution;
 		},
-		getExecutionById(executionId, sourceId) {
-			const executionData = data.execution.find(execution => {
-				return execution.id === executionId && execution.sourceId === sourceId;
-			});
+		getExecutionById(executionId) {
+			const executionData = data.execution.find(execution => execution.id === executionId);
 
 			if (!executionData) {
 				return null;
@@ -227,10 +219,8 @@ exports.DB = function DB() {
 		updateExecution() {
 
 		},
-		destroyExecution(executionId, sourceId) {
-			const index = data.execution.findIndex(execution => {
-				return execution.id === executionId && execution.sourceId === sourceId;
-			});
+		destroyExecution(executionId) {
+			const index = data.execution.findIndex(execution => execution.id === executionId);
 
 			if (index === -1) {
 				return null;

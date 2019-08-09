@@ -13,6 +13,7 @@ const TestServiceModel = require('./src/models');
 const Registry = require('./src/registry');
 const Authorizer = require('./src/authorizer');
 const normalize = require('./src/normalize');
+const Scanner = require('./src/scanner');
 
 const Router = {
 	Base: require('./src/router/base'),
@@ -101,9 +102,7 @@ module.exports = function Examiner(originalOptions, factory = () => {}) {
 					{
 						prefix: '/plugin',
 						Router(router, injection) {
-							store.pluginRouterList.forEach(PluginRouterInstaller => {
-								PluginRouterInstaller(router, injection);
-							});
+							store.pluginRouterList.forEach(install => install(router, injection));
 						}
 					}
 				]
@@ -119,6 +118,7 @@ module.exports = function Examiner(originalOptions, factory = () => {}) {
 			Tester: store.Tester,
 			Model: models,
 			temp,
+			scanner: Scanner(options.scanner),
 			authenticate(ctx) {
 				return options.server.authenticate(ctx, models);
 			},
