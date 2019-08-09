@@ -293,7 +293,9 @@ export default {
 			await this.getProject();
 		},
 		async uploadSource() {
-			await this.$http.project.source(this.projectId).create(this.source)
+			await this.$http.project.source(this.projectId).create(this.source);
+
+			this.show = false;
 			
 			await	this.getSourceList();
 		},

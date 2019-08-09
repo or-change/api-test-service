@@ -1,30 +1,7 @@
-import Vue from 'vue';
-
-import FibricUi from '@or-change/fabric-ui';
-import FibricUiWeb from '@or-change/fabric-ui-web';
-import http from './plugins/http';
-import dateFormat from './plugins/dateFormat';
-import sourceAgent from './plugins/sourceAgent';
-import executor from './plugins/executor';
-
-Vue.use(FibricUi, { size: 'sm' });
-Vue.use(FibricUiWeb);
-Vue.use(http);
-Vue.use(dateFormat);
-Vue.use(sourceAgent);
-Vue.use(executor);
-
-import Breadcrumb from './components/utils/Breadcrumb.vue';
-import List from './components/utils/List.vue';
-import Dialog from './components/utils/Dialog.vue';
-
-Vue.component('custom-breadcrumb', Breadcrumb);
-Vue.component('custom-list', List);
-Vue.component('custom-dialog', Dialog);
-
 import '@or-change/fabric-ui-font';
 import './style/mask.css';
 import './style/style.scss';
+import Vue from 'vue';
 
 import SignIn from './components/pages/SignIn';
 
@@ -38,6 +15,33 @@ const context = {
 	},
 	beforeAppMountHandler: []
 };
+
+import Router from './router';
+const router = Router(context.routerOptions);
+
+import FibricUi from '@or-change/fabric-ui';
+import FibricUiWeb from '@or-change/fabric-ui-web';
+import http from './plugins/http';
+import dateFormat from './plugins/dateFormat';
+import sourceAgent from './plugins/sourceAgent';
+import executor from './plugins/executor';
+
+Vue.use(FibricUi, { size: 'sm' });
+Vue.use(FibricUiWeb);
+Vue.use(http, { router });
+Vue.use(dateFormat);
+Vue.use(sourceAgent);
+Vue.use(executor);
+
+import Breadcrumb from './components/utils/Breadcrumb.vue';
+import List from './components/utils/List.vue';
+import Dialog from './components/utils/Dialog.vue';
+import Panel from './components/utils/Panel.vue';
+
+Vue.component('custom-breadcrumb', Breadcrumb);
+Vue.component('custom-list', List);
+Vue.component('custom-dialog', Dialog);
+Vue.component('custom-panel', Panel);
 
 import * as product from './product';
 
@@ -78,17 +82,16 @@ Vue.prototype.$product = context.product;
 Vue.prototype.$fabric.icon.dropdown = 'ms-Icon ms-Icon--CaretSolidDown';
 
 import App from './components/App';
-import Router from './router';
 import store from './store';
 
-const router = Router(context.routerOptions);
+
 const mask = document.createElement('div');
 
 mask.id = 'app-product-mask';
 
 router.beforeEach((to, from, next) => {
 	if (to.matched.length === 0) {
-		return next('/workbench/project');
+		return next('/workbench/welcome');
 	}
 
 	mask.className = 'blocked';

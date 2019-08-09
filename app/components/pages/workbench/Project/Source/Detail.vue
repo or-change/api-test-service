@@ -124,7 +124,7 @@
 								/>
 							</template>
 
-							<template slot="row-download" slot-scope="item">
+							<!-- <template slot="row-download" slot-scope="item">
 								<f-button
 									size="lg"
 									:border="false"
@@ -132,7 +132,7 @@
 									@click="show = true; completed.downloadExecutionId = item.value.id"
 									title="下载测试报告"
 								/>
-							</template>
+							</template> -->
 						</custom-list>
 					</f-tab-item>
 					<f-tab-item title="未执行完成">
@@ -246,13 +246,16 @@
 					>
 						<span v-show="item.type === 'test'">
 							<i
+								class="default ms-Icon ms-Icon--UnknownSolid"
+								v-show="!selectedExecution"></i>
+							<i
 								class="success ms-Icon ms-Icon--CompletedSolid"
 								v-show="selectedExecution"></i>
 							<i
 								class="fail ms-Icon ms-Icon--ErrorBadge"
-								v-show="!selectedExecution"></i>
+								v-show="selectedExecution"></i>
 						</span>
-						{{item.title}}
+						<span>{{item.title}}</span>
 					</p>
 				</div>
 			</f-col>

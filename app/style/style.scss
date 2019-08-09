@@ -4,7 +4,7 @@ html {
 
 body {
 	height: 100%;
-	border-top: 1px solid transparent;
+	border-top: 1px solid transparent !important;
 }
 
 .button-danger {
@@ -115,6 +115,10 @@ body {
 	color: green;
 }
 
+.default {
+	color: gray;
+}
+
 #download {
 	height: 100%;
 
@@ -202,5 +206,6 @@ hr {
 }
 
 .ms-plugin-container {
-	
+	border: 1px solid #323130;
+	border-radius: 2px;
 }

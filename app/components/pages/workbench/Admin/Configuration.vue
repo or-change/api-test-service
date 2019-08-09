@@ -24,7 +24,7 @@
 						text="插件配置"
 						width="auto !important"
 					>
-						<f-menu slot="menu" style="top: 100%">
+						<f-menu slot="menu" style="top: 100%" id="configuration-menu">
 							<template slot="menu-body">
 								<f-menu-item
 									:options="{
@@ -32,7 +32,6 @@
 										icon: null
 									}"
 									@actived="tab = 1"
-									class="ms-center"
 								/>
 								<!-- <f-menu-item 
 									:options="{
@@ -48,7 +47,6 @@
 										icon: null
 									}"
 									@actived="tab = 3"
-									class="ms-center"
 								/>
 							</template>
 						</f-menu>
@@ -93,15 +91,23 @@
 				</div>
 
 				<div v-show="tab === 1">
-					<div class="ms-plugin-container">
-						
+					<div class="ms-plugin-container ms-mb-4 ms-px-4 ms-py-2" v-for="(sourceAgent, index) in source"
+						:key="index"
+					>
+						<f-label size="lg" class="ms-my-2">{{ sourceAgent | pluginName($product.source) }}</f-label>
+						<component :is="sourceAgent | pluginComponent($product.source)" />
 					</div>
 				</div>
-				<div v-show="tab === 2">
+				<!-- <div v-show="tab === 2">
 
-				</div>
+				</div> -->
 				<div v-show="tab === 3">
-
+					<div class="ms-plugin-container ms-mb-4 ms-px-4 ms-py-2" v-for="(executorRetrive, index) in executor"
+						:key="index"
+					>
+						<f-label size="lg" class="ms-my-2">{{ executorRetrive | pluginName($product.executor) }}</f-label>
+						<component :is="executorRetrive | pluginComponent($product.executor)" />
+					</div>
 				</div>
 			</f-col>
 		</f-row>
@@ -162,6 +168,14 @@ export default {
 			await this.$http.admin.version.update(this.production);
 
 			this.getProduction();
+		}
+	},
+	filters: {
+		pluginComponent(value, register) {
+			return register[value] ? register[value].admin : '';
+		},
+		pluginName(value, register) {
+			return register[value] ? register[value].name : '';
 		}
 	},
 	mounted() {

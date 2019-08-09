@@ -1,9 +1,18 @@
 import axios from 'axios';
 
-export default function install(Vue) {
+export default function install(Vue, { router }) {
 	const agent = axios.create({
 		baseURL: '/api'
 	});
+
+	function skip(error) {
+		router.push({
+			path: '/workbench/error',
+			query: {
+				error: error.message
+			}
+		});
+	}
 
 	Vue.$http = Vue.prototype.$http = {
 		product: {
@@ -43,7 +52,137 @@ export default function install(Vue) {
 			},
 			project: {
 				async query(filter) {
-					const {data: projectList} = await agent.get('/admin/project', { params: filter });
+					try {
+						const {data: projectList} = await agent.get('/admin/project', { params: filter });
+
+						return projectList.map(project => {
+							return {
+								id: project.id,
+								name: project.name,
+								ownerId: project.ownerId,
+								createdAt: new Date(project.createdAt)
+							};
+						});
+					} catch (e) {
+						skip(e);
+					}
+				},
+				assign(projectId, accountId) {
+					try {
+						return agent.put('/admin/project/owner', {
+							projectId, accountId
+						});
+					} catch (e) {
+						skip(e);
+					}
+				}
+			},
+			version: {
+				update(payload) {
+					try {
+						return agent.put('/admin/product', payload);
+					} catch (e) {
+						skip(e);
+					}
+				}
+			},
+			account: {
+				create(payload) {
+					try {
+						return agent.post('/admin/account', payload);
+					} catch (e) {
+						skip(e);
+					}
+				},
+				update(accountId, payload) {
+					try {
+						return agent.put(`/admin/account/${accountId}`, payload);
+					} catch (e) {
+						skip(e);
+					}
+				},
+				delete(accountId) {
+					try {
+						return agent.delete(`/admin/account/${accountId}`);
+					} catch (e) {
+						skip(e);
+					}
+				}
+			}
+		},
+		account: {
+			async query() {
+				try {
+					const { data: accountList } = await agent.get('/account');
+
+					return accountList.map(account => {
+						return {
+							id: account.id,
+							name: account.name,
+							email: account.email,
+							avatar: account.avatar,
+							administrator: account.administrator
+						};
+					});
+				} catch (e) {
+					skip(e);
+				}
+			},
+			update(accountId, payload) {
+				try {
+					return agent.put(`/account/${accountId}`, payload);
+				} catch (e) {
+					skip(e);
+				}
+			},
+			async get(accountId) {
+				try {
+					const { data: account } = await agent.get(`/account/${accountId}`);
+
+					return {
+						id: account.id,
+						name: account.name,
+						email: account.email,
+						avatar: account.avatar,
+						administrator: account.administrator
+					};
+				} catch (e) {
+					skip(e);
+				}
+			}
+		},
+		project: {
+			async create(project) {
+				try {
+					const { data: result } = await agent.post('/project', project);
+
+					return {
+						id: result.id,
+						name: result.name,
+						ownerId: result.ownerId,
+						createdAt: new Date(result.createdAt)
+					};
+				} catch (e) {
+					skip(e);
+				}
+			},
+			update(projectId, payload) {
+				try {
+					return agent.put(`/project/${projectId}`, payload);
+				} catch (e) {
+					skip(e);
+				}
+			},
+			delete(projectId) {
+				try {
+					return agent.delete(`/project/${projectId}`);
+				} catch (e) {
+					skip(e);
+				}
+			},
+			async query(filter) {
+				try {
+					const { data: projectList} = await agent.get('/project', { params: filter });
 
 					return projectList.map(project => {
 						return {
@@ -53,174 +192,131 @@ export default function install(Vue) {
 							createdAt: new Date(project.createdAt)
 						};
 					});
-
-				},
-				assign(projectId, accountId) {
-					return agent.put('/admin/project/owner', {
-						projectId, accountId
-					});
+				} catch (e) {
+					skip(e);
 				}
 			},
-			version: {
-				update(payload) {
-					return agent.put('/admin/product', payload);
-				}
-			},
-			account: {
-				create(payload) {
-					return agent.post('/admin/account', payload);
-				},
-				update(accountId, payload) {
-					return agent.put(`/admin/account/${accountId}`, payload);
-				},
-				delete(accountId) {
-					return agent.delete(`/admin/account/${accountId}`);
-				}
-			}
-		},
-		account: {
-			async query() {
-				const { data: accountList } = await agent.get('/account');
+			async get(projectId) {
+				try {
+					const { data: project} = await agent.get(`/project/${projectId}`);
 
-				return accountList.map(account => {
-					return {
-						id: account.id,
-						name: account.name,
-						email: account.email,
-						avatar: account.avatar,
-						administrator: account.administrator
-					};
-				});
-			},
-			update(accountId, payload) {
-				return agent.put(`/account/${accountId}`, payload);
-			},
-			async get(accountId) {
-				const { data: account } = await agent.get(`/account/${accountId}`);
-
-				return {
-					id: account.id,
-					name: account.name,
-					email: account.email,
-					avatar: account.avatar,
-					administrator: account.administrator
-				};
-			}
-		},
-		project: {
-			async create(project) {
-				const { data: result } = await agent.post('/project', project);
-
-				return {
-					id: result.id,
-					name: result.name,
-					ownerId: result.ownerId,
-					createdAt: new Date(result.createdAt)
-				};
-			},
-			update(projectId, payload) {
-				return agent.put(`/project/${projectId}`, payload);
-			},
-			delete(projectId) {
-				return agent.delete(`/project/${projectId}`);
-			},
-			async query(filter) {
-				const { data: projectList} = await agent.get('/project', { params: filter });
-
-				return projectList.map(project => {
 					return {
 						id: project.id,
 						name: project.name,
 						ownerId: project.ownerId,
 						createdAt: new Date(project.createdAt)
 					};
-				});
-			},
-			async get(projectId) {
-				const { data: project} = await agent.get(`/project/${projectId}`);
-
-				return {
-					id: project.id,
-					name: project.name,
-					ownerId: project.ownerId,
-					createdAt: new Date(project.createdAt)
-				};
+				} catch (e) {
+					skip(e);
+				}
 			},
 			source(projectId) {
 				return {
 					create(payload) {
-						return agent.put(`/project/${projectId}/source`, payload);
+						try {
+							return agent.put(`/project/${projectId}/source`, payload);
+						} catch (e) {
+							skip(e);
+						}
 					},
 					async query(filter) {
-						const { data: sourceList} = await agent.get(`/project/${projectId}/source`, {
-							params: filter
-						});
-
-						return sourceList.map(source => {
+						try {
+							const { data: sourceList} = await agent.get(`/project/${projectId}/source`, {
+								params: filter
+							});
+	
+							return sourceList.map(source => {
+								return {
+									id: source.id,
+									projectId: source.projectId,
+									agent: source.agent,
+									semver: source.semver,
+									initialized: source.initialized,
+									createdAt: new Date(source.createdAt),
+								};
+							});
+						} catch (e) {
+							skip(e);
+						}
+					},
+					async get(sourceId) {
+						try {
+							const { data: source} = await agent.get(`/project/${projectId}/source/${sourceId}`);
+						
 							return {
 								id: source.id,
 								projectId: source.projectId,
 								agent: source.agent,
+								structure: source.structure,
 								semver: source.semver,
-								initialized: source.initialized,
-								createdAt: new Date(source.createdAt),
+								createdAt: new Date(source.createdAt)
 							};
-						});
-					},
-					async get(sourceId) {
-						const { data: source} = await agent.get(`/project/${projectId}/source/${sourceId}`);
-						
-						return {
-							id: source.id,
-							projectId: source.projectId,
-							agent: source.agent,
-							structure: source.structure,
-							semver: source.semver,
-							createdAt: new Date(source.createdAt)
-						};
+						} catch (e) {
+							skip(e);
+						}
 					},
 					delete(sourceId) {
-						return agent.delete(`/project/${projectId}/source/${sourceId}`);
+						try {
+							return agent.delete(`/project/${projectId}/source/${sourceId}`);
+						} catch (e) {
+							skip(e);
+						}
 					},
 					execution(sourceId) {
 						return {
 							start(payload) {
-								return agent.post(`/project/${projectId}/source/${sourceId}/execution`, payload);
+								try {
+									return agent.post(`/project/${projectId}/source/${sourceId}/execution`, payload);
+								} catch (e) {
+									skip(e);
+								}
 							},
 							delete(executionId) {
-								return agent.delete(`/project/${projectId}/source/${sourceId}/execution/${executionId}`);
+								try {
+									return agent.delete(`/project/${projectId}/source/${sourceId}/execution/${executionId}`);
+								} catch (e) {
+									skip(e);
+								}
 							},
 							async query(filter) {
-								const {data: executionList } = await agent.get(`/project/${projectId}/source/${sourceId}/execution`, {
-									params: filter
-								});
-
-								return executionList.map(execution => {
+								try {
+									const {data: executionList } = await agent.get(`/project/${projectId}/source/${sourceId}/execution`, {
+										params: filter
+									});
+	
+									return executionList.map(execution => {
+										return {
+											id: execution.id,
+											progress: execution.progress,
+											status: execution.status,
+											error: execution.error,
+											executor: execution.executor,
+											createdAt: new Date(execution.createdAt),
+											endedAt: execution.endedAt && new Date(execution.endedAt),
+											result: execution.result
+										};
+									});
+								} catch (e) {
+									skip(e);
+								}
+							},
+							async get(executionId) {
+								try {
+									const {data: execution } = await agent.get(`/project/${projectId}/source/${sourceId}/execution/${executionId}`);
+								
 									return {
 										id: execution.id,
-										progress: execution.progress,
+										state: execution.state,
 										status: execution.status,
-										error: execution.error,
 										executor: execution.executor,
 										createdAt: new Date(execution.createdAt),
 										endedAt: execution.endedAt && new Date(execution.endedAt),
+										log: execution.log,
 										result: execution.result
 									};
-								});
-							},
-							async get(executionId) {
-								const {data: execution } = await agent.get(`/project/${projectId}/source/${sourceId}/execution/${executionId}`);
-								
-								return {
-									id: execution.id,
-									state: execution.state,
-									status: execution.status,
-									executor: execution.executor,
-									createdAt: new Date(execution.createdAt),
-									endedAt: execution.endedAt && new Date(execution.endedAt),
-									log: execution.log,
-									result: execution.result
-								};
+								} catch (e) {
+									skip(e);
+								}
 							},
 							report(executionId) {
 								return {

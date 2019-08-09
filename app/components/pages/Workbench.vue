@@ -3,7 +3,11 @@
 	<f-navbar
 		fixed
 	>
-		<f-navbar-brand>接口测试产品后台</f-navbar-brand>
+		<f-navbar-brand
+			href="#/workbench/welcome"
+		>
+			接口测试产品后台
+		</f-navbar-brand>
 
 		<f-navbar-toggle target="navbar" />
 
@@ -94,11 +98,11 @@ export default {
 					href: '#/workbench/admin/project',
 					icon: null
 				},
-				{
-					text: '总览',
-					href: '#/workbench/admin/overview',
-					icon: null
-				}
+				// {
+				// 	text: '总览',
+				// 	href: '#/workbench/admin/overview',
+				// 	icon: null
+				// }
 			]
 		};
 	},

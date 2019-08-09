@@ -7,12 +7,12 @@ import SignIn from './components/pages/SignIn';
 import Workbench from './components/pages/Workbench';
 // import WorkbenchPortal from './components/pages/workbench/Portal';
 
-
 import WorkbenchProject from './components/pages/workbench/Project/Overview';
+import WorkbenchWelcome from './components/pages/workbench/Welcome';
+import WorkbenchError from './components/pages/workbench/Error';
 
 import WorkbenchAccount from './components/pages/workbench/Account.vue';
 import WorkbenchProjectDetail from './components/pages/workbench/Project/Detail';
-// import WorkbenchProjectSource from './components/pages/workbench/Project/Source/Overview';
 import WorkbenchProjectSourceDetail from './components/pages/workbench/Project/Source/Detail';
 import WorkbenchProjectReporter from './components/pages/workbench/Project/Source/Report.vue';
 
@@ -29,7 +29,7 @@ export default function Router(pluginRouterOptions) {
 		routes: [
 			{
 				path: '/',
-				redirect: '/workbench/project'
+				redirect: '/workbench/welcome'
 			},
 			{
 				path: '/signin',
@@ -45,6 +45,14 @@ export default function Router(pluginRouterOptions) {
 				},
 				component: Workbench,
 				children: [
+					{
+						path: 'welcome',
+						component: WorkbenchWelcome
+					},
+					{
+						path: 'error',
+						component: WorkbenchError
+					},
 					// {
 					// 	path: 'portal',
 					// 	component: WorkbenchPortal

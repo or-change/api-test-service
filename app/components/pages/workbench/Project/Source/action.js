@@ -25,11 +25,11 @@ export default {
 						key: 'reporter',
 						class: 'col-90'
 					},
-					{
-						label: 'Download',
-						key: 'download',
-						class: 'col-90'
-					},
+					// {
+					// 	label: 'Download',
+					// 	key: 'download',
+					// 	class: 'col-90'
+					// },
 					{
 						label: 'Executor',
 						key: 'executor',

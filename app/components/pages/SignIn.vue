@@ -46,7 +46,7 @@ export default {
 				type: 'simple',
 				body: this.credential
 			});
-			this.$router.push('/workbench/project');
+			this.$router.push('/workbench/welcome');
 		}
 	}
 }
