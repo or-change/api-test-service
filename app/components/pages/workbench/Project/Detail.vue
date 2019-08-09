@@ -53,6 +53,14 @@
 							multi-select
 						/>
 					</f-col>
+					<f-col col="2" sm="4" md="4" lg="2" class="ms-ml-2">
+						<f-dropdown
+							:options="sourceAgentOptions"
+							placeholder="选择agent类型"
+							v-model="filter.agent"
+							multi-select
+						/>
+					</f-col>
 					<f-button 
 						text="上传"
 						variant="primary"
@@ -80,6 +88,10 @@
 						<i
 							class="fail ms-Icon ms-Icon--ErrorBadge"
 							v-show="!props.value.initialized"></i>
+					</template>
+
+					<template slot="row-agent" slot-scope="props">
+						{{ props.value.agent | agentFormat($product) }}
 					</template>
 
 					<template slot="row-download" slot-scope="props">
@@ -125,13 +137,23 @@
 			@ok="uploadSource"
 		>
 			<f-text-field
-				label="源代码"
-				placeholder="github"
+				label="版本号"
+				placeholder="1.0.0"
 				underline
 				v-model="source.semver"
 			/>
+			<div class="ms-my-2">
+				<f-label class="ms-d-inline-block ms-p-0 label-dropdown">选择上传方式</f-label>
+				<f-dropdown
+					class="ms-d-inline-block"
+					:options="sourceAgentOptions"
+					placeholder="选择方式"
+					v-model="source.agent"
+					style="width: 200px;"
+				/>
+			</div>
 
-			<component ref="upload-source"></component>
+			<component ref="upload-source" :is="sourceAgent"></component>
 		</custom-dialog>
 	</div>
 </template>
@@ -146,13 +168,15 @@ export default {
 			projectName: '',
 			sourceList: [],
 			source: {
-				semver: ''
+				semver: '',
+				agent: ''
 			},
 			selectedSourceList: [],
 			show: false,
 			filter: {
 				semver: [],
-				initialized: []
+				initialized: [],
+				agent: []
 			},
 			fields: [
 				{
@@ -185,6 +209,11 @@ export default {
 			}
 		}
 	},
+	filters: {
+		agentFormat(value, product) {
+			return product.source[value] ? product.source[value].name : value; 
+		}
+	},
 	computed: {
 		projectId() {
 			return this.$route.params.projectId;
@@ -200,6 +229,11 @@ export default {
 			if (this.filter.initialized && this.filter.initialized.length !== 0) {
 				filteredSourceList = filteredSourceList
 					.filter(source => this.filter.initialized.indexOf(source.initialized ? 1 : 0) !== -1);
+			}
+
+			if (this.filter.agent && this.filter.agent.length !== 0) {
+				filteredSourceList = filteredSourceList
+					.filter(source => this.filter.agent.indexOf(source.agent) !== -1);
 			}
 			
 			return filteredSourceList.sort((a, b) => {
@@ -220,6 +254,30 @@ export default {
 			});
 
 			return result;
+		},
+		sourceAgentOptions() {
+			const sourceAgent = [];
+			const { source } = this.$product;
+
+			for (let key in source) {
+				sourceAgent.push({
+					text:	source[key].name,
+					value: key
+				})
+			}
+
+			this.source.agent = sourceAgent[0] ? sourceAgent[0].value : '';
+
+			return sourceAgent;
+		},
+		sourceAgent() {
+			const { source } = this.$product;
+
+			if (source[this.source.agent]) {
+				return source[this.source.agent].create;
+			}
+
+			return '';
 		}
 	},
 	methods: {

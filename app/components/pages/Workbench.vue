@@ -123,7 +123,7 @@ export default {
 		async signOut() {
 			await this.$store.dispatch('signout')
 			
-			this.$router.push('/');
+			this.$router.push('/signin');
 		}
 	}
 }

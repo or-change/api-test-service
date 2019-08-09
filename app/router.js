@@ -70,7 +70,7 @@ export default function Router(pluginRouterOptions) {
 						component: WorkbenchProjectSourceDetail
 					},
 					{
-						path: 'project/:projectId/source/:sourceId/execution/:executinoId/reporter',
+						path: 'project/:projectId/source/:sourceId/execution/:executionId/reporter',
 						component: WorkbenchProjectReporter
 					},
 					{

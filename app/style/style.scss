@@ -51,6 +51,10 @@ body {
 	}
 }
 
+.ms-navbar-fixed {
+	z-index: 300;
+}
+
 #sub-menu {
 	ul li a {
 		text-align: center;
@@ -124,7 +128,7 @@ body {
 	}
 }
 
-#project-detail {
+#project-detail .ms-list-row-cell {
 	i {
 		font-size: 16px;
 	}
@@ -189,4 +193,14 @@ hr {
 	.ms-list {
 		position: relative;
 	}
+}
+
+.label-dropdown {
+	height: 26px;
+	line-height: 26px;
+	vertical-align: top;
+}
+
+.ms-plugin-container {
+	
 }

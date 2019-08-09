@@ -44,7 +44,11 @@
 			:items="filteredProjectList"
 			:select-mode="filteredProjectList.length !== 0 ? 'multi' : 'single'"
 			v-model="selectedProject"
-		/>
+		>
+			<template slot="row-createdAt" slot-scope="props">
+				{{ props.value.createdAt | dateFormat }}
+			</template>
+		</custom-list>
 
 		<custom-dialog
 			id="project-assign"

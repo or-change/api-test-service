@@ -204,7 +204,6 @@ export default function install(Vue) {
 										executor: execution.executor,
 										createdAt: new Date(execution.createdAt),
 										endedAt: execution.endedAt && new Date(execution.endedAt),
-										log: execution.log,
 										result: execution.result
 									};
 								});

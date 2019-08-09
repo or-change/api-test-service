@@ -102,7 +102,7 @@
 							</template>
 
 							<template slot="row-executor" slot-scope="item">
-								{{ item.value.executor | executorFilter }}
+								{{ item.value.executor | executorFilter($product) }}
 							</template>
 
 							<template slot="row-createdAt" slot-scope="item">
@@ -182,7 +182,7 @@
 							</template>
 
 							<template slot="row-executor" slot-scope="item">
-								{{ item.value.executor | executorFilter }}
+								{{ item.value.executor | executorFilter($product) }}
 							</template>
 
 							<template slot="row-createdAt" slot-scope="item">
@@ -223,7 +223,7 @@
 							</template>
 
 							<template slot="row-executor" slot-scope="item">
-								{{ item.value.executor | executorFilter }}
+								{{ item.value.executor | executorFilter($product) }}
 							</template>
 
 							<template slot="row-createdAt" slot-scope="item">
@@ -244,6 +244,14 @@
 						:style="{'padding-left': `${25 * item.level}px`}"
 						:title="item.title"
 					>
+						<span v-show="item.type === 'test'">
+							<i
+								class="success ms-Icon ms-Icon--CompletedSolid"
+								v-show="selectedExecution"></i>
+							<i
+								class="fail ms-Icon ms-Icon--ErrorBadge"
+								v-show="!selectedExecution"></i>
+						</span>
 						{{item.title}}
 					</p>
 				</div>
@@ -252,10 +260,18 @@
 		<custom-dialog
 			id="start-execution"
 			v-model="executionDialog" 
-			title=""
-			ok-text=""
+			title="开始执行"
+			ok-text="执行"
 			@ok="startExecution"
 		>
+			<f-dropdown
+				class="ms-my-2"
+				:options="executorOptions"
+				placeholder="选择方式"
+				v-model="execution.executor"
+			/>
+
+			<component ref="start-execution" :is="executor"></component>
 		</custom-dialog>
 		<custom-dialog
 			id="get-reporter"
@@ -285,13 +301,25 @@ export default {
 		statusFilter(value) {
 			return statusMapping[value];
 		},
-		executorFilter(value) {
-			return value;
+		executorFilter(value, product) {
+			return product.executor[value] ? product.executor[value].name : value;
 		}
 	},
 	computed: {
 		executorOptions() {
-			return [];
+			const executorOptions = [];
+			const { executor } = this.$product;
+
+			for (let key in executor) {
+				executorOptions.push({
+					text:	executor[key].name,
+					value: key
+				})
+			}
+
+			this.execution.executor = executorOptions[0] ? executorOptions[0].value : '';
+
+			return executorOptions;
 		},
 		statusOptions() {
 			const statusValue = Object.keys(statusMapping);
@@ -302,6 +330,15 @@ export default {
 					text: statusMapping[status]
 				}
 			});
+		},
+		executor() {
+			const { executor } = this.$product;
+
+			if (executor[this.execution.executor]) {
+				return executor[this.execution.executor].create;
+			}
+
+			return '';
 		}
 	}
 }
