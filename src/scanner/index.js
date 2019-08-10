@@ -7,11 +7,8 @@ const http = require('http');
 module.exports = function Structure(options) {
 	try {
 		fs.removeSync(options.path);
-		fs.statSync(options.path);
 	} catch (e) {
-		fs.mkdirSync(options.path, {
-			recursive: true
-		});
+		fs.mkdirSync(options.path, { recursive: true });
 	}
 
 	const TIMEOUT = 60 * 1000;
@@ -123,12 +120,9 @@ module.exports = function Structure(options) {
 					env: Object.assign({
 						SCANNER_SESSION: sessionId
 					}, SCANNER_ENV)
-				}).on('error', err => {
-					reject(err);
-				});
+				}).on('close', () => fs.remove(dir));
 			});
-
-			// fs.remove(dir);
+			
 			source.$update({ structure });
 		}
 	};

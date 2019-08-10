@@ -29,8 +29,8 @@ module.exports = {
 					executor: { type: 'string' },
 					createdAt: { type: 'date' },
 					endedAt: { type: 'date' },
-					log: { type: 'string' },
-					result: { type: 'string' }
+					log: { type: 'array', items: { type: 'object' } },
+					result: { type: 'array', items: { type: 'array', items: { type: 'number' } } }
 				},
 				allowNull: ['log', 'endedAt', 'progress', 'result', 'error']
 			},
@@ -44,8 +44,8 @@ module.exports = {
 				async query({ executionId }) {
 					return options.store.getExecutionById(executionId);
 				},
-				async update() {
-
+				async update(items) {
+					return options.store.updateExecution(this.id, items)
 				}
 			}
 		};
@@ -84,7 +84,7 @@ module.exports = {
 						executor: { type: 'string' },
 						createdAt: { type: 'date' },
 						endedAt: { type: 'date' },
-						result: { type: 'string' }
+						result: { type: 'array', items: { type: 'array', items: { type: 'number' } } }
 					},
 					allowNull: ['endedAt', 'progress', 'result', 'error']
 				}

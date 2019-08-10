@@ -1,19 +1,17 @@
 const path = require('path');
-const fs = require('fs');
-const koa = require('koa');
-const koaBody = require('koa-body');
-const Router = require('koa-router');
+const fs = require('fs-extra');
 const { spawn } = require('child_process');
-const yauzl = require('yauzl');
+const Observer = require('./observer');
+const Manager = require('./manager');
+const unzip = require('./unzip');
 
-const TIMEOUT = 15 * 60 * 1000;
 const ID = {
 	SOURCE_AGENT: 'basic.local',
 	EXECUTOR: 'basic.local'
 };
 
 module.exports = function BasicSuitePluginProvider() {
-	const store = {};
+	const sourceBufferStore = {};
 
 	return {
 		name: 'Examiner Basic Plugin Suite',
@@ -21,106 +19,60 @@ module.exports = function BasicSuitePluginProvider() {
 		version: '1.0.0',
 		description: 'Basic functions for getting started.',
 		install: function BasicSuitePluginInstall(examiner, { temp }) {
-			const Session = {
-				store: {},
-				create(scan) {
-					const id = Math.random().toString(16).substr(2, 8);
-					
-					return new Promise((resolve, reject) => {
-						scan(id, reject);
-		
-						const execution = this.store[id] = {
-							callback() {
-								resolve(execution);
-							},
-							timer: setTimeout(() => reject(), TIMEOUT)
-						};
-					}).finally(() => {
-						clearTimeout(this.store[id].timer);
-						delete this.store[id];
-					});
-				}
-			};
-			const router = new Router({
-				prefix: '/:sessionId'
-			}).post('/log', ctx => {
-			
-			}).post('/structure', ctx => {
-
-			}).get('/progress', ctx => {
-			
-			});
-			const observer = new koa().use(koaBody()).use(router.routes()).listen();
+			const manager = Manager();
+			const observer = Observer(manager);
 			const { port } = observer.address();
 			const EXECUTION_ENV =  Object.assign({}, process.env, {
-				TDK_MODE: 'scan',
 				OBSERVER_PORT: port,
 				OBSERVER_HOST: '127.0.0.1',
 			});
 
 			examiner.executor(ID.EXECUTOR, async function BaseLocalExecutor(agent, execution) {
-				const sourceBuffer = await agent.fetch();
 				const dir = path.join(temp.path, Math.random().toString(16).substr(2, 8));
 
-				await fs.ensureDir(dir);
-				await new Promise((resolve, reject) => {
-					yauzl.fromBuffer(sourceBuffer, {
-						lazyEntries: true
-					}, (err, zipfile) => {
-						if (err) {
-							return reject(err);
-						}
+				await execution.$update({ status: 0 });
 
-						zipfile.on('entry', async entry => {
-							if (/\/$/.test(entry.fileName)) {
-								await fs.ensureDir(path.join(dir, entry.fileName));
-								zipfile.readEntry();
-							} else {
-								zipfile.openReadStream(entry, function (err, readStream) {
-									if (err) {
-										return reject(err);
-									}
-
-									readStream.on('end', function () {
-										zipfile.readEntry();
-									}).pipe(fs.createWriteStream(path.join(dir, entry.fileName)));
-								});
-							}
-						}).on('end', () => resolve());
-
-						zipfile.readEntry();
-					});
-				});
-
-				await new Promise((resolve, reject) => {
-					const installing = spawn(process.platform === 'win32' ? 'npm.cmd' : 'npm', [
-						'install'
-					], {
-						cwd: dir,
-					});
-	
-					installing
-						.on('error', err => reject(err))
-						.on('close', code => resolve());
-				});
+				try {
+					await fs.ensureDir(dir);
+					await unzip(await agent.fetch(), dir);
+				} catch (err) {
+					return await execution.$update({ error: err.message });
+				}
 				
-				await Session.create((sessionId, reject) => {
-					spawn(process.platform === 'win32' ? 'npx.cmd' : 'npx', [
-						'mocha',
-						'--reporter',
-						'@or-change/tdk/reporter',
-						'--require',
-						path.join(__dirname, 'log.js')
-					], {
-						cwd: dir,
-						env: Object.assign({
-							EXECUTION_SESSION: sessionId
-						}, EXECUTION_ENV)
-					}).on('error', err => {
-						reject(err);
-					});
-				});
+				await execution.$update({ status: 1 });
 
+				try {
+					await new Promise((resolve, reject) => {
+						const installing = spawn(process.platform === 'win32' ? 'npm.cmd' : 'npm', [
+							'install'
+						], { cwd: dir });
+		
+						installing
+							.on('error', err => reject(err))
+							.on('close', code => resolve());
+					});
+				} catch(err) {
+					return await execution.$update({ error: err.message });
+				}
+
+				await execution.$update({ status: 2 });
+				
+				const sessionId = manager.create(execution);
+				spawn(process.platform === 'win32' ? 'npx.cmd' : 'npx', [
+					'mocha',
+					'--reporter',
+					'@or-change/tdk/reporter',
+					'--require',
+					path.join(__dirname, 'log.js')
+				], {
+					cwd: dir,
+					env: Object.assign({
+						EXECUTION_SESSION: sessionId
+					}, EXECUTION_ENV)
+				}).on('close', () => {
+					manager.destroy(sessionId);
+					fs.remove(dir);
+				});
 			});
 
 			examiner.router(function install(router, { Model, scanner, Tester }) {
@@ -139,7 +91,7 @@ module.exports = function BasicSuitePluginProvider() {
 						return ctx.throw(412, 'Bad source state.');
 					}
 
-					store[sourceId] = await fs.readFile(fileOptions.path);
+					sourceBufferStore[sourceId] = await fs.readFile(fileOptions.path);
 
 					const agent = new Tester.SourceAgent[ID.SOURCE_AGENT](sourceId);
 
@@ -155,7 +107,9 @@ module.exports = function BasicSuitePluginProvider() {
 
 					const agent = new Tester.SourceAgent[ID.SOURCE_AGENT](execution.sourceId);
 
-					Tester.Executor[execution.executor](agent, execution);
+					Tester.Executor[execution.executor](agent, execution).catch(err => {
+						execution.$update({ error: err.message });
+					});
 					ctx.body = 'ok';
 				});
 			});
@@ -163,7 +117,7 @@ module.exports = function BasicSuitePluginProvider() {
 			examiner.sourceAgent(ID.SOURCE_AGENT, function BasicLocalSourceAgent(sourceId) {
 				return {
 					async fetch() {
-						return store[sourceId];
+						return sourceBufferStore[sourceId];
 					}
 				};
 			});

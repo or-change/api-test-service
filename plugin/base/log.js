@@ -1,21 +1,19 @@
 const http = require('http');
 const {
-	SCANNER_SESSION,
+	EXECUTION_SESSION,
 	OBSERVER_HOST,
 	OBSERVER_PORT
 } = process.env;
 
-const URL = `http://${OBSERVER_HOST}:${OBSERVER_PORT}/${SCANNER_SESSION}`;
+const URL = `http://${OBSERVER_HOST}:${OBSERVER_PORT}/${EXECUTION_SESSION}`;
 
 function request(method, path, message) {
-	return http.request(`${URL}/${path}`, {
+	return http.request(`${URL}${path}`, {
 		method,
 		headers: {
 			'Content-Type': 'application/json'
 		}
-	}).on('close', () => {
-		process.exit(0);
-	}).end(message);
+	}).end(message || '');
 }
 
 const state = {
@@ -23,9 +21,9 @@ const state = {
 	finished: 0
 };
 
-global.__TDK__ = {
+global._TDK_ = {
 	structure(object) {
-		request('POST', '/structure', JSON.stringify(object));
+		request('POST', '/ready', JSON.stringify(object));
 	},
 	log(type, message) {
 		state.log.push({
@@ -35,8 +33,7 @@ global.__TDK__ = {
 		});
 	},
 	progress() {
-		state.finished++;
-		request('GET', '/progress', JSON.stringify({ finished: state.finished }));
+		request('GET', `/progress/${++state.finished}`);
 	},
 	end() {
 		request('POST', '/log', JSON.stringify(state.log));

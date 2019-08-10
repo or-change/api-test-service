@@ -216,8 +216,47 @@ exports.DB = function DB() {
 
 			return execution;
 		},
-		updateExecution() {
+		updateExecution(id, items) {
+			const execution = data.execution.find(execution => execution.id === id);
 
+			if (typeof items.status === 'number') {
+				execution.status = items.status;
+			}
+
+			if (typeof items.error === 'string') {
+				execution.error = items.error;
+			}
+
+			if (items.endedAt) {
+				execution.endedAt = new Date(items.endedAt);
+			}
+
+			if (items.progress) {
+				if (!execution.progress) {
+					execution.progress = {
+						length: 0,
+						ended: 0
+					};
+				}
+
+				if (items.progress.ended) {
+					execution.progress.ended = Number(items.progress.ended);
+				}
+
+				if (items.progress.length) {
+					execution.progress.length = items.progress.length;
+				}
+			}
+
+			if (items.log) {
+				execution.log = items.log;
+			}
+
+			if (items.result) {
+				execution.result = items.result;
+			}
+
+			return execution;
 		},
 		destroyExecution(executionId) {
 			const index = data.execution.findIndex(execution => execution.id === executionId);
