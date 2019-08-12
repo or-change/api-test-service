@@ -199,10 +199,18 @@ hr {
 	}
 }
 
-.label-dropdown {
-	height: 26px;
-	line-height: 26px;
-	vertical-align: top;
+.dropdown-container {
+	border-bottom: 1px solid #8a8886;
+
+	.label-dropdown {
+		height: 26px;
+		line-height: 26px;
+		vertical-align: top;
+	}
+
+	.ms-dropdown .ms-text-field-standard .ms-text-field-group-inline {
+		border: none;
+	}
 }
 
 .ms-plugin-container {

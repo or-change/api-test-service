@@ -142,14 +142,14 @@
 				underline
 				v-model="source.semver"
 			/>
-			<div class="ms-my-2">
+			<div class="ms-my-2 dropdown-container">
 				<f-label class="ms-d-inline-block ms-p-0 label-dropdown">选择上传方式</f-label>
 				<f-dropdown
 					class="ms-d-inline-block"
 					:options="sourceAgentOptions"
 					placeholder="选择方式"
 					v-model="source.agent"
-					style="width: 200px;"
+					style="width: 216px;"
 				/>
 			</div>
 

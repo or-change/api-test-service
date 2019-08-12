@@ -1,7 +1,7 @@
 <template>
 	<custom-panel id="error">
 		<f-row>
-			<f-col col="8">
+			<f-col col="5">
 				<h1>操作失败：</h1>
 				<h2 class="ms-my-4">{{ errorMessage }}</h2>
 
@@ -38,7 +38,7 @@ export default {
 <style lang="scss">
 #error {
 	#error-symbol {
-		font-size: 160px;
+		font-size: 130px;
 		color: #a4262c;
 	}
 }

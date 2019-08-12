@@ -267,12 +267,17 @@
 			ok-text="执行"
 			@ok="startExecution"
 		>
-			<f-dropdown
-				class="ms-my-2"
-				:options="executorOptions"
-				placeholder="选择方式"
-				v-model="execution.executor"
-			/>
+			
+			<div class="dropdown-container ms-mb-2">
+				<f-label class="ms-d-inline-block ms-p-0 label-dropdown">执行器</f-label>
+				<f-dropdown
+					class="ms-d-inline-block"
+					:options="executorOptions"
+					placeholder="选择方式"
+					v-model="execution.executor"
+					style="width: 216px;"
+				/>
+			</div>
 
 			<component ref="start-execution" :is="executor"></component>
 		</custom-dialog>

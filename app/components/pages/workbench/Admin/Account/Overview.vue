@@ -95,9 +95,12 @@
 				v-model="account.email"
 				required
 			/>
-			<div>
-				<f-label class="ms-my-2">管理员：</f-label>
+
+			<div class="dropdown-container ms-mt-2">
+				<f-label class="ms-d-inline-block ms-p-0 label-dropdown">管理员：</f-label>
 				<f-dropdown
+					class="ms-d-inline-block"
+					style="width: 240px;"
 					:options="[
 						{
 							text: '是',
