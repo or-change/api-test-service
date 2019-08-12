@@ -212,9 +212,19 @@ export default function install(Vue, { router }) {
 			},
 			source(projectId) {
 				return {
-					create(payload) {
+					async create(payload) {
 						try {
-							return agent.put(`/project/${projectId}/source`, payload);
+							const {data: source} = await agent.post(`/project/${projectId}/source`, payload);
+
+							return {
+								id: source.id,
+								projectId: source.projectId,
+								agent: source.agent,
+								semver: source.semver,
+								initialized: source.initialized,
+								createdAt: new Date(source.createdAt),
+							};
+
 						} catch (e) {
 							skip(e);
 						}
@@ -264,9 +274,21 @@ export default function install(Vue, { router }) {
 					},
 					execution(sourceId) {
 						return {
-							start(payload) {
+							async start(payload) {
 								try {
-									return agent.post(`/project/${projectId}/source/${sourceId}/execution`, payload);
+									const {data: execution } = await agent.post(`/project/${projectId}/source/${sourceId}/execution`, payload);
+
+									return {
+										id: execution.id,
+										sourceId: execution.sourceId,
+										progress: execution.progress,
+										status: execution.status,
+										error: execution.error,
+										executor: execution.executor,
+										createdAt: new Date(execution.createdAt),
+										endedAt: execution.endedAt && new Date(execution.endedAt),
+										result: execution.result
+									};
 								} catch (e) {
 									skip(e);
 								}

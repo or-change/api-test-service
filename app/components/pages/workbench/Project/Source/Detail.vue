@@ -244,16 +244,17 @@
 						:style="{'padding-left': `${25 * item.level}px`}"
 						:title="item.title"
 					>
-						<span v-show="item.type === 'test'">
+						<span v-if="item.type === 'test'">
 							<i
 								class="default ms-Icon ms-Icon--UnknownSolid"
 								v-show="!selectedExecution"></i>
 							<i
 								class="success ms-Icon ms-Icon--CompletedSolid"
-								v-show="selectedExecution"></i>
+								v-show="selectedExecution && !resultMapping[item.path.join('-')]"></i>
+
 							<i
 								class="fail ms-Icon ms-Icon--ErrorBadge"
-								v-show="selectedExecution"></i>
+								v-show="selectedExecution && resultMapping[item.path.join('-')]"></i>
 						</span>
 						<span>{{item.title}}</span>
 					</p>
@@ -279,7 +280,10 @@
 				/>
 			</div>
 
-			<component ref="start-execution" :is="executor"></component>
+			<component
+				ref="start-execution" :is="executor"
+				@success="executionSuccess"
+			></component>
 		</custom-dialog>
 		<custom-dialog
 			id="get-reporter"
@@ -347,6 +351,19 @@ export default {
 			}
 
 			return '';
+		},
+		resultMapping() {
+			const result = {};
+
+			if (!this.selectedExecution) {
+				return result;
+			} else {
+				this.selectedExecution.result.forEach(execution => {
+					result[execution.join('-')] = true;
+				});
+			}
+
+			return result;
 		}
 	}
 }

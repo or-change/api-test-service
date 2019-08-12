@@ -172,10 +172,9 @@ exports.DB = function DB() {
 
 			return source;
 		},
-		querySourceByProjectId({ projectId, initialized = true }) {
+		querySourceByProjectId({ projectId }) {
 			return data.source.filter(source => {
-				return source.projectId === projectId &&
-					source.initialized === initialized;
+				return source.projectId === projectId;
 			}).map(project => {
 				const abstract = Object.assign({}, project);
 

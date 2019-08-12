@@ -62,7 +62,7 @@
 						/>
 					</f-col>
 					<f-button 
-						text="上传"
+						text="创建源代码"
 						variant="primary"
 						@click="show = true"
 						class="ms-ml-3"
@@ -77,7 +77,12 @@
 				>
 					<template slot="row-semver" slot-scope="props">
 						<f-link
-							:href="`#/workbench/project/${projectId}/source/${props.value.id}`"
+							:class="{
+								'link-disabled': !props.value.initialized
+							}"
+							:href="props.value.initialized ? 
+								`#/workbench/project/${projectId}/source/${props.value.id}`
+								: undefined"
 						>{{props.value.semver}}</f-link>
 					</template>
 
@@ -95,13 +100,14 @@
 					</template>
 
 					<template slot="row-download" slot-scope="props">
-						<f-button
-							id="download"
-							icon="ms-Icon ms-Icon--CloudDownload"
-							:border="false"
-							:disabled="!props.value.initialized"
-							@click="downloadSource"
-						/>
+						<f-link
+							:class="{
+								'link-disabled': !props.value.initialized
+							}"
+							:href="`/api/project/${projectId}/source/${props.value.id}/pack`"
+						>
+							<i class="ms-Icon ms-Icon--CloudDownload"></i>
+						</f-link>
 					</template>
 					<template slot="row-createdAt" slot-scope="props">
 						{{ props.value.createdAt | dateFormat }}
@@ -132,28 +138,39 @@
 		<custom-dialog
 			id="create-source"
 			v-model="show" 
-			title="上传项目源代码"
-			ok-text="上传"
+			title="创建项目源代码"
+			ok-text="确定"
 			@ok="uploadSource"
+			size="md"
+			:cancelButton="false"
 		>
-			<f-text-field
-				label="版本号"
-				placeholder="1.0.0"
-				underline
-				v-model="source.semver"
-			/>
-			<div class="ms-my-2 dropdown-container">
-				<f-label class="ms-d-inline-block ms-p-0 label-dropdown">选择上传方式</f-label>
-				<f-dropdown
-					class="ms-d-inline-block"
-					:options="sourceAgentOptions"
-					placeholder="选择方式"
-					v-model="source.agent"
-					style="width: 216px;"
-				/>
-			</div>
+			<f-row class="ms-mb-2">
+				<f-col col="5">
+					<f-text-field
+						label="版本号"
+						placeholder="1.0.0"
+						underline
+						v-model="source.semver"
+					/>
+				</f-col>
+				<f-col col="6" class="ms-ml-2">
+					<div class="dropdown-container">
+						<f-label class="ms-d-inline-block ms-p-0 label-dropdown">创建方式</f-label>
+						<f-dropdown
+							class="ms-d-inline-block"
+							:options="sourceAgentOptions"
+							placeholder="选择方式"
+							v-model="source.agent"
+							style="width: 92px;"
+						/>
+					</div>
+				</f-col>
+			</f-row>
 
-			<component ref="upload-source" :is="sourceAgent"></component>
+			<component
+				@fail=""
+				@success="createSuccess"
+				ref="upload-source" :is="sourceAgent"></component>
 		</custom-dialog>
 	</div>
 </template>
@@ -293,11 +310,9 @@ export default {
 			await this.getProject();
 		},
 		async uploadSource() {
-			await this.$http.project.source(this.projectId).create(this.source);
+			const source = await this.$http.project.source(this.projectId).create(this.source);
 
-			this.show = false;
-			
-			await	this.getSourceList();
+			await this.$refs['upload-source'].submit(source.id);
 		},
 		async deleteSource() {
 			await Promise.all(this.selectedSourceList.map(source => {
@@ -310,6 +325,11 @@ export default {
 		async getSourceList() {
 			this.sourceList = await this.$http.project.source(this.projectId).query();
 		},
+		async createSuccess() {
+			this.show = false;
+			
+			await	this.getSourceList();
+		},
 		downloadSource() {
 
 		}
@@ -320,3 +340,16 @@ export default {
 	}
 }
 </script>
+
+<style lang="scss">
+.ms-link.link-disabled {
+	text-decoration: none;
+	cursor: default;
+	color: #a19f9d;
+
+	&:hover {
+		text-decoration: none;
+		color: #a19f9d;
+	}
+}
+</style>

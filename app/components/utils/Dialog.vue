@@ -24,6 +24,7 @@
 					:text="okText"
 					@click="ok" />
 				<f-button
+					v-if="cancelButton"
 					:text="cancelText"
 					@click="cancel" />
 			</div>
@@ -60,6 +61,10 @@ export default {
 		value: {
 			type: Boolean,
 			default: false
+		},
+		cancelButton: {
+			type: Boolean,
+			default: true
 		}
 	},
 	methods: {

@@ -5,7 +5,8 @@ function constructList(tree, result = [], level = 0) {
 			only: node.only,
 			skip: node.skip,
 			title: node.title,
-			type: node.type
+			type: node.type,
+			path: node.path
 		});
 
 		if (node.children) {

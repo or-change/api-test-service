@@ -124,7 +124,7 @@ const app = new Vue({ store, router, render: h => h(App) });
 
 context.beforeAppMountHandler.forEach(handler => handler(app));
 window.addEventListener('load', async function () {
-	document.body.append(mask);
+	// document.body.append(mask);
 
 	const { $http } = Vue;
 	const product = await $http.product.get();

@@ -153,7 +153,7 @@ export default {
 			return filteredExecutionList.sort((a, b) => b.createdAt - a.createdAt);
 		},
 		filteredCompleted() {
-			let filteredExecutionList = this.filteredExecutionList
+			const filteredExecutionList = this.filteredExecutionList
 				.filter(execution => execution.progress && execution.progress.ended === execution.progress.length)
 				.map((execution) => {
 					const {
@@ -163,13 +163,13 @@ export default {
 
 					return {
 						id, status, executor, createdAt,
-						endedAt,
-						passRate: 10
+						endedAt, result,
+						passRate: (this.source.structure.total - result.length) / this.source.structure.total * 100
 					};
 				});
 
 			if (this.completed.filter.passRate !== '') {
-				filteredExecutionList = filteredExecutionList
+				return filteredExecutionList
 					.filter(execution => {
 						return execution.passRate >= this.completed.filter.passRate;
 					});
@@ -226,8 +226,11 @@ export default {
 			this.executionList = await this.$http.project.source(this.projectId).execution(this.sourceId).query();
 		},
 		async startExecution() {
-			await this.$http.project.source(this.projectId).execution(this.sourceId).start({});
-
+			const execution = await this.$http.project.source(this.projectId).execution(this.sourceId).start(this.execution);
+			await this.$refs['start-execution'].submit(execution.id);
+		},
+		async executionSuccess() {
+			this.executionDialog = false;
 			await this.getExecutionList();
 		},
 		async deleteExecution(options) {

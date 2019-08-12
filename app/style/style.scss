@@ -15,7 +15,7 @@ body {
 	}
 
 	.ms-button:hover button {
-		background-color: #a80000;
+		background-color: #a80000 !important;
 	}
 }
 
@@ -122,14 +122,14 @@ body {
 #download {
 	height: 100%;
 
-	.ms-button {
+	.ms-link {
 		background-color: transparent;
 		height: 100%;
 	}
 
-	.ms-button.ms-button-no-split.ms-button-standard .ms-button-disabled {
-		background-color: transparent;
-	}
+	// .ms-button.ms-button-no-split.ms-button-standard .ms-button-disabled {
+	// 	background-color: transparent;
+	// }
 }
 
 #project-detail .ms-list-row-cell {
@@ -201,17 +201,20 @@ hr {
 
 .dropdown-container {
 	border-bottom: 1px solid #8a8886;
-
-	.label-dropdown {
-		height: 26px;
-		line-height: 26px;
-		vertical-align: top;
-	}
+	height: 25px;
+	background-color: #fff;
 
 	.ms-dropdown .ms-text-field-standard .ms-text-field-group-inline {
 		border: none;
 	}
+
+	.label-dropdown {
+		height: 25px;
+		line-height: 25px;
+		vertical-align: top;
+	}
 }
+
 
 .ms-plugin-container {
 	border: 1px solid #323130;

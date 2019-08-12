@@ -9,7 +9,7 @@
 			接口测试产品后台
 		</f-navbar-brand>
 
-		<f-navbar-toggle target="navbar" />
+		<!-- <f-navbar-toggle target="navbar" /> -->
 
 		<f-navbar-collapse id="navbar">
 			<f-navbar-nav>
@@ -132,3 +132,18 @@ export default {
 	}
 }
 </script>
+
+<style lang="scss">
+nav {
+	display: table;
+}
+
+.ms-navbar-brand {
+	display: table-cell;
+}
+
+.ms-navbar .ms-navbar-collapse {
+	display: table-cell !important;
+	width: 100%;
+}
+</style>
