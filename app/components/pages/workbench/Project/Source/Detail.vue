@@ -369,3 +369,13 @@ export default {
 }
 </script>
 
+<style lang="scss">
+#abstract-container {
+	p span {
+		i, span {
+			vertical-align: middle;
+		}
+	}
+}
+</style>
+

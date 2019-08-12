@@ -17,7 +17,7 @@
 			<f-col col="1" md="2" sm="3" lg="2">
 				<f-button-group vertical :border="false" class="navigation">
 					<f-button @click="tab = 0">基本配置</f-button>
-					<f-button
+					<!-- <f-button
 						dropdown
 						triangle
 						size="sm"
@@ -33,14 +33,14 @@
 									}"
 									@actived="tab = 1"
 								/>
-								<!-- <f-menu-item 
+								<f-menu-item 
 									:options="{
 										text: '报告插件配置',
 										icon: null
 									}"
 									@actived="tab = 2"
 									class="ms-center"
-								/> -->
+								/>
 								<f-menu-item 
 									:options="{
 										text: '执行器配置',
@@ -50,7 +50,7 @@
 								/>
 							</template>
 						</f-menu>
-					</f-button>
+					</f-button> -->
 				</f-button-group>
 			</f-col>
 			<f-col col="11" md="10" sm="9" lg="10">

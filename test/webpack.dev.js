@@ -4,6 +4,9 @@ const path = require('path');
 const config = require('./.config.json');
 const { webpack: base } = require('./testing-service-dev');
 
+base.module.rules[1].use.options.
+	sourceType = 'unambiguous';
+
 module.exports = merge(base, {
 	mode: 'development',
 	devtool: '#inline-source-map',
