@@ -4,7 +4,6 @@ html {
 
 body {
 	height: 100%;
-	border-top: 1px solid transparent !important;
 }
 
 .button-danger {
@@ -69,7 +68,7 @@ body {
 	display: inline-block;
 	width: 100px;
 	height: 100px;
-	background-color: grey;
+	// background-color: grey;
 }
 
 #account-detail {

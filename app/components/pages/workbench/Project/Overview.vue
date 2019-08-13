@@ -101,18 +101,11 @@ export default {
 	},
 	computed: {
 		filteredProjectList() {
-			let filteredProject = this.projectList;
+			return this.projectList.filter((project) => {
+				const { name } = this.filter;
 
-			
-			if (this.filter.name) {
-				const nameReg = new RegExp(this.filter.name);
-
-				filteredProject = filteredProject
-					.filter(project => nameReg.test(project.name));
-
-			}
-				
-			return filteredProject.sort((a, b) => {
+				return name ? new RegExp(name).test(project.name) : true;
+			}).sort((a, b) => {
 				return b.createdAt - a.createdAt;
 			});
 		}
@@ -134,9 +127,6 @@ export default {
 
 			this.projectList = await this.queryProject();
 			this.selectedProject = [];
-		},
-		changeSelect(value) {
-			this.selectedProject = value;
 		}
 	},
 	mounted() {

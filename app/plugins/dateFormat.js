@@ -5,8 +5,8 @@ export default function install(Vue) {
 			const month = value.getMonth() + 1;
 			const date = value.getDate();
 
-			let monthString = month < 10 ? `0${month}` : month;
-			let dateString = date < 10 ? `0${date}` : date;
+			const monthString = month < 10 ? `0${month}` : month;
+			const dateString = date < 10 ? `0${date}` : date;
 
 			return `${year}-${monthString}-${dateString}`;
 		}

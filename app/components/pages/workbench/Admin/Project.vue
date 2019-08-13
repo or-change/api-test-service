@@ -105,7 +105,7 @@ export default {
 			})
 		},
 		filteredProjectList() {
-			let filteredProject = this.projectList.map(project => {
+			return this.projectList.map(project => {
 				const account = this.accountList.find(account => account.id === project.ownerId);
 
 				if (account) {
@@ -113,23 +113,14 @@ export default {
 				}
 
 				return project;
-			});
+			}).filter((project) => {
+				const { name, owner } = this.filter;
 
-			
-			if (this.filter.name) {
-				const nameReg = new RegExp(this.filter.name);
+				const nameFilter = name ? new RegExp(name).test(project.name) : true;
+				const ownerFilter = owner.length ? owner.indexOf(project.ownerId) !== -1 : true;
 
-				filteredProject = filteredProject
-					.filter(project => nameReg.test(project.name));
-
-			}
-				
-			if (this.filter.owner && this.filter.owner.length !== 0) {
-				filteredProject = filteredProject
-					.filter(project => this.filter.owner.indexOf(project.ownerId) !== -1);
-			}
-			
-			return filteredProject.sort((a, b) => {
+				return nameFilter && ownerFilter;
+			}).sort((a, b) => {
 				return new Date(b.createdAt) - new Date(a.createdAt);
 			});
 		}

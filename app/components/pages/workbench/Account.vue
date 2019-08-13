@@ -10,14 +10,16 @@
 			/>
 		<f-row>
 			<f-col col="1" style="text-align: center">
-				<div id="placeholder"></div>
+				<div id="placeholder">
+					<i class="ms-Icon ms-Icon--Contact" style="color: #004e8c;font-size:100px"></i>
+				</div>
 				<br />
-				<f-button
+				<!-- <f-button
 					class="ms-mt-3"
 					variant="primary"
 					text="更换头像"
 					@click="changePortrait"
-				/>
+				/> -->
 			</f-col>
 			<f-col col="8" class="ms-ml-5">
 				<f-row class="ms-pt-3">

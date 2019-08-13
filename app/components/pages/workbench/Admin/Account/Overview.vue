@@ -153,21 +153,14 @@ export default {
 	},
 	computed: {
 		filteredAccountList() {
-			let filteredAccount = this.accountList;
+			return this.accountList.filter((account) => {
+				const { name, admin } = this.filter;
 
-			if (this.filter.name) {
-				const nameReg = new RegExp(this.filter.name);
+				const nameFilter = name ? new RegExp(name).test(account.name) : true;
+				const adminFilter = admin.length ? admin.indexOf(account.administrator ? 1 : -1) !== -1 : true ;
 
-				filteredAccount = filteredAccount
-					.filter(account => nameReg.test(account.name));
-			}
-
-			if (this.filter.admin.length !== 0) {
-				filteredAccount = filteredAccount
-					.filter(account => this.filter.admin.indexOf(account.administrator ? 1 : -1) !== -1);
-			}
-
-			return filteredAccount;
+				return nameFilter && adminFilter;
+			});
 		}
 	},
 	watch: {

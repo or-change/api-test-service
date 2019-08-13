@@ -236,24 +236,15 @@ export default {
 			return this.$route.params.projectId;
 		},
 		filteredSourceList() {
-			let filteredSourceList = this.sourceList;
-				
-			if (this.filter.semver && this.filter.semver.length !== 0) {
-				filteredSourceList = filteredSourceList
-					.filter(source => this.filter.semver.indexOf(source.semver) !== -1);
-			}
+			return this.sourceList.filter((source) => {
+				const { semver, initialized, agent } = this.filter;
 
-			if (this.filter.initialized && this.filter.initialized.length !== 0) {
-				filteredSourceList = filteredSourceList
-					.filter(source => this.filter.initialized.indexOf(source.initialized ? 1 : 0) !== -1);
-			}
+				const semverFilter = semver.length ? semver.indexOf(source.semver) !== -1 : true;
+				const initializedFilter = initialized.length ? initialized.indexOf(source.initialized ? 1 : 0) !== -1 : true;
+				const agentFilter = agent.length ? agent.indexOf(source.agent) !== -1 : true;
 
-			if (this.filter.agent && this.filter.agent.length !== 0) {
-				filteredSourceList = filteredSourceList
-					.filter(source => this.filter.agent.indexOf(source.agent) !== -1);
-			}
-			
-			return filteredSourceList.sort((a, b) => {
+				return semverFilter && initializedFilter && agentFilter;
+			}).sort((a, b) => {
 				return b.createdAt - a.createdAt;
 			});
 		},
