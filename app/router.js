@@ -13,7 +13,7 @@ import WorkbenchError from './components/pages/workbench/Error';
 
 import WorkbenchAccount from './components/pages/workbench/Account.vue';
 import WorkbenchProjectDetail from './components/pages/workbench/Project/Detail';
-import WorkbenchProjectSourceDetail from './components/pages/workbench/Project/Source/Detail';
+import WorkbenchProjectSourceDetail from './components/pages/workbench/Project/Source/detail/Detail.vue';
 import WorkbenchProjectReporter from './components/pages/workbench/Project/Source/Report.vue';
 
 import WorkbenchAdmin from './components/pages/workbench/Admin/Admin.vue';

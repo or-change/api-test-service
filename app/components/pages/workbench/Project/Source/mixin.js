@@ -1,24 +1,3 @@
-function constructList(tree, result = [], level = 0) {
-	tree.children.forEach(node => {
-		result.push({
-			level,
-			only: node.only,
-			skip: node.skip,
-			title: node.title,
-			type: node.type,
-			path: node.path
-		});
-
-		if (node.children) {
-			const newLevel = level + 1;
-
-			constructList(node, result, newLevel);
-		}
-	});
-
-	return result;
-}
-
 export default {
 	data() {
 		return {
@@ -27,13 +6,6 @@ export default {
 		};
 	},
 	computed: {
-		abstract() {
-			if (this.source.structure) {
-				return constructList(this.source.structure);
-			}
-
-			return [];
-		},
 		sourceId() {
 			return this.$route.params.sourceId;
 		},
@@ -49,6 +21,27 @@ export default {
 		},
 		async getSource() {
 			this.source = await this.$http.project.source(this.projectId).get(this.sourceId);
+		},
+		constructList(tree, result = [], level = 0) {
+			tree.children.forEach(node => {
+				result.push({
+					level,
+					only: node.only,
+					skip: node.skip,
+					title: node.title,
+					type: node.type,
+					path: node.type === 'test' ? node.path.join('-') : undefined,
+					result: node.type === 'test' ? 0 : undefined,
+				});
+		
+				if (node.children) {
+					const newLevel = level + 1;
+		
+					this.constructList(node, result, newLevel);
+				}
+			});
+		
+			return result;
 		}
 	},
 	mounted() {

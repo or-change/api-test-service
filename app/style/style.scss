@@ -146,22 +146,6 @@ body {
 }
 
 #execution-container {
-	p {
-		position: relative;
-		margin: 0 0 3px 0;
-	}
-
-	p.suit {
-		color: #323130;
-		font-size: 18px;
-		font-weight: 600;
-	}
-
-	p.test {
-		color: #605e5c;
-		font-size: 14px;
-	}
-
 	.ms-button-container {
 		vertical-align: middle;
 
@@ -175,10 +159,6 @@ body {
 			overflow: unset;
 		}
 	}
-}
-
-#abstract-container {
-	overflow: auto;
 }
 
 .ms-breadcrumb-item.active {

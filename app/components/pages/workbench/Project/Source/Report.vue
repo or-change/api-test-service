@@ -29,36 +29,45 @@
 			<h3 class="ms-center">测试报告</h3>
 
 			<div class="ms-mt-4 ms-center">
-				<f-label class="ms-d-inline">用例通过率: {{ `${passRate}% `}}</f-label>
+				<f-label class="ms-d-inline">用例通过率: {{ `${passRate * 100}% `}}</f-label>
 				<f-label class="ms-d-inline ms-ml-3">接口请求成功率: {{ `${(api.success / api.total) * 100}% `}}</f-label>
 			</div>
 
-			<div v-for="(item, index) in abstract">
-				<p
-					class="ms-textTruncate"
-					:style="{'padding-left': `${25 * item.level}px`}"
-					:title="item.title"
-					v-if="item.type === 'suit'"
-				>
-					<f-label size="lg">{{item.title}}</f-label>
-				</p>
+			<f-row>
+				<f-col col="9">
+					<div v-for="(item, index) in structure">
+						<p
+							class="ms-textTruncate"
+							:style="{'padding-left': `${25 * item.level}px`}"
+							:title="item.title"
+							v-if="item.type === 'suit'"
+						>
+							<f-label size="lg">{{item.title}}</f-label>
+						</p>
 
-				<div v-else :style="{'padding-left': `${25 * item.level}px`}">
-					<f-message-bar
-						class="ms-mt-2"
-						multiLine
-						toggle
-						:variant="resultMapping[item.path.join('-')] ? 'danger' : 'success'"
-						:icon="resultMapping[item.path.join('-')] ? 'fail ms-Icon ms-Icon--ErrorBadge' : 'success ms-Icon ms-Icon--CompletedSolid'"
-						:text="item.title">
-						<div slot="messageBar-text" class="ms-message-bar-text">
-							{{ item.title }}
-							<p v-for="(item, key) in log[item.path.join('-')]" v-html="item" class="ms-mt-3"></p>
+						<div v-else :style="{'padding-left': `${25 * item.level}px`}">
+							<f-message-bar
+								class="ms-mt-2"
+								multiLine
+								toggle
+								:variant="item.result === -1 ? 'danger' : 'success'"
+								:icon="item.result === -1 ? 'fail ms-Icon ms-Icon--ErrorBadge' : 'success ms-Icon ms-Icon--CompletedSolid'"
+								:text="item.title">
+								<div slot="messageBar-text" class="ms-message-bar-text">
+									{{ item.title }}
+									<p v-for="(item, key) in log[item.path]" v-html="item" class="ms-mt-3"></p>
+								</div>
+							</f-message-bar>
 						</div>
-					</f-message-bar>
-				</div>
 
-			</div>
+					</div>
+				</f-col>
+				<f-col col="3" class="ms-pl-3">
+					<structure
+						:structure="structure"
+					/>
+				</f-col>
+			</f-row>
 		</div>
 	</div>
 </template>
@@ -67,9 +76,13 @@
 import Vue from 'vue';
 import mixin from './mixin';
 import Parse from '@or-change/tdk/parser';
+import Structure from './Structure';
 
 export default {
 	mixins: [mixin],
+	components: {
+		Structure
+	},
 	data() {
 		return {
 			execution: null,
@@ -98,12 +111,32 @@ export default {
 			}
 
 			return result;
+		},
+		structure() {
+			if (!this.source.structure) {
+				return [];
+			}
+
+			const structure = this.constructList(this.source.structure);
+
+			if (this.execution) {
+				const result = this.execution.result.map(item => item.join('-'));
+
+
+				structure.forEach(item => {
+					if (item.type === 'test') {
+						result.indexOf(item.path) !== -1 ? item.result = -1 : item.result = 1;
+					}
+				});
+			}
+
+			return structure;
 		}
 	},
 	methods: {
 		async getExecution() {
 			this.execution = await this.$http.project.source(this.projectId).execution(this.sourceId).get(this.executionId);
-			this.passRate = (this.source.structure.total - this.execution.result.length) / this.source.structure.total * 100;
+			this.passRate = (this.source.structure.total - this.execution.result.length) / this.source.structure.total;
 			this.log = {};
 
 			this.execution.log.forEach((item) => {

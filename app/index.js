@@ -22,14 +22,14 @@ const router = Router(context.routerOptions);
 import FibricUi from '@or-change/fabric-ui';
 import FibricUiWeb from '@or-change/fabric-ui-web';
 import http from './plugins/http';
-import dateFormat from './plugins/dateFormat';
+import filter from './plugins/filter';
 import sourceAgent from './plugins/sourceAgent';
 import executor from './plugins/executor';
 
 Vue.use(FibricUi, { size: 'sm' });
 Vue.use(FibricUiWeb);
 Vue.use(http, { router });
-Vue.use(dateFormat);
+Vue.use(filter);
 Vue.use(sourceAgent);
 Vue.use(executor);
 
