@@ -6,6 +6,8 @@ export default function install(Vue, { router }) {
 	});
 
 	function skip(error) {
+		// 派发全局事件
+
 		router.push({
 			path: '/workbench/error',
 			query: {

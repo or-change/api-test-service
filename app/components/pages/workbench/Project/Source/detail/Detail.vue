@@ -145,15 +145,15 @@ export default {
 			options: [
 				{
 					text: '>=10%',
-					value: 10
+					value: 0.1
 				},
 				{
 					text: '>=50%',
-					value: 50
+					value: 0.5
 				},
 				{
 					text: '==100%',
-					value: 100
+					value: 1
 				}
 			],
 			type: 0,
@@ -178,7 +178,7 @@ export default {
 			return this.filteredExecutionList
 				.filter(execution => execution.progress && execution.progress.ended === execution.progress.length)
 				.map((execution) => {
-					if (!execution.result) {
+					if (!execution.result || !this.source.structure) {
 						execution.passRate = 0;
 
 						return execution;
@@ -191,7 +191,7 @@ export default {
 		},
 		filteredUnfinished() {
 			return this.filteredExecutionList
-				.filter(execution => ((execution.progress && execution.progress.ended < execution.progress.length) || execution.status !== 3) && !execution.error)
+				.filter(execution =>  execution.status !== 3 && !execution.error)
 				.map((execution) => {
 					const {
 						progress
@@ -234,7 +234,7 @@ export default {
 
 			const structure = this.constructList(this.source.structure);
 
-			if (this.selectedExecution) {
+			if (this.selectedExecution && this.selectedExecution.result) {
 				const result = this.selectedExecution.result.map(item => item.join('-'));
 
 
@@ -266,8 +266,6 @@ export default {
 	},
 	mounted() {
 		this.getExecutionList();
-	},
-	destroyed() {
 	}
 }
 </script>

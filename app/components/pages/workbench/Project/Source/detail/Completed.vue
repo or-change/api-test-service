@@ -122,7 +122,7 @@ export default {
 	computed: {
 		filteredExecution() {
 			return this.items.filter(execution => {
-				return this.passRate ? execution.passRate >= this.filter.passRate : true;
+				return this.filter.passRate ? execution.passRate >= this.filter.passRate : true;
 			});
 		}
 	}

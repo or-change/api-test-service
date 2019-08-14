@@ -84,6 +84,11 @@ export default {
 	},
 	mounted() {
 		this.show = this.value;
+		
+		this.$root.$on('hide-modal', this.cancel);
+	},
+	destroyed() {
+		this.$root.$off('hide-modal', this.cancel);
 	}
 }
 </script>

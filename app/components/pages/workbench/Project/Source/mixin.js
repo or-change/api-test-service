@@ -23,16 +23,23 @@ export default {
 			this.source = await this.$http.project.source(this.projectId).get(this.sourceId);
 		},
 		constructList(tree, result = [], level = 0) {
-			tree.children.forEach(node => {
-				result.push({
+			tree.children.forEach((node, index) => {
+				const info = {
 					level,
 					only: node.only,
 					skip: node.skip,
 					title: node.title,
-					type: node.type,
-					path: node.type === 'test' ? node.path.join('-') : undefined,
-					result: node.type === 'test' ? 0 : undefined,
-				});
+					type: node.type
+				};
+
+				if (node.type === 'test') {
+					node.path = node.path.join('-');
+					node.result = 0;
+				} else {
+					node.path = `${tree.path}-${index}`;
+				}
+
+				result.push(info);
 		
 				if (node.children) {
 					const newLevel = level + 1;

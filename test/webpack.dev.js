@@ -8,6 +8,7 @@ module.exports = merge(base, {
 	mode: 'development',
 	devtool: '#inline-source-map',
 	devServer: {
+		host: '0.0.0.0',
 		proxy: {
 			'/api': `http://localhost:${config.server.port}`
 		},

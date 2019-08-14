@@ -19,15 +19,15 @@ const context = {
 import Router from './router';
 const router = Router(context.routerOptions);
 
-import FibricUi from '@or-change/fabric-ui';
-import FibricUiWeb from '@or-change/fabric-ui-web';
+import FabricUI from '@or-change/fabric-ui';
+import FabricUIWeb from '@or-change/fabric-ui-web';
 import http from './plugins/http';
 import filter from './plugins/filter';
 import sourceAgent from './plugins/sourceAgent';
 import executor from './plugins/executor';
 
-Vue.use(FibricUi, { size: 'sm' });
-Vue.use(FibricUiWeb);
+Vue.use(FabricUI, { size: 'sm' });
+Vue.use(FabricUIWeb);
 Vue.use(http, { router });
 Vue.use(filter);
 Vue.use(sourceAgent);

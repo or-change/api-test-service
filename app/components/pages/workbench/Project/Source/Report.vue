@@ -85,32 +85,18 @@ export default {
 	},
 	data() {
 		return {
-			execution: null,
+			execution: {},
 			parserRegister: {},
 			log: {},
 			api: {
 				total: 0,
 				success: 0
-			},
-			passRate: 0
+			}
 		}
 	},
 	computed: {
 		executionId() {
 			return this.$route.params.executionId;
-		},
-		resultMapping() {
-			const result = {};
-
-			if (!this.execution) {
-				return result;
-			} else {
-				this.execution.result.forEach(execution => {
-					result[execution.join('-')] = true;
-				});
-			}
-
-			return result;
 		},
 		structure() {
 			if (!this.source.structure) {
@@ -119,7 +105,7 @@ export default {
 
 			const structure = this.constructList(this.source.structure);
 
-			if (this.execution) {
+			if (this.execution.result) {
 				const result = this.execution.result.map(item => item.join('-'));
 
 
@@ -131,12 +117,18 @@ export default {
 			}
 
 			return structure;
+		},
+		passRate() {
+			if (!this.source.structure || !this.execution.result) {
+				return 0;
+			}
+
+			return (this.source.structure.total - this.execution.result.length) / this.source.structure.total;
 		}
 	},
 	methods: {
 		async getExecution() {
 			this.execution = await this.$http.project.source(this.projectId).execution(this.sourceId).get(this.executionId);
-			this.passRate = (this.source.structure.total - this.execution.result.length) / this.source.structure.total;
 			this.log = {};
 
 			this.execution.log.forEach((item) => {

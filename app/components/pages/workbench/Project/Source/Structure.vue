@@ -2,7 +2,7 @@
 	<div :style="{height: `${height}px`}"  class="structure-container">
 		<p
 			v-for="(item, index) in structure"
-			:class="[item.type, 'ms-pb-2', 'ms-textTruncate']"
+			class="ms-textTruncate"
 			:style="{'padding-left': `${25 * item.level}px`}"
 			:title="item.title"
 		>
@@ -18,7 +18,9 @@
 					class="fail ms-Icon ms-Icon--ErrorBadge"
 					v-show="item.result === -1"></i>
 			</span>
-			<span>{{item.title}}</span>
+			<f-label :size="item.type === 'suit' ? 'lg' : 'sm'" :class="[item.type, 'ms-d-inline-block']">
+				<a :href="`#/workbench/project/be67b3cf/source/9665d361/execution/68baf2d8/reporter#`">{{item.title}}</a>
+			</f-label>
 		</p>
 	</div>
 </template>
@@ -58,17 +60,20 @@ export default {
 
 	p {
 		position: relative;
+
+		i {
+			vertical-align: middle;
+		}
 	}
 
-	p.suit {
+	label a {
 		color: #323130;
-		font-size: 18px;
-		font-weight: 600;
 	}
 
-	p.test {
-		color: #605e5c;
+	label.test a {
 		font-size: 14px;
+		color: #605e5c;
+		margin-bottom: 5px;
 	}
 }
 </style>
