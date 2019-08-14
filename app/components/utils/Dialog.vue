@@ -19,7 +19,8 @@
 			slot="ms-modal-footer"
 			class="ms-modal-footer">
 			<div class="ms-modal-action">
-				<f-button 
+				<f-button
+					v-if="okButton"
 					theme="primary"
 					:text="okText"
 					@click="ok" />
@@ -65,6 +66,10 @@ export default {
 		cancelButton: {
 			type: Boolean,
 			default: true
+		},
+		okButton: {
+			type: Boolean,
+			default: true
 		}
 	},
 	methods: {
@@ -73,6 +78,7 @@ export default {
 		},
 		cancel() {
 			this.$emit('cancel');
+			console.log(1111)
 
 			this.$emit('input', false);
 		}

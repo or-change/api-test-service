@@ -87,16 +87,23 @@ module.exports = function BasicSuitePluginProvider() {
 					const fileOptions = files.source;
 					const source = await Model.Source.query({ sourceId });
 					
-					if (!source || source.initialized || source.agent !== ID.SOURCE_AGENT) {
+					if (!source || source.status !== 0 || source.agent !== ID.SOURCE_AGENT) {
 						return ctx.throw(412, 'Bad source state.');
 					}
 
-					sourceBufferStore[sourceId] = await fs.readFile(fileOptions.path);
+					try {
+						sourceBufferStore[sourceId] = await fs.readFile(fileOptions.path);
+						await source.$update({ status: 1 });
 
-					const agent = new Tester.SourceAgent[ID.SOURCE_AGENT](sourceId);
+						const agent = new Tester.SourceAgent[ID.SOURCE_AGENT](sourceId);
+	
+						scanner.parse(agent, source);
+						ctx.body = 'ok';
+					} catch (error) {
+						await source.$update({error: error.message});
+						ctx.throw(417, 'Setting failed.');
+					} 
 
-					scanner.parse(agent, source);
-					ctx.body = 'ok';
 				}).post('/com.oc.basic/execution/:executionId/executor', async ctx => {
 					const { executionId } = ctx.params;
 					const execution = await Model.Execution.query({ executionId });

@@ -10,11 +10,16 @@ body {
 	.ms-button button {
 		background-color: #e81123;
 		border-color: #e81123;
-
 	}
 
 	.ms-button.ms-button-no-split.ms-button-primary:hover button {
 		background-color: #a80000;
+	}
+
+	.ms-button.ms-button-no-split.ms-button-primary:hover .ms-button-disabled
+	{
+		border-color: #f4f4f4;
+    background-color: #f4f4f4;
 	}
 }
 

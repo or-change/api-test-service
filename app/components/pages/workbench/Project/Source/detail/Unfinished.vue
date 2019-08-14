@@ -63,6 +63,8 @@
 </template>
 
 <script>
+import mixin from './mixin'
+
 export default {
 	data() {
 		return {
@@ -72,16 +74,13 @@ export default {
 			}
 		}
 	},
+	mixins: [mixin],
 	props: {
 		items: {
 			type: Array,
 			default: () => []
 		},
 		options: {
-			type: Array,
-			default: () => []
-		},
-		status: {
 			type: Array,
 			default: () => []
 		}
@@ -92,7 +91,7 @@ export default {
 				const { progress, status } = this.filter;
 
 				const progressFilter = progress ? execution.progress >= progress : true;
-				const statusFilter = status ? status.indexOf(execution.status) !== -1 : true;
+				const statusFilter = status.length ? status.indexOf(execution.status) !== -1 : true;
 
 				return progressFilter && statusFilter;
 			});

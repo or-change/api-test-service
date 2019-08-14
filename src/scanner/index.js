@@ -63,67 +63,116 @@ module.exports = function Structure(options) {
 
 	return {
 		async parse(agent, source) {
-			const sourceBuffer = await agent.fetch();
+			await source.$update({ status: 2 });
+			
 			const dir = path.join(options.path, Math.random().toString(16).substr(2, 8));
 
-			await fs.ensureDir(dir);
-			await new Promise((resolve, reject) => {
-				yauzl.fromBuffer(sourceBuffer, {
-					lazyEntries: true
-				}, (err, zipfile) => {
-					if (err) {
-						return reject(err);
-					}
-
-					zipfile.on('entry', async entry => {
-						if (/\/$/.test(entry.fileName)) {
-							await fs.ensureDir(path.join(dir, entry.fileName));
-							zipfile.readEntry();
-						} else {
-							zipfile.openReadStream(entry, function (err, readStream) {
-								if (err) {
-									return reject(err);
-								}
-
-								readStream.on('end', function () {
-									zipfile.readEntry();
-								}).pipe(fs.createWriteStream(path.join(dir, entry.fileName)));
-							});
+			try {
+				const sourceBuffer = await agent.fetch();
+	
+				await fs.ensureDir(dir);
+				await new Promise((resolve, reject) => {
+					yauzl.fromBuffer(sourceBuffer, {
+						lazyEntries: true
+					}, (err, zipfile) => {
+						if (err) {
+							return reject(err);
 						}
-					}).on('end', () => resolve());
-
-					zipfile.readEntry();
+	
+						zipfile.on('entry', async entry => {
+							if (/\/$/.test(entry.fileName)) {
+								await fs.ensureDir(path.join(dir, entry.fileName));
+								zipfile.readEntry();
+							} else {
+								zipfile.openReadStream(entry, function (err, readStream) {
+									if (err) {
+										return reject(err);
+									}
+	
+									readStream.on('end', function () {
+										zipfile.readEntry();
+									}).pipe(fs.createWriteStream(path.join(dir, entry.fileName)));
+								});
+							}
+						}).on('end', () => resolve());
+	
+						zipfile.readEntry();
+					});
 				});
-			});
+			} catch (error) {
+				source.$update({ error: error.message });
 
-			await new Promise((resolve, reject) => {
-				const installing = spawn(process.platform === 'win32' ? 'npm.cmd' : 'npm', [
-					'install'
-				], {
-					cwd: dir,
+				return;
+			}
+
+			await source.$update({ status: 3 });
+
+			try {
+				await new Promise((resolve, reject) => {
+					const installing = spawn(process.platform === 'win32' ? 'npm.cmd' : 'npm', [
+						'install'
+					], {
+						cwd: dir,
+					});
+	
+					let message = Buffer.from([]);
+
+					installing.stderr.on('data', function (data) {
+						message = Buffer.concat([message, data], message.length + data.length);
+					});
+
+					installing
+						.on('error', err => reject(err))
+						.on('close', code => {
+							if (code !== 0) {
+								reject({ message: message.toString() });
+							} else {
+								resolve();
+							}
+						});
+				});
+			} catch (error) {
+				source.$update({ error: error.message });
+
+				return;
+			}
+
+			await source.$update({ status: 4 });
+
+			try {
+				const structure = await Session.create((sessionId, reject) => {
+					const installing = spawn(process.platform === 'win32' ? 'npx.cmd' : 'npx', [
+						'mocha',
+						'--reporter',
+						'@or-change/tdk/reporter',
+						'--require',
+						path.join(__dirname, 'log.js')
+					], {
+						cwd: dir,
+						env: Object.assign({
+							SCANNER_SESSION: sessionId
+						}, SCANNER_ENV)
+					});
+
+					let message = Buffer.from([]);
+
+					installing.stderr.on('data', function (data) {
+						message = Buffer.concat([message, data], message.length + data.length);
+					});
+
+					installing.on('close', (code) => {
+						fs.remove(dir);
+
+						if (code !== 0) {
+							reject({ message: message.toString() });
+						}
+					});
 				});
 
-				installing
-					.on('error', err => reject(err))
-					.on('close', code => resolve());
-			});
-			
-			const structure = await Session.create((sessionId, reject) => {
-				spawn(process.platform === 'win32' ? 'npx.cmd' : 'npx', [
-					'mocha',
-					'--reporter',
-					'@or-change/tdk/reporter',
-					'--require',
-					path.join(__dirname, 'log.js')
-				], {
-					cwd: dir,
-					env: Object.assign({
-						SCANNER_SESSION: sessionId
-					}, SCANNER_ENV)
-				}).on('close', () => fs.remove(dir));
-			});
-			
-			source.$update({ structure });
+				await source.$update({ status: 5, structure });
+			} catch (error) {
+				source.$update({error: error.message });
+			}
 		}
 	};
 };

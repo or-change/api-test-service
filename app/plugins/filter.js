@@ -1,14 +1,4 @@
-const statusMapping = {
-	'-1': '空闲',
-	'0': '拉取代码',
-	'1': '安装',
-	'2': '正在运行',
-	'3': '结束'
-};
-
 export default function install(Vue) {
-	Vue.prototype.$status = statusMapping;
-
 	Vue.filter('dateFormat', (value) => {
 		if (value instanceof Date) {
 			const year = value.getFullYear();
@@ -22,13 +12,5 @@ export default function install(Vue) {
 		}
 
 		return value;
-	});
-
-	Vue.filter('statusFilter', (value) => {
-		return statusMapping[value];
-	});
-
-	Vue.filter('executorFilter', (value, product) => {
-		return product.executor[value] ? product.executor[value].name : value;
 	});
 }

@@ -6,7 +6,7 @@ export default function install(Vue, { router }) {
 	});
 
 	function skip(error) {
-		// 派发全局事件
+		Vue.prototype.$eventBus.$emit('hide-modal');
 
 		router.push({
 			path: '/workbench/error',
@@ -223,7 +223,8 @@ export default function install(Vue, { router }) {
 								projectId: source.projectId,
 								agent: source.agent,
 								semver: source.semver,
-								initialized: source.initialized,
+								status: source.status,
+								error: source.error,
 								createdAt: new Date(source.createdAt),
 							};
 
@@ -243,7 +244,8 @@ export default function install(Vue, { router }) {
 									projectId: source.projectId,
 									agent: source.agent,
 									semver: source.semver,
-									initialized: source.initialized,
+									status: source.status,
+									error: source.error,
 									createdAt: new Date(source.createdAt),
 								};
 							});

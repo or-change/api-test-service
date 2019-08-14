@@ -46,7 +46,7 @@
 						/>
 					</f-col>
 					<f-col col="3" class="ms-center">
-						{{`${item.value.passRate  * 100}%`}}
+						{{`${Math.round(item.value.passRate * 100)}%`}}
 					</f-col>
 				</f-row>
 			</template>

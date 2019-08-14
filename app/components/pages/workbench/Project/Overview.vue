@@ -59,7 +59,6 @@
 		>
 			<f-text-field
 				label="名称："
-				placeholder="project 1"
 				underline
 				v-model="project.name"
 			/>
@@ -74,7 +73,7 @@ export default {
 			projectList: [],
 			selectedProject: [],
 			project: {
-				name: ''
+				name: 'project 1'
 			},
 			show: false,
 			fields: [
@@ -95,7 +94,7 @@ export default {
 	watch:{
 		show() {
 			if (!this.show) {
-				this.project.name = '';
+				this.project.name = 'project 1';
 			}
 		}
 	},

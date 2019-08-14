@@ -1,3 +1,5 @@
+const STATUS = { SETTING: 0, READY: 1, UNZIP: 2, INSTALLING: 3, SCANNING: 4, END: 5 };
+
 module.exports = {
 	Source(options) {
 		return {
@@ -7,12 +9,23 @@ module.exports = {
 					id: { type: 'string' },
 					projectId: { type: 'string' },
 					agent: { type: 'string' },
-					initialized: { type: 'boolean' },
+					status: {
+						type: 'number',
+						range: [
+							STATUS.SETTING,
+							STATUS.READY,
+							STATUS.UNZIP,
+							STATUS.INSTALLING,
+							STATUS.SCANNING,
+							STATUS.END
+						]
+					},
+					error: { type: 'string' },
 					semver: { type: 'string' },
 					createdAt: { type: 'date' },
 					structure: { type: 'object' },
 				},
-				allowNull: ['structure']
+				allowNull: ['structure', 'error']
 			},
 			methods: {
 				async create({ projectId, agent, semver }) {
@@ -24,8 +37,8 @@ module.exports = {
 				async delete() {
 					return options.store.destroySource(this.id);
 				},
-				async update({ structure }) {
-					return options.store.setSourceStructure(this.id, structure);
+				async update({ status, error, structure }) {
+					return options.store.updateSource(this.id, { status, error, structure });
 				}
 			}
 		};

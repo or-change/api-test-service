@@ -140,7 +140,8 @@ exports.DB = function DB() {
 			const newSource = {
 				projectId,
 				agent,
-				initialized: false,
+				status: 0,
+				error: null,
 				semver,
 				id: Math.random().toString(16).substr(2, 8),
 				createdAt: new Date(),
@@ -160,15 +161,24 @@ exports.DB = function DB() {
 
 			return data.source.splice(index, 1)[0];
 		},
-		setSourceStructure(sourceId, structure) {
+		updateSource(sourceId, { status, error, structure }) {
 			const source = data.source.find(source => source.id === sourceId);
 
 			if (!source) {
 				return null;
 			}
 
-			source.structure = structure;
-			source.initialized = true;
+			if (typeof status === 'number') {
+				source.status = status;
+			}
+
+			if (typeof error === 'string') {
+				source.error = error;
+			}
+
+			if (typeof structure === 'object') {
+				source.structure = structure;
+			}
 
 			return source;
 		},

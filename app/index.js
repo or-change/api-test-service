@@ -120,7 +120,7 @@ router.beforeEach((to, from, next) => {
 	});
 });
 
-const app = new Vue({ store, router, render: h => h(App) });
+const app = Vue.prototype.$eventBus = new Vue({ store, router, render: h => h(App) });
 
 context.beforeAppMountHandler.forEach(handler => handler(app));
 window.addEventListener('load', async function () {

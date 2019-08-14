@@ -38,26 +38,17 @@
 					</f-col>
 					<f-col col="2" sm="4" md="4" lg="2" class="ms-ml-2">
 						<f-dropdown
-							:options="[
-								{
-									text: '可用',
-									value: 1
-								},
-								{
-									text: '不可用',
-									value: 0
-								}
-							]"
-							placeholder="选择是否可用"
-							v-model="filter.initialized"
+							:options="sourceAgentOptions"
+							placeholder="选择agent类型"
+							v-model="filter.agent"
 							multi-select
 						/>
 					</f-col>
 					<f-col col="2" sm="4" md="4" lg="2" class="ms-ml-2">
 						<f-dropdown
-							:options="sourceAgentOptions"
-							placeholder="选择agent类型"
-							v-model="filter.agent"
+							:options="status"
+							placeholder="选择初始化状态"
+							v-model="filter.status"
 							multi-select
 						/>
 					</f-col>
@@ -74,13 +65,14 @@
 						:items="filteredSourceList"
 						:select-mode="filteredSourceList.length !== 0 ? 'multi' : 'single'"
 						v-model="selectedSourceList"
+						@input="changeSelected"
 				>
 					<template slot="row-semver" slot-scope="props">
 						<f-link
 							:class="{
-								'link-disabled': !props.value.initialized
+								'link-disabled': props.value.status !== 5
 							}"
-							:href="props.value.initialized ? 
+							:href="props.value.status === 5 ? 
 								`#/workbench/project/${projectId}/source/${props.value.id}`
 								: undefined"
 						>{{props.value.semver}}</f-link>
@@ -97,6 +89,20 @@
 
 					<template slot="row-agent" slot-scope="props">
 						{{ props.value.agent | agentFormat($product) }}
+					</template>
+
+					<template slot="row-status" slot-scope="props">
+						{{ props.value.status | statusFormat }}
+					</template>
+
+					<template slot="row-error" slot-scope="props">
+						<f-button
+							@click="showError(props.value.error)"
+							:border="false"
+							:icon="props.value | statusIcon"
+							style="line-height: 34px"
+							class="toggle-dialog"
+						/>
 					</template>
 
 					<template slot="row-download" slot-scope="props">
@@ -148,7 +154,6 @@
 				<f-col col="5">
 					<f-text-field
 						label="版本号"
-						placeholder="1.0.0"
 						underline
 						v-model="source.semver"
 					/>
@@ -172,10 +177,30 @@
 				@success="createSuccess"
 				ref="upload-source" :is="sourceAgent"></component>
 		</custom-dialog>
+
+		<custom-dialog
+			id="show-error"
+			v-model="error.show" 
+			title="错误信息"
+			ok-text="确定"
+			@ok="error.show = false"
+			:cancelButton="false"
+		>
+			<textarea rows="10" readonly :value="error.msg" style="width: 100%"></textarea>
+		</custom-dialog>
 	</div>
 </template>
 
 <script>
+const STATUS = {
+	'0': '正在配置',
+	'1': '配置完毕',
+	'2': '正在解压',
+	'3': '下载依赖',
+	'4': '正在扫描',
+	'5': '结束'
+};
+
 export default {
 	data() {
 		return {
@@ -185,15 +210,19 @@ export default {
 			projectName: '',
 			sourceList: [],
 			source: {
-				semver: '',
+				semver: '1.0.0',
 				agent: ''
 			},
 			selectedSourceList: [],
 			show: false,
+			error: {
+				show: false,
+				msg: ''
+			},
 			filter: {
 				semver: [],
-				initialized: [],
-				agent: []
+				agent: [],
+				status: []
 			},
 			fields: [
 				{
@@ -201,8 +230,12 @@ export default {
 					key: 'semver'
 				},
 				{
-					label: 'Initialized',
-					key: 'initialized'
+					label: 'Status',
+					key: 'status'
+				},
+				{
+					label: 'Error',
+					key: 'error'
 				},
 				{
 					label: 'Agent',
@@ -222,13 +255,29 @@ export default {
 	watch:{
 		show() {
 			if (!this.show) {
-				this.source.semver = '';
+				this.source.semver = '1.0.0';
 			}
 		}
 	},
 	filters: {
 		agentFormat(value, product) {
 			return product.source[value] ? product.source[value].name : value; 
+		},
+		statusFormat(value) {
+			return STATUS[value];
+		},
+		statusIcon(value) {
+			if (value.error) {
+				return 'fail ms-Icon ms-Icon--StatusErrorFull';
+			}
+
+			if (value.status < 5) {
+				return 'default ms-Icon ms-Icon--UnknownSolid';
+			}
+
+			if (value.status === 5) {
+				return 'success ms-Icon ms-Icon--CompletedSolid';
+			}
 		}
 	},
 	computed: {
@@ -237,13 +286,13 @@ export default {
 		},
 		filteredSourceList() {
 			return this.sourceList.filter((source) => {
-				const { semver, initialized, agent } = this.filter;
+				const { semver, status, agent } = this.filter;
 
 				const semverFilter = semver.length ? semver.indexOf(source.semver) !== -1 : true;
-				const initializedFilter = initialized.length ? initialized.indexOf(source.initialized ? 1 : 0) !== -1 : true;
 				const agentFilter = agent.length ? agent.indexOf(source.agent) !== -1 : true;
+				const statusFilter = status.length ? status.indexOf(source.status) !== -1 : true;
 
-				return semverFilter && initializedFilter && agentFilter;
+				return semverFilter && statusFilter && agentFilter;
 			}).sort((a, b) => {
 				return b.createdAt - a.createdAt;
 			});
@@ -286,6 +335,16 @@ export default {
 			}
 
 			return '';
+		},
+		status() {
+			const statusValue = Object.keys(STATUS);
+
+			return statusValue.map(status => {
+				return {
+					value: Number(status),
+					text: STATUS[status]
+				};
+			});
 		}
 	},
 	methods: {
@@ -321,8 +380,18 @@ export default {
 			
 			await	this.getSourceList();
 		},
-		downloadSource() {
+		showError(error) {
+			if (error) {
+				this.error.show = true;
+				this.error.msg = error;
+			}
+		},
+		changeSelected() {
+			const { status, error } = this.selectedSourceList[this.selectedSourceList.length - 1];
 
+			if (status !== 5 && !error) {
+				this.selectedSourceList.pop();
+			}
 		}
 	},
 	mounted() {
@@ -342,5 +411,15 @@ export default {
 		text-decoration: none;
 		color: #a19f9d;
 	}
+}
+
+.toggle-dialog {
+	.ms-button {
+		background-color: transparent;
+	}
+}
+
+#show-error .ms-modal-main{
+	max-width: 1024px;
 }
 </style>

@@ -4,7 +4,7 @@
 			<f-col col="2">
 				<f-label>执行状态</f-label>
 				<f-dropdown
-					:options="options"
+					:options="status"
 					placeholder="选择执行状态"
 					v-model="filter.status"
 					multi-select
@@ -63,10 +63,6 @@ export default {
 	},
 	props: {
 		items: {
-			type: Array,
-			default: () => []
-		},
-		options: {
 			type: Array,
 			default: () => []
 		}

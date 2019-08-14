@@ -29,7 +29,7 @@
 			<h3 class="ms-center">测试报告</h3>
 
 			<div class="ms-mt-4 ms-center">
-				<f-label class="ms-d-inline">用例通过率: {{ `${passRate * 100}% `}}</f-label>
+				<f-label class="ms-d-inline">用例通过率: {{ `${Math.round(passRate * 100)}% `}}</f-label>
 				<f-label class="ms-d-inline ms-ml-3">接口请求成功率: {{ `${(api.success / api.total) * 100}% `}}</f-label>
 			</div>
 

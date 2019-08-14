@@ -2,7 +2,8 @@ export default {
 	data() {
 		return {
 			source: {},
-			projectName: null
+			projectName: null,
+			path: 0
 		};
 	},
 	computed: {
@@ -23,6 +24,8 @@ export default {
 			this.source = await this.$http.project.source(this.projectId).get(this.sourceId);
 		},
 		constructList(tree, result = [], level = 0) {
+			this.path++;
+
 			tree.children.forEach((node, index) => {
 				const info = {
 					level,
@@ -33,10 +36,10 @@ export default {
 				};
 
 				if (node.type === 'test') {
-					node.path = node.path.join('-');
-					node.result = 0;
+					info.path = node.path.join('-');
+					info.result = 0;
 				} else {
-					node.path = `${tree.path}-${index}`;
+					info.path = `suit-${this.path}`;
 				}
 
 				result.push(info);

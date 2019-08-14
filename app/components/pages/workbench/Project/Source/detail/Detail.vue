@@ -59,13 +59,11 @@
 					<f-tab-item title="未执行完成">
 						<unfinished-list
 							:items="filteredUnfinished"
-							:options="options"
-							:status="statusOptions" />
+							:options="options" />
 					</f-tab-item>
 					<f-tab-item title="异常执行">
 						<abnormal-list
 							:items="filteredExecutionList.filter(execution => !execution.progress && execution.error)"
-							:options="statusOptions"
 							:project-id="projectId"
 							:source-id="sourceId"
 							@delete="getExecutionList" />
@@ -216,16 +214,6 @@ export default {
 			this.execution.executor = executorOptions[0] ? executorOptions[0].value : '';
 
 			return executorOptions;
-		},
-		statusOptions() {
-			const statusValue = Object.keys(this.$status);
-
-			return statusValue.map(status => {
-				return {
-					value: Number(status),
-					text: this.$status[status]
-				}
-			});
 		},
 		structure() {
 			if (!this.source.structure) {
