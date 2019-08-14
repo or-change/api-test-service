@@ -46,6 +46,8 @@ export default {
 		}
 	},
 	mounted() {
+		this.getHeight();
+		
 		window.addEventListener('resize', this.getHeight);
 	},
 	destroyed() {

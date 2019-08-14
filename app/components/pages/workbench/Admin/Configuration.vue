@@ -84,7 +84,12 @@
 						<f-label size="lg" class="ms-my-2">已注册插件</f-label>
 
 						<custom-list
-							:fields="fields"
+							:fields="[
+								{ label: '标识', key: 'id' },
+								{ label: '名称', key: 'name' },
+								{ label: '版本号', key: 'version' },
+								{ label: '描述', 	key: 'description' }
+							]
 							:items="production.plugins"
 						/>
 					</f-row>
@@ -130,24 +135,6 @@ export default {
 			executor: [],
 			reporter: [],
 			source: [],
-			fields: [
-				{
-					label: 'ID',
-					key: 'id'
-				},
-				{
-					label: 'Name',
-					key: 'name'
-				},
-				{
-					label: 'Version',
-					key: 'version'
-				},
-				{
-					label: 'Description',
-					key: 'description'
-				}
-			],
 			tab: 0
 		}
 	},

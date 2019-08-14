@@ -57,7 +57,11 @@
 		</f-row>
 
 		<custom-list
-			:fields="fields"
+			:fields="[
+				{ label: '用户名', key: 'name' },
+				{ label: '邮箱', key: 'email' },
+				{ label: '管理员', key: 'administrator' }
+			]"
 			:items="filteredAccountList"
 			:select-mode="filteredAccountList.length !== 0 ? 'multi' : 'single'"
 			v-model="selectedAccount"
@@ -130,20 +134,6 @@ export default {
 				name: '',
 				admin: []
 			},
-			fields: [
-				{
-					label: 'Name',
-					key: 'name'
-				},
-				{
-					label: 'Email',
-					key: 'email'
-				},
-				{
-					label: 'Admin',
-					key: 'administrator'
-				}
-			],
 			account: {
 				name: '',
 				email: '',

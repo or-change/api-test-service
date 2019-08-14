@@ -23,11 +23,11 @@
 
 		<custom-list
 			:fields="[
-				{ label: 'ID', key: 'id', class: 'ms-w-auto' },
-				{ label: 'Status', key: 'status' },
-				{ label: 'Error', key: 'error' },
-				{ label: 'Executor', key: 'executor' },
-				{ label: 'CreatedAt', key: 'createdAt', class: 'col-130' }
+				{ label: '标识', key: 'id', class: 'ms-w-auto' },
+				{ label: '状态', key: 'status' },
+				{ label: '错误', key: 'error' },
+				{ label: '执行器', key: 'executor' },
+				{ label: '创建时间', key: 'createdAt', class: 'col-130' }
 			]"
 			:items="filteredExecution"
 			:select-mode="filteredExecution.length !== 0 ? 'multi' : 'single'"

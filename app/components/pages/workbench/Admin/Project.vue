@@ -40,7 +40,11 @@
 		</f-row>
 
 		<custom-list
-			:fields="fields"
+			:fields="[
+				{ label: '项目名称', key: 'name' },
+				{ label: '所有者', key: 'owner' },
+				{ label: '创建时间', key: 'createdAt' }
+			]"
 			:items="filteredProjectList"
 			:select-mode="filteredProjectList.length !== 0 ? 'multi' : 'single'"
 			v-model="selectedProject"
@@ -75,20 +79,6 @@ export default {
 			selectOwner: null,
 			accountList: [],
 			selectedProject: [],
-			fields: [
-				{
-					label: 'Name',
-					key: 'name'
-				},
-				{
-					label: 'Owner',
-					key: 'owner'
-				},
-				{
-					label: 'createdAt',
-					key: 'createdAt'
-				}
-			],
 			filter: {
 				name: null,
 				owner: []

@@ -34,7 +34,10 @@
 		</f-row>
 
 		<custom-list
-			:fields="fields"
+			:fields="[
+				{ label: '项目名称', key: 'name' },
+				{ label: '创建时间', key: 'createdAt' }
+			]"
 			:items="filteredProjectList"
 			:select-mode="filteredProjectList.length !== 0 ? 'multi' : 'single'"
 			v-model="selectedProject"
@@ -76,16 +79,6 @@ export default {
 				name: 'project 1'
 			},
 			show: false,
-			fields: [
-				{
-					label: 'Name',
-					key: 'name'
-				},
-				{
-					label: 'createdAt',
-					key: 'createdAt'
-				}
-			],
 			filter: {
 				name: null
 			}

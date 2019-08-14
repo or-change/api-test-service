@@ -61,7 +61,14 @@
 				</f-row>
 
 				<custom-list
-						:fields="fields"
+						:fields="[
+							{ label: '版本号', key: 'semver' },
+							{ label: '状态', key: 'status' },
+							{ label: '错误', key: 'error' },
+							{ label: '代理', key: 'agent' },
+							{ label: '创建时间', key: 'createdAt' },
+							{ label: '', key: 'download' }
+						]"
 						:items="filteredSourceList"
 						:select-mode="filteredSourceList.length !== 0 ? 'multi' : 'single'"
 						v-model="selectedSourceList"
@@ -224,32 +231,6 @@ export default {
 				agent: [],
 				status: []
 			},
-			fields: [
-				{
-					label: 'Semver',
-					key: 'semver'
-				},
-				{
-					label: 'Status',
-					key: 'status'
-				},
-				{
-					label: 'Error',
-					key: 'error'
-				},
-				{
-					label: 'Agent',
-					key: 'agent'
-				},
-				{
-					label: 'CreatedAt',
-					key: 'createdAt'
-				},
-				{
-					label: '',
-					key: 'download'
-				}
-			]
 		}
 	},
 	watch:{

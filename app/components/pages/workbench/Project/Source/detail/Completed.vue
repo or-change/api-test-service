@@ -22,13 +22,13 @@
 
 		<custom-list
 			:fields="[
-				{ label: 'ID', key: 'id', class: 'ms-w-auto' },
-				{ label: 'Pass Rate', key: 'passRate' },
-				{	label: 'Reporter', key: 'reporter', class: 'col-90' },
+				{ label: '标识', key: 'id', class: 'ms-w-auto' },
+				{ label: '通过率', key: 'passRate' },
+				{	label: '报告', key: 'reporter', class: 'col-90' },
 				// { label: 'Download', key: 'download', class: 'col-90' },
-				{ label: 'Executor', key: 'executor', class: 'col-100' },
-				{ label: 'CreatedAt', key: 'createdAt', class: 'col-100' },
-				{ label: 'EndedAt', key: 'endedAt', class: 'col-100' }
+				{ label: '执行器', key: 'executor', class: 'col-100' },
+				{ label: '创建时间', key: 'createdAt', class: 'col-100' },
+				{ label: '结束时间', key: 'endedAt', class: 'col-100' }
 			]"
 			:items="filteredExecution"
 			:select-mode="filteredExecution.length !== 0 ? 'multi' : 'single'"
