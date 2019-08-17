@@ -1,5 +1,5 @@
 const Examiner = require('..');
-const BasicSuitePlugin = require('../plugin/base');
+const BasicSuitePlugin = require('../plugins/basic');
 const Persistence = require('./persistence');
 const fs = require('fs');
 const path = require('path');
@@ -10,7 +10,7 @@ const PASSWORD_REG = /\w{4,20}/;
 const tempPath = path.join(__dirname, '.temp');
 
 try {
-	const stats = fs.statSync(tempPath);
+	fs.statSync(tempPath);
 } catch (error) {
 	fs.mkdirSync(tempPath);
 }
@@ -45,8 +45,7 @@ module.exports = Examiner({
 			};
 	
 			return true;
-		},
-
+		}
 	},
 	plugins: [
 		BasicSuitePlugin()
@@ -56,10 +55,3 @@ module.exports = Examiner({
 		store: db.store
 	}
 });
-
-// appendProjectCollaborator() {
-
-// },
-// removeProjectCollaborator() {
-
-// },

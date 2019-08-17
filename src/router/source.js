@@ -1,6 +1,8 @@
 const fs = require('fs');
 
-module.exports = function SourceRouter(router, { Authorize, Model, Tester }) {
+module.exports = function SourceRouter(router, { Authorize, Model, Registry }) {
+	const Tester = Registry.Tester();
+
 	router.get('/', Authorize('source.query'), async ctx => {
 		const { project } = ctx.state;
 

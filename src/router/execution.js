@@ -1,4 +1,6 @@
-module.exports = function ExecutionRouter(router, { Authorize, Model, Tester }) {
+module.exports = function ExecutionRouter(router, { Authorize, Model, Registry }) {
+	const Tester = Registry.Tester();
+
 	router.get('/', Authorize('execution.query'), async ctx => {
 		ctx.body = await Model.ExecutionList.query({
 			selector: 'sourceId',

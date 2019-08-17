@@ -23,15 +23,11 @@ import FabricUI from '@or-change/fabric-ui';
 import FabricUIWeb from '@or-change/fabric-ui-web';
 import http from './plugins/http';
 import filter from './plugins/filter';
-import sourceAgent from './plugins/sourceAgent';
-import executor from './plugins/executor';
 
 Vue.use(FabricUI, { size: 'sm' });
 Vue.use(FabricUIWeb);
 Vue.use(http, { router });
 Vue.use(filter);
-Vue.use(sourceAgent);
-Vue.use(executor);
 
 import Breadcrumb from './components/utils/Breadcrumb.vue';
 import List from './components/utils/List.vue';

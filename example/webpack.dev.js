@@ -2,7 +2,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const merge = require('webpack-merge');
 const path = require('path');
 const config = require('./.config.json');
-const { webpack: base } = require('./testing-service-dev');
+const { webpack: base } = require('./demo');
 
 module.exports = merge(base, {
 	mode: 'development',

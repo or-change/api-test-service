@@ -28,7 +28,7 @@
 					@click="signIn"
 					class="ms-mt-3"
 					variant="primary"
-					text="Sign In"
+					text="登录"
 				/>
 			</form>
 		</f-col>

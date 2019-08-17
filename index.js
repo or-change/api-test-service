@@ -13,7 +13,7 @@ const TestServiceModel = require('./src/models');
 const Registry = require('./src/registry');
 const Authorizer = require('./src/authorizer');
 const normalize = require('./src/normalize');
-const Scanner = require('./src/scanner');
+const utils = require('./src/utils');
 
 const Router = {
 	Base: require('./src/router/base'),
@@ -26,39 +26,20 @@ const Router = {
 
 module.exports = function Examiner(originalOptions, factory = () => {}) {
 	const options = normalize(originalOptions);
-	const publicPath = path.resolve(options.server.serve.path);
+	const publicPath = path.resolve(options.server.public.path);
 	const models = TestServiceModel(options.model);
 	
-	const store = Registry.Store();
-	const manager = Registry.Manager(store);
-	const pluginList = [];
-	
-	const temp = { path: options.temp.path };
-
-	options.plugins.forEach(plugin => {
-		pluginList.push({
-			id: plugin.id,
-			name: plugin.name,
-			version: plugin.version,
-			description: plugin.description
-		});
-		
-		plugin.install(manager, { temp, Model: models, Tester: store.Tester });
-	});
-
-	factory(manager);
-
 	const Server = ProductKoaServer({
 		factory(app, { Router, Session }) {
+			app.use(serve(publicPath, {
+				gzip: options.server.public.gzip,
+				maxage: options.server.public.maxage
+			}));
 			app.use(koaBody({
 				multipart: true
 			}));
 			Session.install(app);
 			app.use(Router());
-			app.use(serve(publicPath, {
-				gzip: options.server.serve.gzip,
-				maxage: options.server.serve.maxage
-			}));
 		},
 		plugins: [
 			SessionPlugin({
@@ -101,8 +82,8 @@ module.exports = function Examiner(originalOptions, factory = () => {}) {
 					},
 					{
 						prefix: '/plugin',
-						Router(router, injection) {
-							store.pluginRouterList.forEach(install => install(router, injection));
+						Router(router, { Registry }) {
+							Registry.pluginRouterList.forEach(install => install(router));
 						}
 					}
 				]
@@ -110,31 +91,59 @@ module.exports = function Examiner(originalOptions, factory = () => {}) {
 		]
 	});
 
+	const registry = Registry();
+
 	const product = Product({
 		name: options.product.name,
 		version: options.product.version,
 		namespace: options.product.namespace,
 		injection: {
-			Tester: store.Tester,
 			Model: models,
-			temp,
-			scanner: Scanner(options.scanner),
+			temp: { path: options.temp.path },
+			Registry: registry,
 			authenticate(ctx) {
 				return options.server.authenticate(ctx, models);
 			},
-			summary: {
-				plugins: pluginList,
-				source: Object.keys(store.Tester.SourceAgent),
-				executor: Object.keys(store.Tester.Executor),
-				reporter: Object.keys(store.Tester.Reporter)
-			}
+			utils
 		},
 		Server,
-		webapck: {
-			entries: store.webpackEntryList,
-			publicPath
+	}, {
+		beforeServer(injection) {
+			const pluginList = [];
+			const { Registry } = injection;
+			const Tester = Registry.Tester();
+
+			options.plugins.forEach(plugin => {
+				pluginList.push({
+					id: plugin.id,
+					name: plugin.name,
+					version: plugin.version,
+					description: plugin.description
+				});
+				
+				plugin.install(Registry.Register(), injection);
+			});
+
+			injection.Summary = function Summary() {
+				return {
+					plugins: pluginList,
+					source: Object.keys(Tester.SourceAgent),
+					executor: Object.keys(Tester.Executor),
+					reporter: Object.keys(Tester.Reporter),
+					scanner: Object.keys(Tester.Scanner)
+				};
+			};
+		},
+		afterServer(injection) {
+			factory(injection);
 		}
 	});
 
-	return product;
+	return {
+		requestListener: product.requestListrner,
+		webapck: product.Webpack({
+			publicPath,
+			entries: registry.webpackEntryList
+		})
+	};
 };

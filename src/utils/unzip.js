@@ -2,7 +2,7 @@ const fs = require('fs-extra');
 const path = require('path');
 const yauzl = require('yauzl');
 
-module.exports = function unzip(buffer, dir) {
+module.exports = function unzip(buffer, dirname) {
 	return new Promise((resolve, reject) => {
 		yauzl.fromBuffer(buffer, {
 			lazyEntries: true
@@ -13,22 +13,20 @@ module.exports = function unzip(buffer, dir) {
 
 			zipfile.on('entry', async entry => {
 				if (/\/$/.test(entry.fileName)) {
-					await fs.ensureDir(path.join(dir, entry.fileName));
+					await fs.ensureDir(path.join(dirname, entry.fileName));
 					zipfile.readEntry();
 				} else {
-					zipfile.openReadStream(entry, function (err, readStream) {
+					zipfile.openReadStream(entry, (err, readStream) => {
 						if (err) {
 							return reject(err);
 						}
 
-						readStream.on('end', function () {
-							zipfile.readEntry();
-						}).pipe(fs.createWriteStream(path.join(dir, entry.fileName)));
+						readStream
+							.on('end', () => zipfile.readEntry())
+							.pipe(fs.createWriteStream(path.join(dirname, entry.fileName)));
 					});
 				}
-			}).on('end', () => resolve());
-
-			zipfile.readEntry();
+			}).on('end', () => resolve()).readEntry();
 		});
 	});
 };

@@ -1,0 +1,270 @@
+{
+	"type": "object",
+	"additionalProperties": false,
+	"description": "Options of 'Examiner' to build a deliverable application.",
+	"required": [
+		"server",
+		"model"
+	],
+	"properties": {
+		"product": {
+			"type": "object",
+			"additionalProperties": false,
+			"description": "Some application info used by frontend & backend.",
+			"properties": {
+				"name": {
+					"type": "string",
+					"description": "The final product application name."
+				},
+				"version": {
+					"type": "string",
+					"description": "Application version in semver pattern."
+				},
+				"namespace": {
+					"type": "string",
+					"description": "Used for some injections to get."
+				}
+			}
+		},
+		"server": {
+			"type": "object",
+			"additionalProperties": false,
+			"description": "The backend options about storage, session, public etc.",
+			"required": [
+				"authenticate"
+			],
+			"properties": {
+				"authenticate": {
+					"instanceof": "Function",
+					"description": ""
+				},
+				"session": {
+					"type": "object",
+					"additionalProperties": false,
+					"description": "",
+					"required": [
+						"install",
+						"destroy",
+						"get",
+						"set"
+					],
+					"properties": {
+						"install": {
+							"instanceof": "Function",
+							"description": ""
+						},
+						"destroy": {
+							"instanceof": "Function",
+							"description": ""
+						},
+						"get": {
+							"instanceof": "Function",
+							"description": ""
+						},
+						"set": {
+							"instanceof": "Function",
+							"description": ""
+						}
+					}
+				},
+				"public": {
+					"type": "object",
+					"additionalProperties": false,
+					"description": "",
+					"properties": {
+						"path": {
+							"type": "string",
+							"absolutePath": true,
+							"description": ""
+						},
+						"maxage": {
+							"type": "integer",
+							"minimum": 0,
+							"description": ""
+						},
+						"gzip": {
+							"type": "boolean",
+							"description": ""
+						}
+					}
+				}
+			}
+		},
+		"model": {
+			"type": "object",
+			"properties": {
+				"id": {
+					"type": "string",
+					"description": ""
+				},
+				"store": {
+					"type": "object",
+					"additionalProperties": false,
+					"description": "",
+					"required": [
+						"getAccountById",
+						"createAccount",
+						"destroyAccount",
+						"updateAccount",
+						"queryAccountAll",
+						"queryAccountByName",
+						"getProjectById",
+						"createProject",
+						"updateProject",
+						"destroyProject",
+						"queryProjectByOwnerId",
+						"queryProjectAll",
+						"getSourceById",
+						"createSource",
+						"destroySource",
+						"querySourceByProjectId",
+						"createExecution",
+						"getExecutionById",
+						"updateExecution",
+						"destroyExecution",
+						"queryExecutionBySourceId",
+						"updateSource"
+					],
+					"properties": {
+						"getAccountById": {
+							"instanceof": "Function",
+							"description": ""
+						},
+						"createAccount": {
+							"instanceof": "Function",
+							"description": ""
+						},
+						"destroyAccount": {
+							"instanceof": "Function",
+							"description": ""
+						},
+						"updateAccount": {
+							"instanceof": "Function",
+							"description": ""
+						},
+						"queryAccountAll": {
+							"instanceof": "Function",
+							"description": ""
+						},
+						"queryAccountByName": {
+							"instanceof": "Function",
+							"description": ""
+						},
+						"getProjectById": {
+							"instanceof": "Function",
+							"description": ""
+						},
+						"createProject": {
+							"instanceof": "Function",
+							"description": ""
+						},
+						"updateProject": {
+							"instanceof": "Function",
+							"description": ""
+						},
+						"destroyProject": {
+							"instanceof": "Function",
+							"description": ""
+						},
+						"queryProjectByOwnerId": {
+							"instanceof": "Function",
+							"description": ""
+						},
+						"queryProjectAll": {
+							"instanceof": "Function",
+							"description": ""
+						},
+						"getSourceById": {
+							"instanceof": "Function",
+							"description": ""
+						},
+						"createSource": {
+							"instanceof": "Function",
+							"description": ""
+						},
+						"destroySource": {
+							"instanceof": "Function",
+							"description": ""
+						},
+						"querySourceByProjectId": {
+							"instanceof": "Function",
+							"description": ""
+						},
+						"createExecution": {
+							"instanceof": "Function",
+							"description": ""
+						},
+						"getExecutionById": {
+							"instanceof": "Function",
+							"description": ""
+						},
+						"updateExecution": {
+							"instanceof": "Function",
+							"description": ""
+						},
+						"destroyExecution": {
+							"instanceof": "Function",
+							"description": ""
+						},
+						"queryExecutionBySourceId": {
+							"instanceof": "Function",
+							"description": ""
+						},
+						"updateSource": {
+							"instanceof": "Function",
+							"description": ""
+						}
+					}
+				}
+			}
+		},
+		"temp": {
+			"type": "object",
+			"description": "",
+			"properties": {
+				"path": {
+					"type": "string",
+					"absolutePath": true,
+					"description": ""
+				}
+			}
+		},
+		"plugins": {
+			"type": "array",
+			"description": "",
+			"items": {
+				"type": "object",
+				"required": [
+					"name",
+					"id",
+					"version",
+					"description",
+					"install"
+				],
+				"description": "",
+				"properties": {
+					"name": {
+						"type": "string",
+						"description": ""
+					},
+					"id": {
+						"type": "string",
+						"description": ""
+					},
+					"version": {
+						"type": "string",
+						"description": ""
+					},
+					"description": {
+						"type": "string",
+						"description": ""
+					},
+					"install": {
+						"instanceof": "Function",
+						"description": ""
+					}
+				}
+			}
+		}
+	}
+}

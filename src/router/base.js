@@ -1,6 +1,8 @@
 module.exports = function BaseRouter(router, {
-	Authorize, authenticate, product, Model, Session, summary
+	Authorize, authenticate, product, Model, Session, Summary
 }) {
+	const summary = Summary();
+
 	router.get('/product', Authorize('product.query'), ctx => {
 		ctx.body = {
 			name: product.name,
@@ -13,6 +15,7 @@ module.exports = function BaseRouter(router, {
 			source: summary.source,
 			reporter: summary.reporter,
 			executor: summary.executor,
+			scanner: summary.scanner,
 		};
 	}).post('/session/principal', Authorize('principal.create'), async (ctx) => {
 		const success = await authenticate(ctx);

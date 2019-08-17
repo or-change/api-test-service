@@ -1,40 +1,36 @@
 const path = require('path');
 const fs = require('fs-extra');
-const { spawn } = require('child_process');
-const Observer = require('./observer');
-const Manager = require('./manager');
-const unzip = require('./unzip');
+const meta = require('./meta.json');
+const Observer = require('./src/components/executor/observer');
+const Manager = require('./src/dispatcher');
+const spawn = {
+	installing: require('./src/components/process/install'),
+	running: require('./src/components/process/run')
+};
 
 const ID = {
-	SOURCE_AGENT: 'basic.local',
-	EXECUTOR: 'basic.local'
+	SOURCE_AGENT: 'ecma.mocha.basic.local',
+	EXECUTOR: 'ecma.mocha.basic.local'
 };
 
 module.exports = function BasicSuitePluginProvider() {
 	const sourceBufferStore = {};
 
-	return {
-		name: 'Examiner Basic Plugin Suite',
-		id: 'com.oc.basic',
-		version: '1.0.0',
-		description: 'Basic functions for getting started.',
-		install: function BasicSuitePluginInstall(examiner, { temp }) {
+	return Object.assign({}, meta, {
+		install: function BasicSuitePluginInstall(examiner, { temp, utils, Model, Registry }) {
+			const Tester = Registry.Tester();
 			const manager = Manager();
 			const observer = Observer(manager);
 			const { port } = observer.address();
-			const EXECUTION_ENV =  Object.assign({}, process.env, {
-				OBSERVER_PORT: port,
-				OBSERVER_HOST: '127.0.0.1',
-			});
 
 			examiner.executor(ID.EXECUTOR, async function BaseLocalExecutor(agent, execution) {
-				const dir = path.join(temp.path, Math.random().toString(16).substr(2, 8));
-
 				await execution.$update({ status: 0 });
 
+				const dirname = path.join(temp.path, Math.random().toString(16).substr(2, 8));
+
 				try {
-					await fs.ensureDir(dir);
-					await unzip(await agent.fetch(), dir);
+					await fs.ensureDir(dirname);
+					await utils.unzip(await agent.fetch(), dirname);
 				} catch (err) {
 					return await execution.$update({ error: err.message });
 				}
@@ -42,40 +38,21 @@ module.exports = function BasicSuitePluginProvider() {
 				await execution.$update({ status: 1 });
 
 				try {
-					await new Promise((resolve, reject) => {
-						const installing = spawn(process.platform === 'win32' ? 'npm.cmd' : 'npm', [
-							'install'
-						], { cwd: dir });
-		
-						installing
-							.on('error', err => reject(err))
-							.on('close', code => resolve());
-					});
-				} catch(err) {
-					return await execution.$update({ error: err.message });
+					await spawn.installing(dirname);
+					
+					const sessionId = manager.create(execution);
+
+					await spawn.running();
+					manager.destroy(sessionId);
+					fs.remove(dirname);
+				} catch(error) {
+					return await execution.$update({ error: error.message });
 				}
 
 				await execution.$update({ status: 2 });
-				
-				const sessionId = manager.create(execution);
-				spawn(process.platform === 'win32' ? 'npx.cmd' : 'npx', [
-					'mocha',
-					'--reporter',
-					'@or-change/tdk/reporter',
-					'--require',
-					path.join(__dirname, 'log.js')
-				], {
-					cwd: dir,
-					env: Object.assign({
-						EXECUTION_SESSION: sessionId
-					}, EXECUTION_ENV)
-				}).on('close', () => {
-					manager.destroy(sessionId);
-					fs.remove(dir);
-				});
 			});
 
-			examiner.router(function install(router, { Model, scanner, Tester }) {
+			examiner.router(function install(router) {
 				router.post('/com.oc.basic/source/:sourceId/agent', async ctx => {
 					const { sourceId } = ctx.params;
 					const { files } = ctx.request;
@@ -131,5 +108,5 @@ module.exports = function BasicSuitePluginProvider() {
 	
 			examiner.entry(path.join(__dirname, 'app/index.js'));
 		}
-	};
+	});
 };
