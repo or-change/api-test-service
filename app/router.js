@@ -5,13 +5,12 @@ Vue.use(VueRouter);
 
 import SignIn from './components/pages/SignIn';
 import Workbench from './components/pages/Workbench';
-// import WorkbenchPortal from './components/pages/workbench/Portal';
 
 import WorkbenchProject from './components/pages/workbench/Project/Overview';
 import WorkbenchWelcome from './components/pages/workbench/Welcome';
 import WorkbenchError from './components/pages/workbench/Error';
-
 import WorkbenchAccount from './components/pages/workbench/Account.vue';
+
 import WorkbenchProjectDetail from './components/pages/workbench/Project/Detail';
 import WorkbenchProjectSourceDetail from './components/pages/workbench/Project/Source/detail/Detail.vue';
 import WorkbenchProjectReporter from './components/pages/workbench/Project/Source/Report.vue';
@@ -53,10 +52,6 @@ export default function Router(pluginRouterOptions) {
 						path: 'error',
 						component: WorkbenchError
 					},
-					// {
-					// 	path: 'portal',
-					// 	component: WorkbenchPortal
-					// },
 					{
 						path: 'account',
 						component: WorkbenchAccount
@@ -69,10 +64,6 @@ export default function Router(pluginRouterOptions) {
 						path: 'project/:projectId',
 						component: WorkbenchProjectDetail
 					},
-					// {
-					// 	path: 'project/:projectId/source',
-					// 	component: WorkbenchProjectSource
-					// },
 					{
 						path: 'project/:projectId/source/:sourceId',
 						component: WorkbenchProjectSourceDetail
