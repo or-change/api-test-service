@@ -17,3 +17,58 @@
 #app-product-mask.blocked.long-blocked {
 	opacity: 0.5;
 }
+
+html, body {
+	height: 100%;
+}
+
+:focus {
+	outline: none;
+}
+
+.select {
+	width: 2em;
+}
+
+.select .custom-checkbox .custom-control-label,
+.select .custom-checkbox .custom-control-input
+{
+	display: none;
+}
+
+tr:hover .select .custom-checkbox .custom-control-label,
+tr:hover .select .custom-checkbox .custom-control-input,
+tr .select .show .custom-control-label,
+tr .select .show .custom-control-input {
+	display: inline-block;
+}
+
+label {
+	font-size: 14px;
+}
+
+a.disabled {
+	pointer-events: none;
+	text-decoration: none;
+	color: gray;
+}
+
+.col-200 {
+	width: 200px !important;
+}
+
+.col-130 {
+	width: 130px !important;
+}
+
+.col-100 {
+	width: 100px !important;
+}
+
+.col-90 {
+	width: 90px !important;
+}
+
+.col-80 {
+	width: 80px !important;
+}

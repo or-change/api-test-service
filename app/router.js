@@ -11,7 +11,7 @@ import WorkbenchWelcome from './components/pages/workbench/Welcome';
 import WorkbenchError from './components/pages/workbench/Error';
 import WorkbenchAccount from './components/pages/workbench/Account.vue';
 
-import WorkbenchProjectDetail from './components/pages/workbench/Project/Detail';
+import WorkbenchProjectDetail from './components/pages/workbench/Project/Detail/Detail.vue';
 import WorkbenchProjectSourceDetail from './components/pages/workbench/Project/Source/detail/Detail.vue';
 import WorkbenchProjectReporter from './components/pages/workbench/Project/Source/Report.vue';
 

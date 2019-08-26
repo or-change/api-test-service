@@ -20,6 +20,7 @@ const context = {
 	product: {
 		source: {},
 		executor: {},
+		scanner: {},
 		SignIn
 	},
 	beforeAppMountHandler: []
@@ -50,6 +51,13 @@ product.installerList.forEach(installer => {
 			add(key, options) {
 				if (!context.product.executor[key]) {
 					context.product.executor[key] = options;
+				}
+			}
+		},
+		scanner: {
+			add(key, options) {
+				if (!context.product.scanner[key]) {
+					context.product.scanner[key] = options;
 				}
 			}
 		},

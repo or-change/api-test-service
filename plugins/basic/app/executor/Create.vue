@@ -1,7 +1,7 @@
 <template>
-	<div v-show="show" class="ms-center fail">
-		<i class="ms-Icon ms-Icon--ErrorBadge" style="font-size: 16px"></i>
-		<f-label>执行失败</f-label>
+	<div v-show="show" class="text-center text-danger">
+		<i class="fas fa-exclamation-circle" style="font-size: 16px"></i>
+		<label>执行失败</label>
 	</div>
 </template>
 

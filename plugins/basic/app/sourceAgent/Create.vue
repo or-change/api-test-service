@@ -1,25 +1,24 @@
 <template>
-	<div id="upload-file" class="ms-p-2">
+	<div id="upload-file">
 		<form ref="uploadFile" name="uploadFile" v-show="canUpload">
 			<input type="file" ref="file" @change="tips" />
 		</form>
 		<div id="like-file-upload">
-			<f-button
-				text="选择上传文件"
+			<b-button
 				variant="primary"
-				:disabled="!canUpload"
-			/>
-			<f-label class="ms-d-inline-block ms-ml-2 ms-textTruncate">{{ fileMessage }}</f-label>
+				:disabled="!canUpload" size="sm"
+			>选择上传文件</b-button>
+			<label class="d-inline-block ml-2 mb-0 text-truncate align-middle">{{ fileMessage }}</label>
 		</div>
-		<div class="ms-mt-3" v-if="state !== -1">
-			<f-progress
-				title="文件上传进度："
-				:data="progress"
+		<div class="mt-3" v-if="state !== -1">
+			<b-progress
+				title="文件上传进度：" variant="success" height="2px"
+				:value="progress"
 				v-show="state === 0"
 			/>
-			<div v-if="message" :class="['ms-center', message.variant]">
+			<div v-if="message" :class="['text-center', message.variant]">
 				<i :class="message.class" style="font-size: 16px"></i>
-				<f-label>{{ message.info }}</f-label>
+				<label>{{ message.info }}</label>
 			</div>
 		</div>
 	</div>
@@ -34,28 +33,25 @@ export default {
 		return {
 			fileMessage: '未选择任何文件',
 			state: -1,
-			progress: {
-				value: 0,
-				variant: 'success'
-			}
+			progress: 0
 		}
 	},
 	computed: {
 		message() {
 			const mapping = {
 				'1': {
-					class: 'ms-Icon ms-Icon--LocationCircle',
-					variant: 'default',
+					class: 'fas fa-question-circle',
+					variant: 'text-default',
 					info: '文件解压中'
 				},
 				'2': {
-					class: 'ms-Icon ms-Icon--CompletedSolid',
-					variant: 'success',
+					class: 'fas fa-check-circle',
+					variant: 'text-success',
 					info: '上传成功'
 				},
 				'3': {
-					class: 'ms-Icon ms-Icon--ErrorBadge',
-					variant: 'fail',
+					class: 'fas fa-exclamation-circle',
+					variant: 'text-fail',
 					info: '上传失败'
 				}
 			};
@@ -121,11 +117,6 @@ export default {
 
 	#like-file-upload {
 		z-index: -1;
-
-		label {
-			height: 26px;
-			width: 170px;
-		}
 	}
 
 	input[type="file"] {

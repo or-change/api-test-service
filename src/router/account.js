@@ -1,4 +1,4 @@
-module.exports = function ExecutionRouter(router, { Authorize, Model, Session }) {
+module.exports = function AccountRouter(router, { Authorize, Model, Session }) {
 	async function getAccount(ctx, next) {
 		const { accountId } = ctx.params;
 		const account = await Model.Account.query(accountId);

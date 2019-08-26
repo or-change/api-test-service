@@ -7,12 +7,17 @@ const STATUS = {
 };
 
 export default {
+	data() {
+		return {
+			totalRow: 0,
+			perPage: 10,
+			currentPage: 1
+		};
+	},
 	props: {
-		projectId: {
-			default: null
-		},
-		sourceId: {
-			default: null
+		items: {
+			type: Array,
+			default: () => []
 		}
 	},
 	filters: {
@@ -23,26 +28,17 @@ export default {
 			return product.executor[value] ? product.executor[value].name : value;
 		}
 	},
-	computed: {
-		status() {
-			const statusValue = Object.keys(STATUS);
-
-			return statusValue.map(status => {
-				return {
-					value: Number(status),
-					text: STATUS[status]
-				};
-			});
+	methods: {
+		deleteExecution() {
+			this.$emit('delete', this.selected);
+			this.selected = [];
+		},
+		onFiltered(filteredItems) {
+			this.totalRow = filteredItems.length;
+			this.currentPage = 1;
 		}
 	},
-	methods: {
-		async deleteExecution() {
-			await Promise.all(this.selected.map(execution => {
-				return this.$http.project.source(this.projectId).execution(this.sourceId).delete(execution.id);
-			}));
-	
-			this.$emit('delete');
-			this.selected = [];
-		}
+	mounted() {
+		this.totalRow = this.items.length;
 	}
 };

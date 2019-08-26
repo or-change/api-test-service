@@ -141,8 +141,8 @@ module.exports = function Examiner(originalOptions, factory = () => {}) {
 
 	return {
 		requestListener: product.requestListrner,
-		webapck: product.Webpack({
-			publicPath,
+		webpack: product.Webpack({
+			publicPath: '/',  //暂时修改
 			entries: registry.webpackEntryList
 		})
 	};

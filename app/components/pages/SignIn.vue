@@ -5,7 +5,7 @@
 				cols="4"
 				offset="4"
 			>
-				<b-form @submit="signIn">
+				<b-form @submit.prevent="signIn">
 					<b-form-group label="用户名：" label-for="username" label-size="sm">
 						<b-form-input id="username" size="sm" trim required
 							v-model="credential.username"></b-form-input>

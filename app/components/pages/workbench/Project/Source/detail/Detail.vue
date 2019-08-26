@@ -1,5 +1,85 @@
 <template>
-	
+	<div class="mt-3">
+		<b-breadcrumb
+			:items="[
+				{
+					to: '/',
+					html: '<i class=\'fas fa-home\' />'
+				},
+				{
+					to: '/workbench/project',
+					text: '我的项目'
+				},
+				{
+					to: `/workbench/project/${projectId}`,
+					text: projectName ? projectName : projectId
+				},
+				{
+					text: '源代码',
+					to: `/workbench/project/${projectId}`
+				},
+				{
+					text: source.semver ? source.semver : sourceId,
+					to: `/workbench/project/${projectId}/source/${sourceId}`,
+					active: true
+				}
+			]"
+		/>
+
+		<b-row>
+			<b-col cols="9">
+				<b-tabs content-class="mt-3" small>
+					<b-tab title="执行完成" active>
+						<compeleted-list
+							:items="filteredCompleted"
+							:project-id="projectId"
+							:source-id="sourceId"
+							@select="(execution) => selectedExecution = execution"
+							@delete="deleteExecution" />
+					</b-tab>
+					<b-tab title="未执行完成">
+						<unfinished-list
+							:items="filteredUnfinished" />
+					</b-tab>
+					<b-tab title="异常执行">
+						<abnormal-list
+							:items="executionList.filter(execution => !execution.progress && execution.error)"
+							@delete="deleteExecution" />
+					</b-tab>
+
+					<b-button class="position-absolute" style="top: 4px;right: 0"
+						size="sm" variant="primary" v-b-modal.execution-source>执行</b-button>
+				</b-tabs>
+			</b-col>
+			<b-col cols="3">
+				<h6 class="mb-2 font-weight-bold">
+					{{selectedExecution ? `执行结果：${selectedExecution.id}` : `源码摘要: 版本${source.semver}`}}
+				</h6>
+
+				<structure 
+					:structure="structure"
+				/>
+			</b-col>
+		</b-row>
+
+		<b-modal id="execution-source" size="sm" title="开始执行" centered button-size="sm"
+			@ok.prevent="startExecution" ok-title="执行" ok-only
+		>
+			<div>
+				<label for="executor" class="align-middle mb-0">执行器：</label>
+				<b-form-select
+					id="executor" size="sm" class="d-inline-block align-middle mr-3" style="width: 10em"
+					v-model="execution.executor" :options="executorOptions"
+				></b-form-select>
+
+				<component
+					ref="start-execution"
+					:is="$product.executor[execution.executor] ? $product.executor[execution.executor].create : ''"
+					@success="executionSuccess"
+				/>
+			</div>
+		</b-modal>
+	</div>
 </template>
 
 <script>
@@ -21,45 +101,12 @@ export default {
 			selectedExecution: null,
 			execution: {
 				executor: ''
-			},
-			filter: {
-				createdAt: null,
-				executor: []
-			},
-			options: [
-				{
-					text: '>=10%',
-					value: 0.1
-				},
-				{
-					text: '>=50%',
-					value: 0.5
-				},
-				{
-					text: '==100%',
-					value: 1
-				}
-			],
-			type: 0,
-			dialog: {
-				execution: false,
-				report: false
 			}
 		}
 	},
 	computed: {
-		filteredExecutionList() {
-			return this.executionList.filter((execution) => {
-				const { createdAt, executor } = this.filter;
-
-				const createAtFilter = createdAt ? execution.createdAt >= createdAt : true;
-				const executorFilter = executor.length ? executor.indexOf(execution.executor) !== -1 : true;
-
-				return createAtFilter && executorFilter;
-			}).sort((a, b) => b.createdAt - a.createdAt);
-		},
 		filteredCompleted() {
-			return this.filteredExecutionList
+			return this.executionList
 				.filter(execution => execution.progress && execution.progress.ended === execution.progress.length)
 				.map((execution) => {
 					if (!execution.result || !this.source.structure) {
@@ -74,7 +121,7 @@ export default {
 				});
 		},
 		filteredUnfinished() {
-			return this.filteredExecutionList
+			return this.executionList
 				.filter(execution =>  execution.status !== 3 && !execution.error)
 				.map((execution) => {
 					const {
@@ -134,6 +181,13 @@ export default {
 			this.dialog.execution = false;
 			await this.getExecutionList();
 		},
+		async deleteExecution(selected) {
+			await Promise.all(selected.map(id => {
+				return this.$http.project.source(this.projectId).execution(this.sourceId).delete(id);
+			}));
+	
+			await this.getExecutionList();
+		},
 		downloadReporter() {
 
 		}
@@ -143,3 +197,9 @@ export default {
 	}
 }
 </script>
+
+<style lang="scss">
+.tabs {
+	position: relative;
+}
+</style>

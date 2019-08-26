@@ -66,7 +66,7 @@ export default function install(Vue, { router }) {
 							};
 						});
 					} catch (e) {
-						skip(e);
+						return [];
 					}
 				},
 				assign(projectId, accountId) {
@@ -127,7 +127,7 @@ export default function install(Vue, { router }) {
 						};
 					});
 				} catch (e) {
-					skip(e);
+					return [];					
 				}
 			},
 			update(accountId, payload) {
@@ -149,7 +149,7 @@ export default function install(Vue, { router }) {
 						administrator: account.administrator
 					};
 				} catch (e) {
-					skip(e);
+					return {};
 				}
 			}
 		},
@@ -195,7 +195,7 @@ export default function install(Vue, { router }) {
 						};
 					});
 				} catch (e) {
-					skip(e);
+					return [];
 				}
 			},
 			async get(projectId) {
@@ -209,7 +209,7 @@ export default function install(Vue, { router }) {
 						createdAt: new Date(project.createdAt)
 					};
 				} catch (e) {
-					skip(e);
+					return {};
 				}
 			},
 			source(projectId) {
@@ -250,7 +250,7 @@ export default function install(Vue, { router }) {
 								};
 							});
 						} catch (e) {
-							skip(e);
+							return [];
 						}
 					},
 					async get(sourceId) {
@@ -266,7 +266,7 @@ export default function install(Vue, { router }) {
 								createdAt: new Date(source.createdAt)
 							};
 						} catch (e) {
-							skip(e);
+							return {};
 						}
 					},
 					delete(sourceId) {
@@ -323,7 +323,7 @@ export default function install(Vue, { router }) {
 										};
 									});
 								} catch (e) {
-									skip(e);
+									return [];
 								}
 							},
 							async get(executionId) {
@@ -341,7 +341,7 @@ export default function install(Vue, { router }) {
 										result: execution.result
 									};
 								} catch (e) {
-									skip(e);
+									return [];
 								}
 							},
 							report(executionId) {

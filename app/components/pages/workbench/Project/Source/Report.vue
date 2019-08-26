@@ -1,5 +1,83 @@
 <template>
+	<div class="mt-3" id="reporter-container">
+		<b-breadcrumb
+			:items="[
+				{
+					to: '/',
+					html: '<i class=\'fas fa-home\' />'
+				},
+				{
+					to: '/workbench/project',
+					text: '我的项目'
+				},
+				{
+					to: `/workbench/project/${projectId}`,
+					text: projectName ? projectName : projectId
+				},
+				{
+					text: '源代码',
+					to: `/workbench/project/${projectId}`
+				},
+				{
+					text: source.semver ? source.semver : sourceId,
+					to: `/workbench/project/${projectId}/source/${sourceId}`,
+				},
+				{
+					text: '报告',
+					to: `/workbench/project/${projectId}/source/${sourceId}/execution/${executionId}/reporter`,
+					active: true
+				}
+			]"
+		/>
 
+		<div>
+			<h5 class="text-center font-weight-bold">测试报告</h5>
+			<div class="mt-3 text-center">
+				<label>用例通过率: {{ `${Math.round(passRate * 100)}% `}}</label>
+				<label class="ml-3">接口请求成功率: {{ `${(api.success / api.total) * 100}% `}}</label>
+			</div>
+
+			<b-row>
+				<b-col cols="9">
+					<div v-for="(item, index) in structure">
+						<p class="mb-0" :title="item.title"
+							:style="{'padding-left': `${25 * item.level}px`}"
+							v-if="item.type === 'suit'"
+						>
+							<label class="mb-0 suit-title">{{item.title}}</label>
+						</p>
+
+						<div v-else :style="{'padding-left': `${25 * item.level}px`}">
+							<b-card no-body class="my-2 p-1 "
+								:bg-variant="item.result === -1 ? 'danger' : (item.result === 1 ? 'success' : 'secondary')">
+								<p class="mb-0 text-white">
+									{{ item.title }}
+									<b-button variant="outline-primary" size="sm"
+										class="toggle py-0 align-baseline float-right"
+										v-show="log[item.path] && log[item.path].length"
+										@click="toggle(item.path)"
+									>
+										<i :class="[
+											visible.indexOf(item.path) !== -1 ? 'fas fa-angle-double-up' : 'fas fa-angle-double-down'
+										]" />
+									</b-button>
+								</p>
+
+								<b-collapse :id="item.path" :visible="visible.indexOf(item.path) !== -1">
+									<p v-for="(item, key) in log[item.path]" v-html="item" class="mt-3 text-white"></p>
+								</b-collapse>
+							</b-card>
+						</div>
+					</div>
+				</b-col>
+				<b-col cols="3">
+					<structure
+						:structure="structure"
+					/>
+				</b-col>
+			</b-row>
+		</div>
+	</div>
 </template>
 
 <script>
@@ -21,7 +99,8 @@ export default {
 			api: {
 				total: 0,
 				success: 0
-			}
+			},
+			visible: []
 		}
 	},
 	computed: {
@@ -37,7 +116,6 @@ export default {
 
 			if (this.execution.result) {
 				const result = this.execution.result.map(item => item.join('-'));
-
 
 				structure.forEach(item => {
 					if (item.type === 'test') {
@@ -57,9 +135,22 @@ export default {
 		}
 	},
 	methods: {
+		toggle(path) {
+			const index = this.visible.indexOf(path);
+
+			if (index === -1) {
+				this.visible.push(path);
+			} else {
+				this.visible.splice(index, 1);
+			}
+		},
 		async getExecution() {
 			this.execution = await this.$http.project.source(this.projectId).execution(this.sourceId).get(this.executionId);
 			this.log = {};
+
+			if (!this.execution.log) {
+				return;
+			}
 
 			this.execution.log.forEach((item) => {
 				this.parserRegister[item.type].write(item.message);
@@ -126,23 +217,19 @@ export default {
 
 <style lang="scss">
 #reporter-container {
-	.ms-message-bar-single .ms-message-bar-content .ms-message-bar-text p{
-		display: none;
+	.suit-title {
+		font-size: 16px;
+		font-weight: 600;
 	}
 
-	.ms-message-bar-multi .ms-message-bar-content .ms-message-bar-text p {
-		display: block;
-	}
-
-	.ms-message-bar-md .ms-message-bar-icon,
-	.ms-message-bar-md .ms-message-bar-text {
-		padding-top: 10px;
-    padding-bottom: 10px;
-	}
-
-	.ms-message-bar-md .ms-message-bar-multi-button {
-    width: 40px;
-    height: 28px;
+	.toggle {
+		width: 4em;
+		text-align: right;
+		border: none;
+		outline: none;
+		box-shadow: none;
+		background-color: transparent;
+		color: white;
 	}
 }
 </style>
