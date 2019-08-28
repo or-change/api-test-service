@@ -40,7 +40,7 @@
 			<b-row>
 				<b-col cols="9">
 					<div v-for="(item, index) in structure">
-						<p class="mb-0" :title="item.title"
+						<p class="mb-0  text-truncate" :title="item.title"
 							:style="{'padding-left': `${25 * item.level}px`}"
 							v-if="item.type === 'suit'"
 						>
@@ -48,31 +48,31 @@
 						</p>
 
 						<div v-else :style="{'padding-left': `${25 * item.level}px`}">
-							<b-card no-body class="my-2 p-1 "
-								:bg-variant="item.result === -1 ? 'danger' : (item.result === 1 ? 'success' : 'secondary')">
-								<p class="mb-0 text-white">
+							<b-alert class="my-2 p-1 position-relative" show
+								:variant="item.result === -1 ? 'danger' : (item.result === 1 ? 'success' : 'secondary')">
+								<b-button variant="outline-primary" size="sm"
+									class="toggle py-0 position-absolute"
+									v-show="log[item.path] && log[item.path].length"
+									@click="toggle(item.path)"
+								>
+									<i :class="[
+										visible.indexOf(item.path) !== -1 ? 'fas fa-angle-double-up' : 'fas fa-angle-double-down'
+									]" />
+								</b-button>
+								<p class="mb-0  text-truncate pr-2" :title="item.title">
 									{{ item.title }}
-									<b-button variant="outline-primary" size="sm"
-										class="toggle py-0 align-baseline float-right"
-										v-show="log[item.path] && log[item.path].length"
-										@click="toggle(item.path)"
-									>
-										<i :class="[
-											visible.indexOf(item.path) !== -1 ? 'fas fa-angle-double-up' : 'fas fa-angle-double-down'
-										]" />
-									</b-button>
 								</p>
 
 								<b-collapse :id="item.path" :visible="visible.indexOf(item.path) !== -1">
 									<p v-for="(item, key) in log[item.path]" v-html="item" class="mt-3 text-white"></p>
 								</b-collapse>
-							</b-card>
+							</b-alert>
 						</div>
 					</div>
 				</b-col>
 				<b-col cols="3">
 					<structure
-						:structure="structure"
+						:structure="structure" :offset="217"
 					/>
 				</b-col>
 			</b-row>
@@ -81,13 +81,13 @@
 </template>
 
 <script>
-import Vue from 'vue';
 import mixin from './mixin';
-import Parse from '@or-change/tdk/parser';
+import parser from './parser';
+
 import Structure from './Structure';
 
 export default {
-	mixins: [mixin],
+	mixins: [mixin, parser],
 	components: {
 		Structure
 	},
@@ -101,6 +101,11 @@ export default {
 				success: 0
 			},
 			visible: []
+		}
+	},
+	watch: {
+		$route(to, from) {
+			console.log(to, from)
 		}
 	},
 	computed: {
@@ -156,57 +161,7 @@ export default {
 				this.parserRegister[item.type].write(item.message);
 			});
 		},
-		registerParser() {
-			let currentKey = '';
 
-			this.parserRegister.tdk = Parse({
-				on: {
-					casestart:(path) => {
-						currentKey = path.join('-');
-
-						if (!this.log[currentKey]) {
-							this.log[currentKey] = [];
-						}
-					},
-					fail: (path, error) => {
-						this.log[path.join('-')].push(`错误信息：${error}`);
-					},
-					caseend: () => {
-						currentKey = null;
-					}
-				}
-			});
-
-			this.parserRegister.agent = {
-				write: (message) => {
-					const info = JSON.parse(message);
-					const {
-						method, url, status, statusText, duration,
-						headers, timeStamp
-					} = info;
-
-					const date = Vue.filter('dateFormat')(new Date(timeStamp));
-
-					if (info.type === 0) {
-						this.api.total++;
-
-						return this.log[currentKey].push(`${method.toUpperCase()}&nbsp;&nbsp;请求&nbsp;&nbsp;${url}&nbsp;&nbsp;开始于&nbsp;&nbsp;${date};`);
-					}
-
-					if (info.type === 1) {
-						this.api.success++;
-
-						return this.log[currentKey].push(`${method.toUpperCase()}&nbsp;&nbsp;请求&nbsp;&nbsp;${url}&nbsp;&nbsp;结束于&nbsp;&nbsp;${date}; <br /> 状态码：${status}; <br /> 状态描述：${statusText}; <br />
-							请求头部为：${JSON.stringify(headers)}
-						`);
-					}
-
-					if (!info.type) {
-						this.log[currentKey].push(`${method.toUpperCase()}&nbsp;&nbsp;请求&nbsp;&nbsp;${url}&nbsp;&nbsp;耗时${duration}ms;`);
-					}
-				}
-			}
-		}
 	},
 	mounted() {
 		this.getExecution();
@@ -222,14 +177,20 @@ export default {
 		font-weight: 600;
 	}
 
+	p {
+		cursor: default;
+	}
+
 	.toggle {
-		width: 4em;
+		width: 2em;
+		top: 6px;
+		right: 0;
 		text-align: right;
 		border: none;
 		outline: none;
 		box-shadow: none;
 		background-color: transparent;
-		color: white;
+		color: inherit;
 	}
 }
 </style>

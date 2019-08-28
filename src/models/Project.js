@@ -30,7 +30,8 @@ module.exports = {
 	ProjectList(options) {
 		const selector = {
 			ownerId: options.store.queryProjectByOwnerId,
-			all: options.store.queryProjectAll
+			all: options.store.queryProjectAll,
+			memberOf: options.store.queryProjectByMember
 		};
 
 		return {

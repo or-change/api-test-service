@@ -30,6 +30,10 @@ html, body {
 	width: 2em;
 }
 
+.select .custom-checkbox {
+	position: static;
+}
+
 .select .custom-checkbox .custom-control-label,
 .select .custom-checkbox .custom-control-input
 {
@@ -71,4 +75,23 @@ a.disabled {
 
 .col-80 {
 	width: 80px !important;
+}
+
+table {
+	table-layout: fixed;
+}
+
+table tr th, table tr td {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.breadcrumb-item span, .breadcrumb-item a {
+	max-width: 400px;
+	display: inline-block;
+	vertical-align: bottom;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }

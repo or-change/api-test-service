@@ -61,7 +61,8 @@
 			</template>
 
 			<template slot="[name]" slot-scope="data">
-				<b-link :to="`/workbench/admin/account/${data.item.id}`">
+				<b-link class="text-truncate d-inline-block w-100" :title="data.value"
+					:to="`/workbench/admin/account/${data.item.id}`">
 					{{ data.value }}
 				</b-link>
 			</template>

@@ -114,6 +114,12 @@
 						"destroyProject",
 						"queryProjectByOwnerId",
 						"queryProjectAll",
+						"queryProjectByMember",
+						"createCollabrator",
+						"queryCollabratorByProjectId",
+						"queryCollabratorByAccountId",
+						"getCollabrator",
+						"updateCollabrator",
 						"getSourceById",
 						"createSource",
 						"destroySource",
@@ -171,6 +177,30 @@
 							"description": ""
 						},
 						"queryProjectAll": {
+							"instanceof": "Function",
+							"description": ""
+						},
+						"queryProjectByMember": {
+							"instanceof": "Function",
+							"description": ""
+						},
+						"createCollabrator": {
+							"instanceof": "Function",
+							"description": ""
+						},
+						"queryCollabratorByProjectId": {
+							"instanceof": "Function",
+							"description": ""
+						},
+						"queryCollabratorByAccountId": {
+							"instanceof": "Function",
+							"description": ""
+						},
+						"getCollabrator": {
+							"instanceof": "Function",
+							"description": ""
+						},
+						"updateCollabrator": {
 							"instanceof": "Function",
 							"description": ""
 						},

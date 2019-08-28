@@ -35,7 +35,7 @@
 			:fields="[
 				{ label: '', key: 'select', class: 'select' },
 				{ label: '项目名称', key: 'name' },
-				{ label: '创建时间', key: 'createdAt', sortable: true }
+				{ label: '创建时间', key: 'createdAt', class: 'col-130', sortable: true }
 			]"
 			:items="projectList"
 			sort-by="createdAt" :sort-desc="true"
@@ -55,7 +55,8 @@
 			</template>
 
 			<template slot="[name]" slot-scope="data">
-				<b-link :to="`/workbench/project/${data.item.id}`">{{ data.value }}</b-link>
+				<b-link class="text-truncate d-inline-block w-100" :title="data.value"
+					:to="`/workbench/project/${data.item.id}`">{{ data.value }}</b-link>
 			</template>
 			<template slot="[createdAt]" slot-scope="data">
 				{{ data.value | dateFormat  }}

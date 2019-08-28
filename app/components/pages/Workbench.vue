@@ -56,7 +56,7 @@
 export default {
 	data() {
 		return {
-			productName: '接口测试产品后台'
+			productName: 'Examiner'
 		}
 	},
 	computed: {

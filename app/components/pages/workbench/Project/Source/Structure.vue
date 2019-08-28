@@ -19,7 +19,7 @@
 					v-show="item.result === -1"></i>
 			</span>
 			<label :class="[item.type, 'd-inline-block', 'mb-0']">
-				<b-link :to="`/workbench/project/be67b3cf/source/9665d361/execution/68baf2d8/reporter#`">{{item.title}}</b-link>
+				<b-link :to="`/workbench/project/be67b3cf/source/9665d361/execution/68baf2d8/reporter#${item.path}`">{{item.title}}</b-link>
 			</label>
 		</p>
 	</div>
@@ -36,13 +36,17 @@ export default {
 		structure: {
 			type: Array,
 			default: () => []
+		},
+		offset: {
+			type: Number,
+			default: 190
 		}
 	},
 	methods: {
 		getHeight() {
 			const height = document.body.clientHeight;
 
-			this.height = height - 170;
+			this.height = height - this.offset;
 		}
 	},
 	mounted() {

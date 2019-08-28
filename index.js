@@ -20,6 +20,7 @@ const Router = {
 	Admin: require('./src/router/admin'),
 	Account: require('./src/router/account'),
 	Project: require('./src/router/project'),
+	Collabrator: require('./src/router/collabrator'),
 	Source: require('./src/router/source'),
 	Execution: require('./src/router/execution')
 };
@@ -69,6 +70,10 @@ module.exports = function Examiner(originalOptions, factory = () => {}) {
 										Router: Router.Execution
 									}
 								]
+							},
+							{
+								prefix: '/:projectId/collabrator',
+								Router: Router.Collabrator
 							}
 						]
 					},

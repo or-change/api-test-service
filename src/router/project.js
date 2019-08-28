@@ -1,9 +1,9 @@
 module.exports = function ProjectRouter(router, { Authorize, Model }) {
 	router.get('/', Authorize('project.query'), async ctx => {
 		ctx.body = await Model.ProjectList.query({
-			selector: 'ownerId',
+			selector: 'memberOf',
 			args: {
-				ownerId: ctx.principal.account.id
+				memberId: ctx.principal.account.id
 			}
 		});
 	}).post('/', Authorize('project.create'), async ctx => {
@@ -21,6 +21,12 @@ module.exports = function ProjectRouter(router, { Authorize, Model }) {
 		}
 
 		ctx.state.project = project;
+		ctx.state.collabratorList = await Model.CollabratorList.query({
+			selector: 'projectId',
+			args: {
+				projectId: ctx.state.project.id
+			}
+		});
 		
 		return next();
 	}).get('/:projectId', Authorize('project.get'), async ctx => {

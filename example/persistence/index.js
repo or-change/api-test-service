@@ -1,6 +1,7 @@
 const mock = {
 	account: require('./account.json'),
 	project: require('./project.json'),
+	collabrator: require('./collabrator.json'),
 	source: require('./source.json'),
 	execution: require('./execution.json')
 };
@@ -16,6 +17,13 @@ const Data = {
 			project.createdAt = new Date(project.createdAt);
 
 			return Object.assign({}, project);
+		});
+	},
+	Collabrator() {
+		return mock.collabrator.map(collabrator => {
+			collabrator.createdAt = new Date(collabrator.createdAt);
+
+			return Object.assign({}, collabrator);
 		});
 	},
 	Source() {
@@ -38,13 +46,14 @@ exports.DB = function DB() {
 	const data = {
 		account: Data.Account(),
 		project: Data.Project(),
+		collabrator: Data.Collabrator(),
 		source: Data.Source(),
 		execution: Data.Execution()
 	};
 
 	const store = {
 		getAccountById(id) {
-			return data.account.find(account => account.id === id);
+			return data.account.find(account => account.id === id) || null;
 		},
 		createAccount({ name, administrator, email, avatar }) {
 			const id = Math.random().toString(16).substr(2, 8);
@@ -130,8 +139,61 @@ exports.DB = function DB() {
 		queryProjectByOwnerId({ ownerId }) {
 			return data.project.filter(project => project.ownerId === ownerId);
 		},
+		queryCollabratorByAccountId({ accountId, includeExited }) {
+			return data.collabrator.filter(collabrator => {
+				if (!includeExited && collabrator.exitedAt !== null) {
+					return false;
+				}
+
+				return collabrator.accountId === accountId;
+			});
+		},
+		queryProjectByMember({ memberId }) {
+			const myCollabratorList = store.queryCollabratorByAccountId({
+				accountId: memberId, includeExited: false
+			});
+
+			return data.project.filter(project => {
+				return project.ownerId === memberId || 
+					myCollabratorList.find(collabrator => collabrator.projectId === project.id);
+			});
+		},
 		queryProjectAll() {
 			return data.project;
+		},
+		createCollabrator({ projectId, accountId, inviter }) {
+			const newCollabrator = {
+				id: Math.random().toString(16).substr(2, 8),
+				projectId, accountId, inviter,
+				joinedAt: new Date(), exitedAt: null
+			};
+
+			data.collabrator.push(newCollabrator);
+
+			return newCollabrator;
+		},
+		queryCollabratorByProjectId({ projectId, includeExited }) {
+			return data.collabrator.filter(collabrator => {
+				if (!includeExited && collabrator.exitedAt !== null) {
+					return false;
+				}
+
+				return collabrator.projectId === projectId;
+			});
+		},
+		getCollabrator(id) {
+			return data.collabrator.find(collabrator => collabrator.id === id) || null;
+		},
+		updateCollabrator(id) {
+			const collabrator = data.collabrator.find(collabrator => collabrator.id === id);
+
+			if (collabrator) {
+				collabrator.exitedAt = new Date();
+
+				return collabrator;
+			}
+
+			return null;
 		},
 		getSourceById(sourceId) {
 			return data.source.find(source => source.id === sourceId) || null;
@@ -212,7 +274,7 @@ exports.DB = function DB() {
 			return execution;
 		},
 		getExecutionById(executionId) {
-			const executionData = data.execution.find(execution => execution.id === executionId);
+			const executionData = data.execution.find(execution => execution.id === executionId) || null;
 
 			if (!executionData) {
 				return null;

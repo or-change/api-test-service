@@ -26,6 +26,17 @@
 				{ label: '创建时间', key: 'createdAt', class: 'col-130' }
 			]"
 		>
+			<template slot="HEAD[select]">
+				<b-checkbox :checked="totalRow && totalRow === selected.length"
+					:class="{ 'show': totalRow && totalRow === selected.length }"
+					@change="selectAll" />
+			</template>
+			<template slot="[select]" slot-scope="data">
+				<b-checkbox :checked="selected.indexOf(data.item.id) !== -1"
+					:class="{ 'show': selected.indexOf(data.item.id) !== -1 }"
+					@change="selectOne($event, data.item.id)" />
+			</template>
+
 			<template slot="[status]" slot-scope="data">
 				{{ data.value | statusFilter }}
 			</template>
@@ -67,6 +78,20 @@ export default {
 		}
 	},
 	methods: {
+		selectAll(checked) {
+			if (!checked) {
+				return this.selected = [];
+			}
+			return this.selected = this.$refs.abnormalList.filteredItems.map(source => source.id);
+		},
+		selectOne(checked, id) {
+			const index = this.selected.indexOf(id);
+
+			if (index === -1) {
+				return this.selected.push(id);
+			}
+			return this.selected.splice(index, 1);
+		},
 		filter(item, keyword) {
 			return new RegExp(keyword).test(this.$options.filters.executorFilter(item.executor))
 				||	new RegExp(keyword).test(this.$options.filters.statusFilter(item.status));

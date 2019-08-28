@@ -2,10 +2,11 @@ const DataHub = require('@or-change/data-hub');
 
 const Account = require('./Account');
 const Project = require('./Project');
+const Collabrator = require('./Collabrator');
 const Exection = require('./Execution');
 const Source = require('./Source');
 
-const ModelMapping = Object.assign({}, Account, Project, Exection, Source);
+const ModelMapping = Object.assign({}, Account, Project, Collabrator, Exection, Source);
 
 module.exports = function Model(options) {
 	const { org: name } = options;
