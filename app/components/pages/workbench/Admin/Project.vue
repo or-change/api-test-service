@@ -35,35 +35,23 @@
 			/>
 		</div>
 
-		<b-table
+		<custom-table
 			ref="projectList" class="mt-3"
 			:fields="[
-				{ label: '', key: 'select', class: 'select' },
 				{ label: '项目名称', key: 'name' },
 				{ label: '所有者', key: 'ownerId' },
 				{ label: '创建时间', key: 'createdAt', sortable: true }
 			]"
-			:items="projectList"
+			:items="projectList" :selectable="true"
 			sort-by="createdAt" :sort-desc="true"
 			:filter="keyword" :filter-function="filter"
 			:per-page="perPage" :current-page="currentPage"
-			@filtered="onFiltered"
+			@filtered="onFiltered" v-model="selectedProject"
 		>
-			<template slot="HEAD[select]">
-				<b-checkbox :checked="totalRow && totalRow === selectedProject.length" 
-					:class="{ 'show': totalRow && totalRow === selectedProject.length }"
-					@change="selectAll" />
-			</template>
-			<template slot="[select]" slot-scope="data">
-				<b-checkbox :checked="selectedProject.indexOf(data.item.id) !== -1"
-					:class="{ 'show': selectedProject.indexOf(data.item.id) !== -1 }"
-					@change="selectOne($event, data.item.id)" />
-			</template>
-
 			<template slot="[createdAt]" slot-scope="data">
 				{{ data.value | dateFormat }}
 			</template>
-		</b-table>
+		</custom-table>
 
 		<b-modal
 			id="assign-owner" size="sm" title="更换项目所有者" centered
@@ -110,20 +98,6 @@ export default {
 		}
 	},
 	methods: {
-		selectAll(checked) {
-			if (!checked) {
-				return this.selectedProject = [];
-			}
-			return this.selectedProject = this.$refs.projectList.filteredItems.map(project => project.id);
-		},
-		selectOne(checked, id) {
-			const index = this.selectedProject.indexOf(id);
-
-			if (index === -1) {
-				return this.selectedProject.push(id);
-			}
-			return this.selectedProject.splice(index, 1);
-		},
 		onFiltered(filteredItems) {
 			this.totalRow = filteredItems.length;
       this.currentPage = 1;
@@ -136,6 +110,7 @@ export default {
 		},
 		async queryProject() {
 			this.projectList = await this.$http.admin.project.query();
+			this.totalRow = this.projectList.length;
 		},
 		async assignOwner() {
 			if (this.selectedProject.length === 0 || this.selectOwner === null) {
@@ -151,9 +126,7 @@ export default {
 		}
 	},
 	mounted() {
-		this.queryProject().then(() => {
-			this.totalRow = this.projectList.length;
-		});
+		this.queryProject();
 		this.getAccountList();
 	}
 }

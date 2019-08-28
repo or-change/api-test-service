@@ -7,7 +7,8 @@
 				v-model="keyword"
 				placeholder="输入查找关键字"
 			></b-form-input>
-			<b-button size="sm" variant="danger" @click="deleteExecution" class="float-right">删除</b-button>
+			<b-button size="sm" variant="danger" :disabled="selected.length === 0"
+				@click="deleteExecution" class="float-right">删除</b-button>
 			<b-pagination
 				size="sm" class="float-right mr-3 mb-0"
 				:total-rows="totalRow" :per-page="perPage"
@@ -15,28 +16,18 @@
 			/>
 		</div>
 		
-		<b-table
+		<custom-table
 			ref="abnormalList" class="mt-3"
 			:fields="[
-				{ label: '', key: 'select', class: 'select' },
-				{ label: '标识', key: 'id', class: 'col-100' },
-				{ label: '状态', key: 'status' },
+				{ label: '标识', key: 'id', class: 'col-130' },
+				{ label: '状态', key: 'status', class: 'col-100' },
 				{ label: '错误', key: 'error' },
 				{ label: '执行器', key: 'executor' },
 				{ label: '创建时间', key: 'createdAt', class: 'col-130' }
 			]"
+			:items="items"
+			:selectable="true" v-model="selected"
 		>
-			<template slot="HEAD[select]">
-				<b-checkbox :checked="totalRow && totalRow === selected.length"
-					:class="{ 'show': totalRow && totalRow === selected.length }"
-					@change="selectAll" />
-			</template>
-			<template slot="[select]" slot-scope="data">
-				<b-checkbox :checked="selected.indexOf(data.item.id) !== -1"
-					:class="{ 'show': selected.indexOf(data.item.id) !== -1 }"
-					@change="selectOne($event, data.item.id)" />
-			</template>
-
 			<template slot="[status]" slot-scope="data">
 				{{ data.value | statusFilter }}
 			</template>
@@ -54,7 +45,7 @@
 			<template slot="[createdAt]" slot-scope="data">
 				{{ data.value | dateFormat }}
 			</template>
-		</b-table>
+		</custom-table>
 		
 		<b-modal
 			ref="show-error" size="md" title="错误信息" centered ok-only
@@ -73,27 +64,12 @@ export default {
 	data() {
 		return {
 			selected: [],
-			keyword: '',
 			error: ''
 		}
 	},
 	methods: {
-		selectAll(checked) {
-			if (!checked) {
-				return this.selected = [];
-			}
-			return this.selected = this.$refs.abnormalList.filteredItems.map(source => source.id);
-		},
-		selectOne(checked, id) {
-			const index = this.selected.indexOf(id);
-
-			if (index === -1) {
-				return this.selected.push(id);
-			}
-			return this.selected.splice(index, 1);
-		},
 		filter(item, keyword) {
-			return new RegExp(keyword).test(this.$options.filters.executorFilter(item.executor))
+			return new RegExp(keyword).test(this.$options.filters.executorFilter(item.executor, this.$product))
 				||	new RegExp(keyword).test(this.$options.filters.statusFilter(item.status));
 		},
 		showError(error) {

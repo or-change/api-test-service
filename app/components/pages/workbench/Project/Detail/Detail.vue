@@ -18,15 +18,16 @@
 			]"
 		/>
 
-		<project-info :project-id="projectId" @inited="(name) => { projectName = name; }" />
-		<source-list class="mt-3" @delete="deleteSource" :source-list="sourceList" :project-id="projectId" />
-
-		<b-modal
-			ref="show-error" size="md" title="错误信息" centered ok-only
-			button-size="sm" ok-title="确定"
-		>
-			<textarea rows="10" readonly :value="error" style="width: 100%"></textarea>
-		</b-modal>
+		<project-info @update="updateProject" v-model="project" />
+		
+		<b-tabs class="mt-3" content-class="mt-3" small>
+			<b-tab title="代码列表" active>
+				<source-list @delete="deleteSource" :source-list="sourceList" :project-id="projectId" />
+			</b-tab>
+			<b-tab title="参与者列表">
+				<member-list :project-id="projectId" :owner-id="project.ownerId" />
+			</b-tab>
+		</b-tabs>
 
 		<upload-dialog :project-id="projectId" @success="getSourceList" />
 	</div>
@@ -36,17 +37,18 @@
 import UploadDialog from './Upload';
 import ProjectInfo from './Info';
 import SourceList from './List';
+import MemberList from './Member';
 
 export default {
 	data() {
 		return {
 			projectName: '',
-			error: '',
-			sourceList: []
+			sourceList: [],
+			project: {}
 		}
 	},
 	components: {
-		UploadDialog, ProjectInfo, SourceList
+		UploadDialog, ProjectInfo, SourceList, MemberList
 	},
 	computed: {
 		projectId() {
@@ -54,12 +56,6 @@ export default {
 		}
 	},
 	methods: {
-		showError(error) {
-			if (error) {
-				this.error = error;
-				this.$refs['show-error'].show();
-			}
-		},
 		async getSourceList() {
 			this.sourceList = await this.$http.project.source(this.projectId).query();
 		},
@@ -70,9 +66,21 @@ export default {
 
 			await this.getSourceList();
 			this.selectedSourceList = [];
+		},
+		async getProject() {
+			this.project = await this.$http.project.get(this.projectId);
+			this.projectName = this.project.name;
+		},
+		async updateProject() {
+			await this.$http.project.update(this.projectId, {
+				name: this.project.name
+			});
+			
+			await this.getProject();
 		}
 	},
 	mounted() {
+		this.getProject();
 		this.getSourceList();
 	}
 }

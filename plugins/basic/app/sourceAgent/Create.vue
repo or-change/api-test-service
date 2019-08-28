@@ -75,8 +75,6 @@ export default {
 					'Content-Type': 'multipart/form-data'
 				},
 				onUploadProgress(progressEvent) {
-					// console.log(progressEvent.loaded, progressEvent.total, 100);
-
 					this.progress = progressEvent.loaded / progressEvent.total * 100;
 
 					if (this.progress === 100) {

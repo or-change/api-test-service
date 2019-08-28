@@ -28,7 +28,8 @@
 			<b-button variant="primary" size="sm" v-b-modal.create-account>
 				新建
 			</b-button>
-			<b-button size="sm" variant="danger" @click="deleteAccount" class="float-right">删除</b-button>
+			<b-button size="sm" variant="danger" @click="deleteAccount"
+				:disabled="selectedAccount.length === 0" class="float-right">删除</b-button>
 			<b-pagination
 				size="sm" class="float-right mr-3 mb-0"
 				:total-rows="totalRow" :per-page="perPage"
@@ -36,30 +37,19 @@
 			/>
 		</div>
 
-		<b-table
+		<custom-table
 			ref="accountList" class="mt-3"
 			:fields="[
-				{ label: '', key: 'select', class: 'select' },
 				{ label: '用户名', key: 'name' },
 				{ label: '邮箱', key: 'email' },
 				{ label: '管理员', key: 'administrator' }
 			]"
 			:items="accountList"
+			:selectable="true"
 			:filter="keyword" :filter-function="filter"
 			:per-page="perPage" :current-page="currentPage"
-			@filtered="onFiltered"
+			@filtered="onFiltered" v-model="selectedAccount"
 		>
-			<template slot="HEAD[select]">
-				<b-checkbox :checked="totalRow && totalRow === selectedAccount.length" 
-					:class="{ 'show': totalRow && totalRow === selectedAccount.length }"
-					@change="selectAll" />
-			</template>
-			<template slot="[select]" slot-scope="data">
-				<b-checkbox :checked="selectedAccount.indexOf(data.item.id) !== -1"
-					:class="{ 'show': selectedAccount.indexOf(data.item.id) !== -1 }"
-					@change="selectOne($event, data.item.id)" />
-			</template>
-
 			<template slot="[name]" slot-scope="data">
 				<b-link class="text-truncate d-inline-block w-100" :title="data.value"
 					:to="`/workbench/admin/account/${data.item.id}`">
@@ -69,7 +59,7 @@
 			<template slot="[administrator]" slot-scope="data">
 				{{ data.value ? '是' : '否' }}
 			</template>
-		</b-table>
+		</custom-table>
 
 		<b-modal
 			id="create-account" size="sm" title="创建新用户" centered
@@ -140,20 +130,6 @@ export default {
 		}
 	},
 	methods: {
-		selectAll(checked) {
-			if (!checked) {
-				return this.selectedAccount = [];
-			}
-			return this.selectedAccount = this.$refs.accountList.filteredItems.map(account => account.id);
-		},
-		selectOne(checked, id) {
-			const index = this.selectedAccount.indexOf(id);
-
-			if (index === -1) {
-				return this.selectedAccount.push(id);
-			}
-			return this.selectedAccount.splice(index, 1);
-		},
 		onFiltered(filteredItems) {
 			this.totalRow = filteredItems.length;
       this.currentPage = 1;
@@ -179,12 +155,12 @@ export default {
 		},
 		async getAccount() {
 			this.accountList = await this.$http.account.query();
+
+			this.totalRow = this.accountList.length;
 		}
 	},
 	mounted () {
-		this.getAccount().then(() => {
-			this.totalRow = this.accountList.length;
-		});
+		this.getAccount();
 	}
 }
 </script>

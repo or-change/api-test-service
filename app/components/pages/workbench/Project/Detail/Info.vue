@@ -12,55 +12,41 @@
 			id="project-name" size="sm" class="d-inline-block align-middle mr-3" style="width: 10em"
 			:value="project.createdAt | dateFormat" readonly
 		></b-form-input>
-		<b-button size="sm" variant="primary" :disabled="!state || project.name === projectName" @click="updateProject">更新</b-button>
+		<b-button size="sm" variant="primary" :disabled="!state || project.name === projectName" @click="$emit('update')">更新</b-button>
 	</div>
 </template>
 
 <script>
-
 export default {
 	data() {
 		return {
 			project: {
-				name: ''
+				name: '',
+				createdAt: '',
+				id: '',
+				ownerId: ''
 			},
 			projectName: '',
 			error: ''
 		}
 	},
 	props: {
-		projectId: {
-			default: ''
+		value: {
+			type: Object
+		}
+	},
+	watch: {
+		value() {
+			this.project = this.value;
+			this.projectName = this.value.name;
 		}
 	},
 	computed: {
 		state() {
+			this.$emit('input', this.project);
+
 			return this.project.name.length > 0 ? true : false;
 		}
-	},
-	methods: {
-		async getProject() {
-			this.project = await this.$http.project.get(this.projectId);
-			this.projectName = this.project.name;
-
-			this.$emit('inited', this.projectName);
-		},
-		async updateProject() {
-			await this.$http.project.update(this.projectId, {
-				name: this.project.name
-			});
-			
-			await this.getProject();
-		},
-		showError(error) {
-			if (error) {
-				this.error = error;
-				this.$refs['show-error'].show();
-			}
-		}
-	},
-	mounted() {
-		this.getProject();
 	}
 }
 </script>

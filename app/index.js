@@ -7,6 +7,7 @@ import Vue from 'vue';
 import BootstrapVue from 'bootstrap-vue';
 import http from './plugins/http';
 import dateFormat from './plugins/dateFormat';
+import Table from './components/utils/Table.vue';
 
 import *  as product from './product';
 import SignIn from './components/pages/SignIn';
@@ -30,6 +31,7 @@ const router = Router(context.routerOptions);
 Vue.use(BootstrapVue);
 Vue.use(dateFormat);
 Vue.use(http, { router });
+Vue.component('custom-table', Table);
 
 Vue.prototype.$product = context.product;
 

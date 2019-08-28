@@ -1,6 +1,5 @@
 <template>
 	<div>
-			<h6 class="font-weight-bold">源代码列表</h6>
 			<div>
 				<label for="keyword" class="align-middle mb-0">关键字搜索：</label>
 				<b-form-input
@@ -9,7 +8,9 @@
 					placeholder="输入搜索关键字"
 				></b-form-input>
 				<b-button size="sm" variant="primary" v-b-modal.upload-source>创建源代码</b-button>
-				<b-button size="sm" variant="danger" @click="$emit('delete')" class="float-right">删除</b-button>
+				<b-button size="sm" variant="danger" @click="$emit('delete')" class="float-right"
+					:disabled="selectedSourceList.length === 0"
+				>删除</b-button>
 				<b-pagination
 					size="sm" class="float-right mr-3 mb-0"
 					:total-rows="totalRow" :per-page="perPage"
@@ -17,10 +18,9 @@
 				/>
 			</div>
 
-			<b-table
+			<custom-table
 				ref="sourceList" class="mt-3"
 				:fields="[
-					{ label: '', key: 'select', class: 'select' },
 					{ label: '版本号', key: 'semver' },
 					{ label: '状态', key: 'status' },
 					{ label: '错误', key: 'error' },
@@ -28,24 +28,16 @@
 					{ label: '创建时间', key: 'createdAt', class: 'col-130', sortable: true },
 					{ label: '', key: 'download' }
 				]"
-				:items="sourceList"
+				:items="sourceList.map(source => {
+					source.selectable = source.status !== 5 && !source.error ? false : true;
+					return source;
+				})"
+				:selectable="true"
 				sort-by="createdAt" :sort-desc="true"
 				:per-page="perPage" :current-page="currentPage"
 				:filter="keyword" :filter-function="filter" @filtered="onFiltered"
+				v-model="selectedSourceList"
 			>
-				<template slot="HEAD[select]">
-					<b-checkbox :checked="totalRow && totalRow === selectedSourceList.length"
-						:disabled="disabledSelectAll"
-						:class="{ 'show': totalRow && totalRow === selectedSourceList.length }"
-						@change="selectAll" />
-				</template>
-				<template slot="[select]" slot-scope="data">
-					<b-checkbox :checked="selectedSourceList.indexOf(data.item.id) !== -1"
-						:disabled="data.item.status !== 5 && !data.item.error"
-						:class="{ 'show': selectedSourceList.indexOf(data.item.id) !== -1 }"
-						@change="selectOne($event, data.item.id)" />
-				</template>
-
 				<template slot="[semver]" slot-scope="data">
 					<b-link class="text-truncate d-inline-block w-100" :disabled="data.item.status !== 5" :title="data.value"
 						:to="`/workbench/project/${projectId}/source/${data.item.id}`">{{ data.value }}</b-link>
@@ -73,7 +65,14 @@
 							<i class="fas fa-cloud-download-alt"></i>
 						</b-link>
 				</template>
-			</b-table>
+			</custom-table>
+
+			<b-modal
+				ref="show-error" size="md" title="错误信息" centered ok-only
+				button-size="sm" ok-title="确定"
+			>
+				<textarea rows="10" readonly :value="error" style="width: 100%"></textarea>
+			</b-modal>
 		</div>
 </template>
 
@@ -95,22 +94,12 @@ export default {
 			perPage: 10,
 			currentPage: 1,
 			keyword: '',
-			disabledSelectAll: false,
+			error: ''
 		}
 	},
 	watch:{
-		keyword() {
-			this.$nextTick(() => {
-				this.setDisabled();
-			});
-		},
 		sourceList() {
 			this.totalRow = this.sourceList.length;
-			this.keyword = '';
-
-			this.$nextTick(() => {
-				this.setDisabled();
-			});
 		}
 	},
 	props: {
@@ -143,28 +132,15 @@ export default {
 		}
 	},
 	methods: {
-		selectAll(checked) {
-			if (!checked) {
-				return this.selectedSourceList = [];
+		showError(error) {
+			if (error) {
+				this.error = error;
+				this.$refs['show-error'].show();
 			}
-			return this.selectedSourceList = this.$refs.sourceList.filteredItems
-				.filter((source) => source.status === 5 || source.error).map(source => source.id);
-		},
-		selectOne(checked, id) {
-			const index = this.selectedSourceList.indexOf(id);
-
-			if (index === -1) {
-				return this.selectedSourceList.push(id);
-			}
-			return this.selectedSourceList.splice(index, 1);
 		},
 		onFiltered(filteredItems) {
 			this.totalRow = filteredItems.length;
       this.currentPage = 1;
-		},
-		setDisabled() {
-			console.log(this.$refs.sourceList.filteredItems.filter(source => source.status !== 5 && !source.error), this.$refs.sourceList.filteredItems.length)
-			this.disabledSelectAll = this.$refs.sourceList.filteredItems.filter(source => source.status !== 5 && !source.error).length === this.$refs.sourceList.filteredItems.length;
 		},
 		filter(item, keyword) {
 			const regExp = new RegExp(keyword);

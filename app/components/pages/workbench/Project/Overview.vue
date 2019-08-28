@@ -22,7 +22,8 @@
 				placeholder="输入查找项目名称"
 			></b-form-input>
 			<b-button size="sm" variant="primary" v-b-modal.create-project>新建</b-button>
-			<b-button size="sm" variant="danger" @click="deleteProject" class="float-right">删除</b-button>
+			<b-button size="sm" variant="danger" :disabled="selectedProject.length === 0"
+				@click="deleteProject" class="float-right">删除</b-button>
 			<b-pagination
 				size="sm" class="float-right mr-3 mb-0"
 				:total-rows="totalRow" :per-page="perPage"
@@ -30,30 +31,19 @@
 			/>
 		</div>
 
-		<b-table
+		<custom-table
 			ref="projectList" class="mt-3"
 			:fields="[
-				{ label: '', key: 'select', class: 'select' },
 				{ label: '项目名称', key: 'name' },
 				{ label: '创建时间', key: 'createdAt', class: 'col-130', sortable: true }
 			]"
 			:items="projectList"
+			:selectable="true"
 			sort-by="createdAt" :sort-desc="true"
 			:filter="filter.name" :filter-included-fields="['name']"
 			:per-page="perPage" :current-page="currentPage"
-			@filtered="onFiltered"
+			@filtered="onFiltered" v-model="selectedProject"
 		>
-			<template slot="HEAD[select]">
-				<b-checkbox :checked="totalRow && totalRow === selectedProject.length" 
-					:class="{ 'show': totalRow && totalRow === selectedProject.length }"
-					@change="selectAll" />
-			</template>
-			<template slot="[select]" slot-scope="data">
-				<b-checkbox :checked="selectedProject.indexOf(data.item.id) !== -1"
-					:class="{ 'show': selectedProject.indexOf(data.item.id) !== -1 }"
-					@change="selectOne($event, data.item.id)" />
-			</template>
-
 			<template slot="[name]" slot-scope="data">
 				<b-link class="text-truncate d-inline-block w-100" :title="data.value"
 					:to="`/workbench/project/${data.item.id}`">{{ data.value }}</b-link>
@@ -61,7 +51,7 @@
 			<template slot="[createdAt]" slot-scope="data">
 				{{ data.value | dateFormat  }}
 			</template>
-		</b-table>
+		</custom-table>
 
 		<b-modal
 			id="create-project" size="sm" title="创建新项目" centered ok-only
@@ -100,26 +90,14 @@ export default {
 		},
 	},
 	methods: {
-		selectAll(checked) {
-			if (!checked) {
-				return this.selectedProject = [];
-			}
-			return this.selectedProject = this.$refs.projectList.filteredItems.map(project => project.id);
-		},
-		selectOne(checked, id) {
-			const index = this.selectedProject.indexOf(id);
-
-			if (index === -1) {
-				return this.selectedProject.push(id);
-			}
-			return this.selectedProject.splice(index, 1);
-		},
 		onFiltered(filteredItems) {
 			this.totalRow = filteredItems.length;
       this.currentPage = 1;
 		},
 		async queryProject() {
 			this.projectList = await this.$http.project.query();
+
+			this.totalRow = this.projectList.length;
 		},
 		async addProject() {
 			const project = await this.$http.project.create(this.project);
@@ -135,9 +113,7 @@ export default {
 		}
 	},
 	mounted() {
-		this.queryProject().then(() => {
-			this.totalRow = this.projectList.length;
-		});
+		this.queryProject();
 	}
 }
 </script>

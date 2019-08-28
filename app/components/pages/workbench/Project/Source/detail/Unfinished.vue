@@ -51,15 +51,10 @@
 import mixin from './mixin'
 
 export default {
-	data() {
-		return {
-			keyword: ''
-		}
-	},
 	mixins: [mixin],
 	methods: {
 		filter(item, keyword) {
-			return new RegExp(keyword).test(this.$options.filters.executorFilter(item.executor))
+			return new RegExp(keyword).test(this.$options.filters.executorFilter(item.executor, this.$product))
 				||	new RegExp(keyword).test(this.$options.filters.statusFilter(item.status))
 				|| keyword === `${item.progress * 100}%`;
 		}

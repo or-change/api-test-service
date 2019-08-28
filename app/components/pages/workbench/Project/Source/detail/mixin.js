@@ -11,13 +11,19 @@ export default {
 		return {
 			totalRow: 0,
 			perPage: 10,
-			currentPage: 1
+			currentPage: 1,
+			keyword: ''
 		};
 	},
 	props: {
 		items: {
 			type: Array,
 			default: () => []
+		}
+	},
+	watch: {
+		items() {
+			this.totalRow = this.items.length;
 		}
 	},
 	filters: {
@@ -37,8 +43,5 @@ export default {
 			this.totalRow = filteredItems.length;
 			this.currentPage = 1;
 		}
-	},
-	mounted() {
-		this.totalRow = this.items.length;
 	}
 };

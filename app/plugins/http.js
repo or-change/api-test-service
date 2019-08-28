@@ -66,6 +66,8 @@ export default function install(Vue, { router }) {
 							};
 						});
 					} catch (e) {
+						skip(e);
+
 						return [];
 					}
 				},
@@ -89,23 +91,23 @@ export default function install(Vue, { router }) {
 				}
 			},
 			account: {
-				create(payload) {
+				async create(payload) {
 					try {
-						return agent.post('/admin/account', payload);
+						return await agent.post('/admin/account', payload);
 					} catch (e) {
 						skip(e);
 					}
 				},
-				update(accountId, payload) {
+				async update(accountId, payload) {
 					try {
-						return agent.put(`/admin/account/${accountId}`, payload);
+						return await agent.put(`/admin/account/${accountId}`, payload);
 					} catch (e) {
 						skip(e);
 					}
 				},
-				delete(accountId) {
+				async delete(accountId) {
 					try {
-						return agent.delete(`/admin/account/${accountId}`);
+						return await agent.delete(`/admin/account/${accountId}`);
 					} catch (e) {
 						skip(e);
 					}
@@ -113,9 +115,11 @@ export default function install(Vue, { router }) {
 			}
 		},
 		account: {
-			async query() {
+			async query(payload) {
 				try {
-					const { data: accountList } = await agent.get('/account');
+					const { data: accountList } = await agent.get('/account', {
+						params: payload
+					});
 
 					return accountList.map(account => {
 						return {
@@ -127,12 +131,14 @@ export default function install(Vue, { router }) {
 						};
 					});
 				} catch (e) {
+					skip(e);
+
 					return [];					
 				}
 			},
-			update(accountId, payload) {
+			async update(accountId, payload) {
 				try {
-					return agent.put(`/account/${accountId}`, payload);
+					return await agent.put(`/account/${accountId}`, payload);
 				} catch (e) {
 					skip(e);
 				}
@@ -149,6 +155,8 @@ export default function install(Vue, { router }) {
 						administrator: account.administrator
 					};
 				} catch (e) {
+					skip(e);
+
 					return {};
 				}
 			}
@@ -168,16 +176,16 @@ export default function install(Vue, { router }) {
 					skip(e);
 				}
 			},
-			update(projectId, payload) {
+			async update(projectId, payload) {
 				try {
-					return agent.put(`/project/${projectId}`, payload);
+					return await agent.put(`/project/${projectId}`, payload);
 				} catch (e) {
 					skip(e);
 				}
 			},
-			delete(projectId) {
+			async delete(projectId) {
 				try {
-					return agent.delete(`/project/${projectId}`);
+					return await agent.delete(`/project/${projectId}`);
 				} catch (e) {
 					skip(e);
 				}
@@ -195,6 +203,8 @@ export default function install(Vue, { router }) {
 						};
 					});
 				} catch (e) {
+					skip(e);
+
 					return [];
 				}
 			},
@@ -209,8 +219,78 @@ export default function install(Vue, { router }) {
 						createdAt: new Date(project.createdAt)
 					};
 				} catch (e) {
+					skip(e);
+
 					return {};
 				}
+			},
+			collabrator(projectId) {
+				return {
+					async create(payload) {
+						try {
+							const {data: collabrator} = await agent.post(`/project/${projectId}/collabrator`, payload);
+
+							return {
+								id: collabrator.id,
+								projectId: collabrator.projectId,
+								accountId: collabrator.accountId,
+								inviter: collabrator.inviter,
+								joinedAt: new Date(collabrator.joinedAt),
+								exitedAt: new Date(collabrator.exitedAt)
+							};
+
+						} catch (e) {
+							skip(e);
+						}
+					},
+					async query(filter) {
+						try {
+							const { data: collabratorList} = await agent.get(`/project/${projectId}/collabrator`, {
+								params: filter
+							});
+	
+							return collabratorList.map(collabrator => {
+								return {
+									id: collabrator.id,
+									projectId: collabrator.projectId,
+									accountId: collabrator.accountId,
+									inviter: collabrator.inviter,
+									joinedAt: new Date(collabrator.joinedAt),
+									exitedAt: new Date(collabrator.exitedAt)
+								};
+							});
+						} catch (e) {
+							skip(e);
+
+							return [];
+						}
+					},
+					async get(collabratorId) {
+						try {
+							const { data: collabrator} = await agent.get(`/project/${projectId}/collabrator/${collabratorId}`);
+						
+							return {
+								id: collabrator.id,
+								projectId: collabrator.projectId,
+								accountId: collabrator.accountId,
+								inviter: collabrator.inviter,
+								joinedAt: new Date(collabrator.joinedAt),
+								exitedAt: new Date(collabrator.exitedAt),
+							};
+						} catch (e) {
+							skip(e);
+
+							return {};
+						}
+					},
+					async delete(collabratorId) {
+						try {
+							return await agent.delete(`/project/${projectId}/collabrator/${collabratorId}`);
+						} catch (e) {
+							skip(e);
+						}
+					}
+				};
 			},
 			source(projectId) {
 				return {
@@ -250,6 +330,8 @@ export default function install(Vue, { router }) {
 								};
 							});
 						} catch (e) {
+							skip(e);
+
 							return [];
 						}
 					},
@@ -266,12 +348,14 @@ export default function install(Vue, { router }) {
 								createdAt: new Date(source.createdAt)
 							};
 						} catch (e) {
+							skip(e);
+
 							return {};
 						}
 					},
-					delete(sourceId) {
+					async delete(sourceId) {
 						try {
-							return agent.delete(`/project/${projectId}/source/${sourceId}`);
+							return await agent.delete(`/project/${projectId}/source/${sourceId}`);
 						} catch (e) {
 							skip(e);
 						}
@@ -297,9 +381,9 @@ export default function install(Vue, { router }) {
 									skip(e);
 								}
 							},
-							delete(executionId) {
+							async delete(executionId) {
 								try {
-									return agent.delete(`/project/${projectId}/source/${sourceId}/execution/${executionId}`);
+									return await agent.delete(`/project/${projectId}/source/${sourceId}/execution/${executionId}`);
 								} catch (e) {
 									skip(e);
 								}
@@ -323,6 +407,8 @@ export default function install(Vue, { router }) {
 										};
 									});
 								} catch (e) {
+									skip(e);
+
 									return [];
 								}
 							},
@@ -341,6 +427,8 @@ export default function install(Vue, { router }) {
 										result: execution.result
 									};
 								} catch (e) {
+									skip(e);
+
 									return [];
 								}
 							},
