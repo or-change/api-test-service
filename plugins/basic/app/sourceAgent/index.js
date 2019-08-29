@@ -1,15 +1,10 @@
-import AdminSourceConfig from './Admin.vue';
-import CreateSourceConfig from './Create.vue';
+import Global from './Global.vue';
+import Detail from './Detail.vue';
 
 window.product.use(function ({source}) {
-	source.add('ecma.mocha.basic.local', {
+	source('ecma.mocha.basic.local', {
 		name: '文件',
-		admin: AdminSourceConfig.name,
-		create: CreateSourceConfig.name
+		global: Global,
+		detail: Detail
 	});
 });
-
-export default function install(Vue) {
-	Vue.component(AdminSourceConfig.name, AdminSourceConfig);
-	Vue.component(CreateSourceConfig.name, CreateSourceConfig);
-}

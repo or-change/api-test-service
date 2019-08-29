@@ -1,15 +1,10 @@
-import AdminExecutorConfig from './Admin.vue';
-import CreateExecutorConfig from './Create.vue';
+import Global from './Global.vue';
+import Detail from './Detail.vue';
 
 window.product.use(function ({executor}) {
-	executor.add('ecma.mocha.basic.local', {
-		name: '一般执行器',
-		admin: AdminExecutorConfig.name,
-		create: CreateExecutorConfig.name
+	executor('ecma.mocha.basic.local', {
+		description: '一般执行器',
+		global: Global,
+		detail: Detail
 	});
 });
-
-export default function install(Vue) {
-	Vue.component(AdminExecutorConfig.name, AdminExecutorConfig);
-	Vue.component(CreateExecutorConfig.name, CreateExecutorConfig);
-}

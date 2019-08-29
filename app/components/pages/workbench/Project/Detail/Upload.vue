@@ -24,11 +24,11 @@
 			></b-form-select>
 		</div>
 		<component
-			ref="source-scanner" :is="$product.scanner[source.scanner] ? $product.scanner[source.scanner].create : ''"></component>
+			ref="source-scanner" :is="$product.scanner[source.scanner] ? $product.scanner[source.scanner].detail : ''"></component>
 		<component
 			class="my-3"
 			@success="createSuccess"
-			ref="upload-agent" :is="$product.source[source.agent] ? $product.source[source.agent].create : ''"></component>
+			ref="upload-agent" :is="$product.source[source.agent] ? $product.source[source.agent].detail : ''"></component>
 	</b-modal>
 </template>
 

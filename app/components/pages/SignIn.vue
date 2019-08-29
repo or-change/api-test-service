@@ -39,7 +39,7 @@ export default {
 				type: 'simple',
 				body: this.credential
 			});
-			this.$router.push('/workbench/welcome');
+			this.$router.push('/');
 		}
 	}
 }

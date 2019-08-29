@@ -74,7 +74,7 @@
 
 				<component
 					ref="start-execution"
-					:is="$product.executor[execution.executor] ? $product.executor[execution.executor].create : ''"
+					:is="$product.executor[execution.executor] ? $product.executor[execution.executor].detail : ''"
 					@success="executionSuccess"
 				/>
 			</div>

@@ -119,10 +119,10 @@ export default {
 	},
 	filters: {
 		pluginComponent(value, register) {
-			return register[value] ? register[value].admin : '';
+			return register[value] ? register[value].global : '';
 		},
 		pluginName(value, register) {
-			return register[value] ? register[value].name : '';
+			return register[value] ? register[value].name : value;
 		}
 	},
 	mounted() {

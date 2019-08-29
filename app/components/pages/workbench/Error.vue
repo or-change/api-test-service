@@ -1,5 +1,9 @@
 <template>
-	
+	<b-jumbotron
+		class="mt-4" bg-variant="danger" text-variant="white"
+		header="错误信息" :lead="errorMessage">
+		<b-button variant="light" to="/" size="sm">返回首页</b-button>
+	</b-jumbotron>
 </template>
 
 <script>
@@ -8,22 +12,6 @@ export default {
 		errorMessage() {
 			return this.$route.query.error;
 		}
-	},
-	methods: {
-		back() {
-			return this.$router.go(-1);
-		}
 	}
 }
 </script>
-
-
-<style lang="scss">
-#error {
-	#error-symbol {
-		font-size: 130px;
-		color: #a4262c;
-	}
-}
-</style>
-

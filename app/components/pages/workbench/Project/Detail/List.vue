@@ -54,7 +54,7 @@
 					</b-button>
 				</template>
 				<template slot="[agent]" slot-scope="data">
-					{{ data.value | agentFormat($product) }}
+					{{ data.value | agentFormat($product.source) }}
 				</template>
 				<template slot="[createdAt]" slot-scope="data">
 					{{ data.value | dateFormat  }}
@@ -111,8 +111,8 @@ export default {
 		}
 	},
 	filters: {
-		agentFormat(value, product) {
-			return product.source[value] ? product.source[value].name : value; 
+		agentFormat(value, register) {
+			return register[value] ? register[value].name : value; 
 		},
 		statusFormat(value) {
 			return STATUS[value];
