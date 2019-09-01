@@ -46,7 +46,7 @@ router.beforeEach((to, from, next) => {
 	});
 });
 
-const app = Vue.prototype.$eventBus = new Vue({ store, router, render: h => h(App) });
+const app = new Vue({ store, router, render: h => h(App) });
 
 Vue.prototype.$product.beforeAppMountHandler.forEach(handler => handler(app));
 

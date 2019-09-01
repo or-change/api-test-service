@@ -24,7 +24,7 @@ import WorkbenchConfiguration from './components/pages/workbench/Admin/Configura
 
 export default function Router(pluginRouterOptions) {
 	const router = new VueRouter({
-		fallback: true,
+		// fallback: false, 兼容IE9
 		routes: [
 			{
 				path: '/',
@@ -103,7 +103,7 @@ export default function Router(pluginRouterOptions) {
 					}
 				].concat(pluginRouterOptions)
 			},
-		],
+		]
 	});
 
 	return router;

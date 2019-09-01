@@ -6,8 +6,6 @@ export default function install(Vue, { router }) {
 	});
 
 	function skip(error) {
-		Vue.prototype.$eventBus.$emit('hide-modal');
-
 		router.push({
 			path: '/workbench/error',
 			query: {
