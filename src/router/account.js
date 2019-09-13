@@ -13,12 +13,12 @@ module.exports = function AccountRouter(router, { Authorize, Model, Session }) {
 	}
 
 	router.get('/', Authorize('account.query'), async ctx => {
-		ctx.body = await Model.AccountList.query({
+		return Model.AccountList.query({
 			selector: 'name',
 			args: {
 				name: ctx.query.name
 			}
-		});
+		}).then(accountList => ctx.body = accountList);
 	}).get('/:accountId', Authorize('account.get'), getAccount, ctx => {
 		ctx.body = ctx.state.account;
 	}).put('/:accountId', Authorize('account.update'), getAccount, async ctx => {
